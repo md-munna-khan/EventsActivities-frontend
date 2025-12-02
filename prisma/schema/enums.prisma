@@ -143,3 +143,10 @@ enum Interest {
   SOCIALIZING
   OTHER
 }
+
+
+enum ParticipantStatus {
+  CONFIRMED
+  LEFT
+  PENDING
+}

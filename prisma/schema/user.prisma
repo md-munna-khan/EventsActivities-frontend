@@ -75,3 +75,4 @@ model Host {
 
   @@map("hosts")
 }
+

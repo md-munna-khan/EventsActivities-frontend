@@ -1,25 +1,13 @@
-// src/routes/paymentRoutes.ts
 import express from "express";
-import {
+import { PaymentController } from "./payment.controller";
 
-  successHandler,
-  failHandler,
-  cancelHandler,
-  initiatePaymentController,
-  ipnValidateHandler, 
-} from "../Payment/payment.controller";
+
 
 const router = express.Router();
 
-router.post("/initiate", initiatePaymentController); // call this to create payment & get gateway URL
-router.post("/validate-payment", ipnValidateHandler); // SSL IPN -> POSTs here
-router.post("/success", successHandler);
-router.post("/fail", failHandler);
-router.post("/cancel", cancelHandler);
 
-// also accept GET forms (gateway might GET)
-router.get("/success", successHandler);
-router.get("/fail", failHandler);
-router.get("/cancel", cancelHandler);
+router.get("/success", PaymentController.successPayment);
+router.get("/fail", PaymentController.failPayment);
+router.get("/cancel", PaymentController.cancelPayment);
 
-export const  paymentsRouter = router;
+export const PaymentRoutes = router;

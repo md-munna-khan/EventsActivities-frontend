@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from "express";
+import express   from "express";
 import { fileUploader } from "../../../helpers/fileUploader";
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";

@@ -21,15 +21,15 @@ model Event {
 }
 
 model EventParticipant {
-    id        String   @id @default(uuid())
-    eventId   String
-    clientId  String
-     paymentId  String?
-    createdAt DateTime @default(now())
- 
-    event  Event  @relation(fields: [eventId], references: [id])
-    client Client @relation(fields: [clientId], references: [id])
-    payment Payment? @relation(fields: [paymentId], references: [id])
- 
+    id                String            @id @default(uuid())
+    eventId           String
+    clientId          String
+    paymentId         String?
+    createdAt         DateTime          @default(now())
+    participantStatus ParticipantStatus @default(PENDING)
+    event             Event             @relation(fields: [eventId], references: [id])
+    client            Client            @relation(fields: [clientId], references: [id])
+    payment           Payment?          @relation(fields: [paymentId], references: [id])
+
     @@map("event_participants")
 }

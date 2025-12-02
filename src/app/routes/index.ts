@@ -4,6 +4,7 @@ import { userRoutes } from '../modules/User/user.routes';
 import { AdminRoutes } from '../modules/Admin/admin.routes';
 import {  hostsRoutes } from '../modules/Host/host.routes';
 import { eventsRoutes } from '../modules/Events/event.routes';
+import { PaymentRoutes } from '../modules/Payment/payment.routes';
 
 
 const router = express.Router();
@@ -29,7 +30,12 @@ const moduleRoutes = [
         path: '/hosts',
         route: hostsRoutes
     },
-
+    {
+        path: '/payments',
+        route: PaymentRoutes
+    },
+    // Add more module routes here
+    
 ];
 
 moduleRoutes.forEach(route => router.use(route.path, route.route))

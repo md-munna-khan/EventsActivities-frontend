@@ -11,10 +11,10 @@ import { eventsService } from "./event.service";
 // participant controllers
 const joinEvent = catchAsync(async (req: Request, res: Response) => {
   const { id: eventId } = req.params;
- const user = req.cookies;// must be authenticated client
+  const user = req.cookies;// must be authenticated client
   if (!user) throw new Error("Unauthorized");
 
-  const participant = await eventsService.joinEvent(eventId, user);
+  const participant = await eventsService.joinEvent( eventId , user);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
