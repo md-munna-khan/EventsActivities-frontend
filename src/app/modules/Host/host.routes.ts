@@ -31,19 +31,10 @@ router.patch(
   "/:id",
   auth(), // allow host or admin; inside service we check ownership
   fileUploader.upload.single("file"),
-  (req, res, next) => {
-    // if body is JSON string
-    try {
-      if (req.body.data) {
-        const payload = typeof req.body.data === "string" ? JSON.parse(req.body.data) : req.body.data;
-        // you could validate with updateEventValidation
-        req.body = eventValidation.updateEventValidation.parse(payload);
-      }
-      return eventsController.updateEvent(req, res, next);
-    } catch (err) {
-      return next(err);
+    (req: Request, res: Response, next: NextFunction) => {
+        req.body = eventValidation.updateEventValidation.parse(JSON.parse(req.body.data))
+        return eventsController.updateEvent(req, res, next)
     }
-  }
 );
 
 // Delete event

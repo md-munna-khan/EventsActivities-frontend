@@ -6,7 +6,7 @@ import { sendResponse } from "../../../shared/sendResponse";
 import eventsService from "./host.service";
 
 
-// optional; create if needed
+
 
 // Create event (HOST)
 const createEvent = catchAsync(async (req: Request,  res: Response) => {
@@ -37,7 +37,7 @@ const getEvents = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getSingleEvent = catchAsync(async (req: Request, res: Response) => {
+const getSingleEvent = catchAsync(async (req: Request, res: Response) => { 
   const { id } = req.params;
   const event = await eventsService.getSingleEvent(id);
   sendResponse(res, {
@@ -74,10 +74,10 @@ const deleteEvent = catchAsync(async (req: Request, res: Response) => {
 // participant controllers
 const joinEvent = catchAsync(async (req: Request, res: Response) => {
   const { id: eventId } = req.params;
-  const clientId = (req as any).user?.id; // must be authenticated client
-  if (!clientId) throw new Error("Unauthorized");
+ const user = req.cookies;// must be authenticated client
+  if (!user) throw new Error("Unauthorized");
 
-  const participant = await eventsService.joinEvent(eventId, clientId);
+  const participant = await eventsService.joinEvent(eventId, user);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
@@ -88,10 +88,10 @@ const joinEvent = catchAsync(async (req: Request, res: Response) => {
 
 const leaveEvent = catchAsync(async (req: Request, res: Response) => {
   const { id: eventId } = req.params;
-  const clientId = (req as any).user?.id;
-  if (!clientId) throw new Error("Unauthorized");
+ const user = req.cookies;// must be authenticated client
+  if (!user) throw new Error("Unauthorized");
 
-  const result = await eventsService.leaveEvent(eventId, clientId);
+  const result = await eventsService.leaveEvent(eventId, user);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

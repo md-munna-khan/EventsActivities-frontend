@@ -1,17 +1,14 @@
 
-import { homedir } from "os";
+
 import { fileUploader } from "../../../helpers/fileUploader";
 import prisma from "../../../shared/prisma";
 import { jwtHelper } from "../../../helpers/jwtHelper";
 import config from "../../../config";
 import { Secret } from "jsonwebtoken";
+import { QueryOptions } from "../../interfaces/common";
 
 
-
-
-
-
-
+import { Request } from "express";
 
 const createEvent = async (req:any,user:any)=> {
 
@@ -29,11 +26,7 @@ const createEvent = async (req:any,user:any)=> {
         req.body.image = uploadToCloudinary?.secure_url;
     }
 
-    
-      // convert date & numeric fields
-  // if (payload.date) payload.date = new Date(payload.date);
-  // if (payload.joiningFee !== undefined) payload.joiningFee = Number(payload.joiningFee);
-  // if (payload.capacity !== undefined) payload.capacity = Number(payload.capacity);
+
  const dbUser = await prisma.user.findUnique({
         where: { id: decodedData.userId }
     });
@@ -41,12 +34,24 @@ const createEvent = async (req:any,user:any)=> {
     if (!dbUser) throw new Error("User not found");
 
    
-    const host = await prisma.host.findUnique({
-        where: { email: dbUser.email }
-    });
+    // const host = await prisma.host.findUnique({
+    //     where: { email: dbUser.email }
+    // });
 
-    if (!host) throw new Error("Host profile not found");
- 
+   let host = await prisma.host.findFirst({
+  where: { email: dbUser.email }
+});
+
+if (!host) {
+
+  throw new Error("Host profile not found for email: " + dbUser.email);
+}
+ const hostId = String (host.id);
+
+     // convert date string to Date object
+    // payload.date = new Date(payload.date);
+    // if (payload.joiningFee !== undefined) payload.joiningFee = Number(payload.joiningFee);
+    // if (payload.capacity !== undefined) payload.capacity = Number(payload.capacity);
   
  const event = await prisma.event.create({
     data: {
@@ -58,7 +63,7 @@ const createEvent = async (req:any,user:any)=> {
       joiningFee: payload.joiningFee ?? 0,
       image: payload.image ?? "",
       capacity: payload.capacity,
-      hostId: host.id,
+      hostId: hostId,
       status: payload.status, // optional
     },
    
@@ -139,14 +144,28 @@ const getSingleEvent = async (id: string) => {
 
 const updateEvent = async (id: string, payload: any, req?: Request) => {
   // optional: check host ownership before update (recommended)
-  const existing = await prisma.event.findUnique({ where: { id } });
+  const existing = await prisma.event.findUnique({ where: { id },
+  include: { host: true } });
+
   if (!existing) throw new Error("Event not found");
 
-  // If you want only host can update: compare req.user.id === existing.hostId
-  if ((req as any)?.user && (req as any).user.id !== existing.hostId) {
-    // allow admin? skip if admin
-    const role = (req as any).user?.role;
-    if (role !== "ADMIN") throw new Error("Unauthorized to update this event");
+ // 2) require auth info
+  if (!req) throw new Error("Request required for authorization");
+  const requester = (req as any).user;
+  if (!requester) throw new Error("Unauthorized: missing user info");
+
+  // 3) admin can update anything
+  if (requester.role === "ADMIN") {
+    // continue to update below
+  } else {
+    // 4) non-admin: find host record for this requester by email
+    const host = await prisma.host.findFirst({ where: { email: requester.email } });
+    if (!host) throw new Error("Unauthorized: host profile not found for your account");
+
+    // 5) check ownership: host.id must match event.hostId
+    if (String(host.id) !== String(existing.hostId)) {
+      throw new Error("Unauthorized to update this event");
+    }
   }
 
   // handle file if new upload provided
@@ -172,11 +191,27 @@ const deleteEvent = async (id: string, req?: Request) => {
   // optional: ownership check
   const existing = await prisma.event.findUnique({ where: { id } });
   if (!existing) throw new Error("Event not found");
-  if ((req as any)?.user && (req as any).user.id !== existing.hostId) {
-    const role = (req as any).user?.role;
-    if (role !== "ADMIN") throw new Error("Unauthorized to delete this event");
-  }
+  
+  if (!existing) throw new Error("Event not found");
 
+ // 2) require auth info
+  if (!req) throw new Error("Request required for authorization");
+  const requester = (req as any).user;
+  if (!requester) throw new Error("Unauthorized: missing user info");
+
+  // 3) admin can update anything
+  if (requester.role === "ADMIN") {
+    // continue to update below
+  } else {
+    // 4) non-admin: find host record for this requester by email
+    const host = await prisma.host.findFirst({ where: { email: requester.email } });
+    if (!host) throw new Error("Unauthorized: host profile not found for your account");
+
+    // 5) check ownership: host.id must match event.hostId
+    if (String(host.id) !== String(existing.hostId)) {
+      throw new Error("Unauthorized to update this event");
+    }
+  }
   // remove participants first (or cascade configured)
   await prisma.$transaction([
     prisma.eventParticipant.deleteMany({ where: { eventId: id } }),
@@ -191,11 +226,23 @@ const deleteEvent = async (id: string, req?: Request) => {
  *
  * joinEvent: checks capacity and duplicate join, then creates EventParticipant
  */
-const joinEvent = async (eventId: string, clientId: string) => {
+const joinEvent = async (eventId: string, user: any) => {
+    const accessToken = user.accessToken;
+        
+      const decodedData = jwtHelper.verifyToken(accessToken, config.jwt.jwt_secret as Secret);
+    // find Client linked to this user
+  const client = await prisma.client.findUnique({
+    where: { email: decodedData.email },
+  });
+  if (!client) throw new Error("Unauthorized: Client profile not found");
+
+  const clientId = client.id;
   const event = await prisma.event.findUnique({
     where: { id: eventId },
     include: { participants: true },
+   
   });
+  
   if (!event) throw new Error("Event not found");
 
   // check capacity
@@ -215,7 +262,13 @@ const joinEvent = async (eventId: string, clientId: string) => {
   return participant;
 };
 
-const leaveEvent = async (eventId: string, clientId: string) => {
+const leaveEvent = async (eventId: string, user: any) => {
+    const clientId = user.id;
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: { participants: true },
+   
+  });
   const existing = await prisma.eventParticipant.findFirst({
     where: { eventId, clientId },
   });

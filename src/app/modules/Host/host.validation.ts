@@ -19,7 +19,7 @@ export const createEventValidation = z.object({
   // status is optional because Prisma sets default PENDING
   status: z.nativeEnum(EventStatus).optional(),
 
-  hostId: z.string().uuid("hostId must be a valid UUID"),
+
 });
 
 // Update Event Validation Schema
