@@ -1,6 +1,6 @@
 
+import { uploadBufferToCloudinary, cloudinaryUpload } from "../../../config/cloudinary.config";
 
-import { fileUploader } from "../../../helpers/fileUploader";
 import prisma from "../../../shared/prisma";
 import { jwtHelper } from "../../../helpers/jwtHelper";
 import config from "../../../config";
@@ -21,10 +21,18 @@ const createEvent = async (req:any,user:any)=> {
         const file = req.file;
     
     
+        let uploadedPublicId: string | undefined;
         if (file) {
-        const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-        req.body.image = uploadToCloudinary?.secure_url;
-    }
+          if ((file as any).buffer) {
+            const uploaded = await uploadBufferToCloudinary((file as any).buffer, (file as any).originalname || 'event');
+            req.body.image = uploaded?.secure_url;
+            uploadedPublicId = (uploaded as any)?.public_id;
+          } else if ((file as any).path) {
+            const uploaded = await cloudinaryUpload.uploader.upload((file as any).path, { resource_type: 'auto' });
+            req.body.image = uploaded?.secure_url;
+            uploadedPublicId = (uploaded as any)?.public_id;
+          }
+        }
 
  const dbUser = await prisma.user.findUnique({
         where: { id: decodedData.userId }
@@ -169,9 +177,17 @@ const updateEvent = async (id: string, payload: any, req?: Request) => {
 
   // handle file if new upload provided
   const file = (req as any)?.file;
+  let uploadedPublicId: string | undefined;
   if (file) {
-    const res = await fileUploader.uploadToCloudinary(file);
-    if (res?.secure_url) payload.image = res.secure_url;
+    if ((file as any).buffer) {
+      const uploaded = await uploadBufferToCloudinary((file as any).buffer, (file as any).originalname || 'event');
+      if (uploaded?.secure_url) payload.image = uploaded.secure_url;
+      uploadedPublicId = (uploaded as any)?.public_id;
+    } else if ((file as any).path) {
+      const uploaded = await cloudinaryUpload.uploader.upload((file as any).path, { resource_type: 'auto' });
+      if (uploaded?.secure_url) payload.image = uploaded.secure_url;
+      uploadedPublicId = (uploaded as any)?.public_id;
+    }
   }
 
   if (payload.date) payload.date = new Date(payload.date);

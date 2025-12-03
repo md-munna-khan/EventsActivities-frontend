@@ -1,5 +1,5 @@
 import express   from "express";
-import { fileUploader } from "../../../helpers/fileUploader";
+
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
 import { eventsController } from "./event.controller";

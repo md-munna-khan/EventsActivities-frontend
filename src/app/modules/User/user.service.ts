@@ -2,7 +2,7 @@ import { Admin, Client, Prisma, UserRole, UserStatus } from "@prisma/client";
 import * as bcrypt from 'bcryptjs';
 import { Request } from "express";
 import config from "../../../config";
-import { fileUploader } from "../../../helpers/fileUploader";
+import { uploadBufferToCloudinary, cloudinaryUpload } from "../../../config/cloudinary.config";
 import { paginationHelper } from "../../../helpers/paginationHelper";
 import prisma from "../../../shared/prisma";
 import { IAuthUser } from "../../interfaces/common";
@@ -15,9 +15,15 @@ const createAdmin = async (req: Request): Promise<Admin> => {
 
     let uploadedPublicId: string | undefined;
     if (file) {
-        const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-        req.body.admin.profilePhoto = uploadToCloudinary?.secure_url;
-        uploadedPublicId = (uploadToCloudinary as any)?.public_id;
+        if ((file as any).buffer) {
+            const uploaded = await uploadBufferToCloudinary((file as any).buffer, (file as any).originalname || 'profile');
+            req.body.admin.profilePhoto = uploaded?.secure_url;
+            uploadedPublicId = (uploaded as any)?.public_id;
+        } else if ((file as any).path) {
+            const uploaded = await cloudinaryUpload.uploader.upload((file as any).path, { resource_type: 'auto' });
+            req.body.admin.profilePhoto = uploaded?.secure_url;
+            uploadedPublicId = (uploaded as any)?.public_id;
+        }
     }
 
     const hashedPassword: string = await bcrypt.hash(req.body.password, Number(config.salt_round))
@@ -44,7 +50,11 @@ const createAdmin = async (req: Request): Promise<Admin> => {
         return result;
     } catch (error) {
         if (uploadedPublicId) {
-            await fileUploader.deleteFromCloudinary(uploadedPublicId as string);
+            try {
+                await cloudinaryUpload.uploader.destroy(uploadedPublicId as string);
+            } catch (cleanupErr) {
+                // ignore cleanup errors
+            }
         }
         throw error;
     }
@@ -57,9 +67,16 @@ const createClient = async (req: Request): Promise<Client> => {
 
     let uploadedPublicId: string | undefined;
     if (file) {
-        const uploadedProfileImage = await fileUploader.uploadToCloudinary(file);
-        req.body.client.profilePhoto = uploadedProfileImage?.secure_url;
-        uploadedPublicId = (uploadedProfileImage as any)?.public_id;
+        // If multer stored the file in memory (buffer available), upload buffer to Cloudinary
+        if ((file as any).buffer) {
+            const uploadedProfileImage = await uploadBufferToCloudinary((file as any).buffer, (file as any).originalname || 'profile');
+            req.body.client.profilePhoto = uploadedProfileImage?.secure_url;
+            uploadedPublicId = (uploadedProfileImage as any)?.public_id;
+        } else if ((file as any).path) {
+            const uploadedProfileImage = await cloudinaryUpload.uploader.upload((file as any).path, { resource_type: 'auto' });
+            req.body.client.profilePhoto = uploadedProfileImage?.secure_url;
+            uploadedPublicId = (uploadedProfileImage as any)?.public_id;
+        }
     }
 
     const hashedPassword: string = await bcrypt.hash(req.body.password, Number(config.salt_round))
@@ -90,7 +107,13 @@ const createClient = async (req: Request): Promise<Client> => {
         return result;
     } catch (error) {
         if (uploadedPublicId) {
-            await fileUploader.deleteFromCloudinary(uploadedPublicId as string);
+            // Try to remove the uploaded image from Cloudinary using the public_id
+            try {
+                await cloudinaryUpload.uploader.destroy(uploadedPublicId as string);
+            } catch (err) {
+                // If cleanup fails, log it but rethrow the original error below
+                // console.error('Failed to delete uploaded image from Cloudinary', err);
+            }
         }
         throw error;
     }
@@ -245,9 +268,15 @@ const updateMyProfile = async (user: IAuthUser, req: Request) => {
     const file = req.file;
     let uploadedPublicId: string | undefined;
     if (file) {
-        const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-        req.body.profilePhoto = uploadToCloudinary?.secure_url;
-        uploadedPublicId = (uploadToCloudinary as any)?.public_id;
+        if ((file as any).buffer) {
+            const uploaded = await uploadBufferToCloudinary((file as any).buffer, (file as any).originalname || 'profile');
+            req.body.profilePhoto = uploaded?.secure_url;
+            uploadedPublicId = (uploaded as any)?.public_id;
+        } else if ((file as any).path) {
+            const uploaded = await cloudinaryUpload.uploader.upload((file as any).path, { resource_type: 'auto' });
+            req.body.profilePhoto = uploaded?.secure_url;
+            uploadedPublicId = (uploaded as any)?.public_id;
+        }
     }
 
     let profileInfo;
@@ -274,7 +303,11 @@ const updateMyProfile = async (user: IAuthUser, req: Request) => {
         return { ...profileInfo };
     } catch (error) {
         if (uploadedPublicId) {
-            await fileUploader.deleteFromCloudinary(uploadedPublicId as string);
+            try {
+                await cloudinaryUpload.uploader.destroy(uploadedPublicId as string);
+            } catch (cleanupErr) {
+                // ignore cleanup errors
+            }
         }
         throw error;
     }

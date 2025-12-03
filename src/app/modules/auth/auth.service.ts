@@ -180,44 +180,6 @@ const getMe = async (user: any) => {
     return userData;
 };
 
-// const applyHost= async (user: any,body:any) => {
-//        const accessToken = user.accessToken;
-      
-//     const decodedData = jwtHelper.verifyToken(accessToken, config.jwt.jwt_secret as Secret);
-//     const userData = await prisma.user.findUniqueOrThrow({
-//         where: {    
-//             email: decodedData.email,
-//             status: UserStatus.ACTIVE
-//         }
-//     }); 
-
-//     console.log(decodedData)
-//       // prevent duplicate
-//   const existing = await prisma.host.findUnique({
-//     where: { email: userData.email }
-//   });
-//   if (existing) {
-//     if (existing.status === 'APPROVED' || existing.status === 'PENDING') {
-//       return { message: 'Host application already exists', host: existing };
-//     }
-//   }
-//    const host = await prisma.host.create({
-//     data: {
-//       email: userData.email,
-//       name: body?.name ??  userData.email.split('@')[0],
-//       profilePhoto: body?.profilePhoto ?? '',
-//       contactNumber: body?.contactNumber ?? '',
-//       bio: body?.bio ?? '',
-//       location: body?.location ?? '',
-//       // use enum value or string that matches your prisma enum
-//       status: 'PENDING', // okay if hostsStatus enum contains PENDING
-//     },
-//   });
-//     return { message: "Host application submitted successfully!",host }
-// }
-
-
-
 const applyHost = async (user: any) => {
   // user is taken from req.cookies (set by login)
   const accessToken = user?.accessToken;
@@ -269,5 +231,5 @@ export const AuthServices = {
     forgotPassword,
     resetPassword,
     getMe,
-applyHost
+    applyHost
 }
