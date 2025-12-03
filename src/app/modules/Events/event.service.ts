@@ -13,15 +13,19 @@ const getTransactionId = () => {
 
 const joinEvent = async (eventId: string, user: any) => {
   try {
-    const accessToken = user.accessToken;
+    // user can be either decoded token (req.user) or object with accessToken
+    let email: string | undefined;
+    if (user && typeof user.email === 'string') {
+      email = user.email;
+    } else if (user && typeof user.accessToken === 'string') {
+      const decodedData = jwtHelper.verifyToken(user.accessToken, config.jwt.jwt_secret as Secret);
+      email = (decodedData as any).email;
+    }
 
-    // Decode user token
-    const decodedData = jwtHelper.verifyToken(accessToken, config.jwt.jwt_secret as Secret);
+    if (!email) throw new Error('Unauthorized: missing user email');
 
     // Find the client linked to this user
-    const client = await prisma.client.findUnique({
-      where: { email: decodedData.email },
-    });
+    const client = await prisma.client.findUnique({ where: { email } });
     if (!client) throw new Error("Unauthorized: Client profile not found");
 
     const clientId = client.id;

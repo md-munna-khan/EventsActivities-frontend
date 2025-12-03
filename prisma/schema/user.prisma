@@ -11,7 +11,7 @@ model User {
   admin  Admin?
   client Client?
   host   Host?
-
+  hostApplications HostApplication[]
   @@map("users")
 }
 
@@ -72,7 +72,7 @@ model Host {
   rating      Float? @default(0)
   ratingCount Int    @default(0)
  payments     Payment[]
-
+ reviews      Review[]
   @@map("hosts")
 }
 

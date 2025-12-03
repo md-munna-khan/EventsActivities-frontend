@@ -2,6 +2,9 @@
 CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'CLIENT', 'HOST');
 
 -- CreateEnum
+CREATE TYPE "hostsStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
+
+-- CreateEnum
 CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'SUSPENDED', 'DELETED', 'PENDING');
 
 -- CreateEnum
@@ -18,6 +21,9 @@ CREATE TYPE "EventCategory" AS ENUM ('MUSIC', 'MOVIE', 'THEATER', 'COMEDY', 'PAR
 
 -- CreateEnum
 CREATE TYPE "Interest" AS ENUM ('MUSIC', 'SPORTS', 'HIKING', 'TRAVEL', 'COOKING', 'READING', 'DANCING', 'GAMING', 'TECHNOLOGY', 'PHOTOGRAPHY', 'ART', 'MOVIES', 'FITNESS', 'YOGA', 'CYCLING', 'RUNNING', 'CAMPING', 'FISHING', 'LANGUAGES', 'FOOD', 'VOLUNTEERING', 'GARDENING', 'WRITING', 'FASHION', 'BUSINESS', 'FINANCE', 'MEDITATION', 'DIY', 'PETS', 'SOCIALIZING', 'OTHER');
+
+-- CreateEnum
+CREATE TYPE "ParticipantStatus" AS ENUM ('CONFIRMED', 'LEFT', 'PENDING');
 
 -- CreateTable
 CREATE TABLE "events" (
@@ -43,20 +49,37 @@ CREATE TABLE "event_participants" (
     "id" TEXT NOT NULL,
     "eventId" TEXT NOT NULL,
     "clientId" TEXT NOT NULL,
+    "paymentId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "participantStatus" "ParticipantStatus" NOT NULL DEFAULT 'PENDING',
 
     CONSTRAINT "event_participants_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "host_applications" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "userId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "host_applications_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "payments" (
     "id" TEXT NOT NULL,
     "amount" DOUBLE PRECISION NOT NULL,
-    "paymentStatus" "PaymentStatus" NOT NULL DEFAULT 'PENDING',
     "eventId" TEXT NOT NULL,
     "clientId" TEXT NOT NULL,
     "hostId" TEXT NOT NULL,
+    "tranId" TEXT NOT NULL,
+    "currency" TEXT NOT NULL DEFAULT 'BDT',
+    "status" "PaymentStatus" NOT NULL DEFAULT 'PENDING',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "payments_pkey" PRIMARY KEY ("id")
 );
@@ -133,11 +156,15 @@ CREATE TABLE "hosts" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "income" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "status" "hostsStatus" NOT NULL DEFAULT 'PENDING',
     "rating" DOUBLE PRECISION DEFAULT 0,
     "ratingCount" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "hosts_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "payments_tranId_key" ON "payments"("tranId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
@@ -161,10 +188,19 @@ ALTER TABLE "event_participants" ADD CONSTRAINT "event_participants_eventId_fkey
 ALTER TABLE "event_participants" ADD CONSTRAINT "event_participants_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "clients"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "event_participants" ADD CONSTRAINT "event_participants_paymentId_fkey" FOREIGN KEY ("paymentId") REFERENCES "payments"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "host_applications" ADD CONSTRAINT "host_applications_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "payments" ADD CONSTRAINT "payments_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "events"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "payments" ADD CONSTRAINT "payments_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "clients"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "payments" ADD CONSTRAINT "payments_hostId_fkey" FOREIGN KEY ("hostId") REFERENCES "hosts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "reviews" ADD CONSTRAINT "reviews_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "events"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

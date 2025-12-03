@@ -127,7 +127,7 @@ const getMe = catchAsync(async (req: Request & { user?: any }, res: Response) =>
 const applyHost = catchAsync(
     async (req: Request & { user?: any }, res: Response) => {
          const user = req.cookies;
-        const result = await AuthServices.applyHost(user, req.body);
+        const result = await AuthServices.applyHost(user);
 
         sendResponse(res, { 
             statusCode: httpStatus.OK,

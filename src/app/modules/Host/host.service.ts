@@ -26,7 +26,6 @@ const createEvent = async (req:any,user:any)=> {
         req.body.image = uploadToCloudinary?.secure_url;
     }
 
-
  const dbUser = await prisma.user.findUnique({
         where: { id: decodedData.userId }
     });
@@ -49,9 +48,9 @@ if (!host) {
  const hostId = String (host.id);
 
      // convert date string to Date object
-    // payload.date = new Date(payload.date);
-    // if (payload.joiningFee !== undefined) payload.joiningFee = Number(payload.joiningFee);
-    // if (payload.capacity !== undefined) payload.capacity = Number(payload.capacity);
+    payload.date = new Date(payload.date);
+    if (payload.joiningFee !== undefined) payload.joiningFee = Number(payload.joiningFee);
+    if (payload.capacity !== undefined) payload.capacity = Number(payload.capacity);
   
  const event = await prisma.event.create({
     data: {

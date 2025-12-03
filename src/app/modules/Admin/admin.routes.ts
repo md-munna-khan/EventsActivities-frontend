@@ -34,11 +34,11 @@ router.delete(
     AdminController.deleteFromDB
 );
 // host event approval/rejection routes
-router.patch('/:hostId/approve', auth(UserRole.ADMIN),  AdminController.HostApprove);
-router.patch('/:hostId/reject', auth(UserRole.ADMIN),   AdminController.HostReject);
+router.patch('/:applicationId/approve', auth(UserRole.ADMIN),  AdminController.HostApprove);
+router.patch('/:applicationId/reject', auth(UserRole.ADMIN),   AdminController.HostReject);
 
 // fetch pending events route
-router.get("/events/pending",auth(UserRole.ADMIN),AdminController.fetchPendingEvents);
+router.get("/events/pending",auth(UserRole.ADMIN),AdminController.fetchPendingHostApplications);
 // approve an event
 router.patch("/events/:id/approve", auth(UserRole.ADMIN), AdminController.approveEventController);
 

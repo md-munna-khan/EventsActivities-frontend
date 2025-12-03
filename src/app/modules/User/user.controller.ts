@@ -22,16 +22,7 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-const createClient = catchAsync(async (req: Request, res: Response) => {
 
-    const result = await userService.createClient(req);
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Client Created successfully!",
-        data: result
-    })
-});
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     const filters = pick(req.query, userFilterableFields);
@@ -89,7 +80,16 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
         data: result
     })
 });
+const createClient = catchAsync(async (req: Request, res: Response) => {
 
+    const result = await userService.createClient(req);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Client Created successfully!",
+        data: result
+    })
+});
 export const userController = {
     createAdmin,
     getAllFromDB,

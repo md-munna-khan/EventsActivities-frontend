@@ -47,7 +47,7 @@ export const createClient = z.object({
 
         profilePhoto: z.string({
             error: "Profile photo is required!",
-        }),
+        }).optional(),
 
         contactNumber: z.string({
             error: "Contact Number is required!",
