@@ -50,7 +50,7 @@ export async function createEventAction(_prevState: any, formData: FormData) {
             uploadFormData.append('file', file);
         }
 
-        const response = await serverFetch.post("/host/create-event", {
+        const response = await serverFetch.post("/hosts/create-event", {
             body: uploadFormData,
         });
 
@@ -85,6 +85,7 @@ export async function createEvent(data: IEventFormData, file?: File) {
         });
 
         const result = await response.json();
+        console.log(result);
         return result;
     } catch (error: any) {
         console.error("Error creating event:", error);
@@ -279,6 +280,57 @@ export async function updateEvent(
 
         const response = await serverFetch.patch(`/hosts/${eventId}`, {
             body: formData,
+        });
+
+        const result = await response.json();
+        return result;
+    } catch (error: any) {
+        console.error("Error updating event:", error);
+        return {
+            success: false,
+            message:
+                process.env.NODE_ENV === "development"
+                    ? error.message
+                    : "Failed to update event",
+        };
+    }
+}
+
+// Server action for form submission (update)
+export async function updateEventAction(eventId: string, _prevState: any, formData: FormData) {
+    try {
+        // Extract form data
+        const data: Partial<IEventFormData> = {};
+        
+        const title = formData.get('title') as string;
+        const category = formData.get('category') as string;
+        const description = formData.get('description') as string;
+        const date = formData.get('date') as string;
+        const location = formData.get('location') as string;
+        const joiningFee = formData.get('joiningFee') as string;
+        const capacity = formData.get('capacity') as string;
+
+        if (title) data.title = title;
+        if (category) data.category = category;
+        if (description) data.description = description;
+        if (date) data.date = date;
+        if (location) data.location = location;
+        if (joiningFee) data.joiningFee = Number(joiningFee);
+        if (capacity) data.capacity = Number(capacity);
+
+        // Get file if exists
+        const file = formData.get('file') as File | null;
+
+        // Create FormData for API call
+        const uploadFormData = new FormData();
+        uploadFormData.append('data', JSON.stringify(data));
+        
+        if (file && file instanceof File && file.size > 0) {
+            uploadFormData.append('file', file);
+        }
+
+        const response = await serverFetch.patch(`/hosts/${eventId}`, {
+            body: uploadFormData,
         });
 
         const result = await response.json();

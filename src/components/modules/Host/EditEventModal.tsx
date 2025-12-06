@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useActionState, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { createEvent } from '@/services/host/hostService';
+import { updateEvent } from '@/services/host/hostService';
 import {
     Dialog,
     DialogContent,
@@ -24,19 +24,29 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import InputFieldError from '@/components/shared/InputFieldError';
 import { Upload, X } from 'lucide-react';
 import Image from 'next/image';
 
-interface CreateEventModalProps {
+interface Event {
+    id: string;
+    title: string;
+    category: string;
+    description: string;
+    date: string | Date;
+    location: string;
+    joiningFee: number;
+    image?: string | null;
+    capacity: number;
+    status?: string;
+}
+
+interface EditEventModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    event: Event | null;
 }
-const getLocalDateTimeNow = (): string => {
-  const now = new Date();
-  // adjust to local timezone by subtracting the offset, then ISO and slice
-  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-  return local.toISOString().slice(0, 16);
-};
+
 // Event categories matching backend enum
 const eventCategories = [
     { label: 'Music', value: 'MUSIC' },
@@ -93,7 +103,7 @@ const eventCategories = [
     { label: 'Other', value: 'OTHER' },
 ];
 
-const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
+const EditEventModal = ({ open, onOpenChange, event }: EditEventModalProps) => {
     const router = useRouter();
     const [isPending, setIsPending] = useState(false);
     const [preview, setPreview] = useState<string | null>(null);
@@ -107,6 +117,28 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
         joiningFee: '',
         capacity: '',
     });
+
+    // Initialize form when event changes
+    useEffect(() => {
+        if (event && open) {
+            const eventDate = new Date(event.date);
+            const localDateTime = new Date(eventDate.getTime() - eventDate.getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(0, 16);
+            
+            setFormData({
+                title: event.title || '',
+                category: event.category || '',
+                description: event.description || '',
+                date: localDateTime,
+                location: event.location || '',
+                joiningFee: event.joiningFee?.toString() || '',
+                capacity: event.capacity?.toString() || '',
+            });
+            setPreview(event.image && event.image.trim() !== '' ? event.image : null);
+            setSelectedFile(null);
+        }
+    }, [event, open]);
 
     // Handle file selection and preview
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,12 +156,17 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
     // Remove selected file
     const handleRemoveFile = () => {
         setSelectedFile(null);
-        setPreview(null);
+        if (event?.image && event.image.trim() !== '') {
+            setPreview(event.image);
+        } else {
+            setPreview(null);
+        }
     };
 
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!event) return;
 
         setIsPending(true);
         try {
@@ -137,38 +174,23 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
                 title: formData.title,
                 category: formData.category,
                 description: formData.description,
-                date: getLocalDateTimeNow(),
+                date: formData.date,
                 location: formData.location,
                 joiningFee: Number(formData.joiningFee),
                 capacity: Number(formData.capacity),
             };
 
-            const result = await createEvent(data, selectedFile || undefined);
+            const result = await updateEvent(event.id, data, selectedFile || undefined);
 
             if (result.success) {
-                toast.success('Event created successfully!');
+                toast.success('Event updated successfully!');
                 onOpenChange(false);
-                // Add a small delay to ensure backend has processed the image
-                setTimeout(() => {
-                    router.refresh();
-                }, 1000);
-                // Reset form
-                setPreview(null);
-                setSelectedFile(null);
-                setFormData({
-                    title: '',
-                    category: '',
-                    description: '',
-                    date: '',
-                    location: '',
-                    joiningFee: '',
-                    capacity: '',
-                });
+                router.refresh();
             } else {
-                toast.error(result.message || 'Failed to create event');
+                toast.error(result.message || 'Failed to update event');
             }
         } catch (error: any) {
-            toast.error('An error occurred while creating the event');
+            toast.error('An error occurred while updating the event');
             console.error(error);
         } finally {
             setIsPending(false);
@@ -180,25 +202,18 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
         if (!open) {
             setPreview(null);
             setSelectedFile(null);
-            setFormData({
-                title: '',
-                category: '',
-                description: '',
-                date: '',
-                location: '',
-                joiningFee: '',
-                capacity: '',
-            });
         }
     }, [open]);
+
+    if (!event) return null;
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Create New Event</DialogTitle>
+                    <DialogTitle>Edit Event</DialogTitle>
                     <DialogDescription>
-                        Fill in the details to create a new event. All fields are required.
+                        Update the event details. All fields are optional.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -206,28 +221,26 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
                     <FieldGroup>
                         {/* Title */}
                         <Field>
-                            <FieldLabel htmlFor="title">Event Title *</FieldLabel>
+                            <FieldLabel htmlFor="edit-title">Event Title</FieldLabel>
                             <Input
-                                id="title"
+                                id="edit-title"
                                 type="text"
                                 placeholder="e.g., Mountain Music Adventure"
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                required
                                 disabled={isPending}
                             />
                         </Field>
 
                         {/* Category */}
                         <Field>
-                            <FieldLabel htmlFor="category">Category *</FieldLabel>
-                            <Select 
-                                value={formData.category} 
+                            <FieldLabel htmlFor="edit-category">Category</FieldLabel>
+                            <Select
+                                value={formData.category}
                                 onValueChange={(value) => setFormData({ ...formData, category: value })}
-                                required 
                                 disabled={isPending}
                             >
-                                <SelectTrigger id="category">
+                                <SelectTrigger id="edit-category">
                                     <SelectValue placeholder="Select a category" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -242,14 +255,13 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
 
                         {/* Description */}
                         <Field>
-                            <FieldLabel htmlFor="description">Description *</FieldLabel>
+                            <FieldLabel htmlFor="edit-description">Description</FieldLabel>
                             <Textarea
-                                id="description"
+                                id="edit-description"
                                 placeholder="Describe your event in detail..."
                                 rows={4}
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                required
                                 disabled={isPending}
                             />
                         </Field>
@@ -257,26 +269,24 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
                         {/* Date and Location Row */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Field>
-                                <FieldLabel htmlFor="date">Event Date *</FieldLabel>
+                                <FieldLabel htmlFor="edit-date">Event Date</FieldLabel>
                                 <Input
-                                    id="date"
+                                    id="edit-date"
                                     type="datetime-local"
                                     value={formData.date}
                                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                    required
                                     disabled={isPending}
                                 />
                             </Field>
 
                             <Field>
-                                <FieldLabel htmlFor="location">Location *</FieldLabel>
+                                <FieldLabel htmlFor="edit-location">Location</FieldLabel>
                                 <Input
-                                    id="location"
+                                    id="edit-location"
                                     type="text"
                                     placeholder="e.g., Dhaka Hill Tracts, Bangladesh"
                                     value={formData.location}
                                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                    required
                                     disabled={isPending}
                                 />
                             </Field>
@@ -285,38 +295,36 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
                         {/* Joining Fee and Capacity Row */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Field>
-                                <FieldLabel htmlFor="joiningFee">Joining Fee ($) *</FieldLabel>
+                                <FieldLabel htmlFor="edit-joiningFee">Joining Fee ($)</FieldLabel>
                                 <Input
-                                    id="joiningFee"
+                                    id="edit-joiningFee"
                                     type="number"
                                     min="0"
                                     step="0.01"
                                     placeholder="0.00"
                                     value={formData.joiningFee}
                                     onChange={(e) => setFormData({ ...formData, joiningFee: e.target.value })}
-                                    required
                                     disabled={isPending}
                                 />
                             </Field>
 
                             <Field>
-                                <FieldLabel htmlFor="capacity">Capacity *</FieldLabel>
+                                <FieldLabel htmlFor="edit-capacity">Capacity</FieldLabel>
                                 <Input
-                                    id="capacity"
+                                    id="edit-capacity"
                                     type="number"
                                     min="1"
                                     placeholder="e.g., 20"
                                     value={formData.capacity}
                                     onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
-                                    required
                                     disabled={isPending}
                                 />
                             </Field>
                         </div>
 
-                       {/* Image Upload */}
-                       <Field>
-                            <FieldLabel htmlFor="file">Event Image</FieldLabel>
+                        {/* Image Upload */}
+                        <Field>
+                            <FieldLabel htmlFor="edit-file">Event Image</FieldLabel>
                             <div className="space-y-4">
                                 {preview ? (
                                     <div className="relative w-full h-48 rounded-lg overflow-hidden border">
@@ -337,9 +345,9 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
                                             <X className="h-4 w-4" />
                                         </Button>
                                     </div>
-                                )  : (
+                                ) : (
                                     <label
-                                        htmlFor="file"
+                                        htmlFor="edit-file"
                                         className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                                     >
                                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -352,7 +360,7 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
                                             </p>
                                         </div>
                                         <input
-                                            id="file"
+                                            id="edit-file"
                                             type="file"
                                             accept="image/*"
                                             className="hidden"
@@ -375,7 +383,7 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
                             Cancel
                         </Button>
                         <Button type="submit" disabled={isPending}>
-                            {isPending ? 'Creating...' : 'Create Event'}
+                            {isPending ? 'Updating...' : 'Update Event'}
                         </Button>
                     </DialogFooter>
                 </form>
@@ -384,5 +392,5 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
     );
 };
 
-export default CreateEventModal;
+export default EditEventModal;
 

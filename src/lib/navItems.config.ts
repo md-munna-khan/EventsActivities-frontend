@@ -31,12 +31,7 @@ export const hostNavItems: NavSection[] = [
   {
     title: "Event Management",
     items: [
-      {
-        title: "Create Event",
-        href: "/host/dashboard/create-event",
-        icon: "PlusCircle", // ✅ String
-        roles: ["HOST"],
-      },
+    
       {
         title: "All Events",
         href: "/host/dashboard/all-events",

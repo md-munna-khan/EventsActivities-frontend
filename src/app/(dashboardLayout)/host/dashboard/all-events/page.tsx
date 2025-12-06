@@ -24,7 +24,7 @@ const AllEventsPage = async ({ searchParams }: AllEventsPageProps) => {
 
     // Fetch events
     const result = await getEvents(filters);
-
+ 
     // Debug logging
     console.log("AllEventsPage - Filters:", filters);
     console.log("AllEventsPage - Result:", JSON.stringify(result, null, 2));

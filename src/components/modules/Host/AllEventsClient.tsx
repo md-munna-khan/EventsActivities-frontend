@@ -29,6 +29,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import CreateEventModal from './CreateEventModal';
+import EditEventModal from './EditEventModal';
 
 interface Event {
     id: string;
@@ -48,6 +49,7 @@ interface Event {
         name: string;
         email: string;
         profilePhoto?: string | null;
+        rating?: number;
     };
     createdAt?: string | Date;
     updatedAt?: string | Date;
@@ -70,6 +72,8 @@ const AllEventsClient = ({ initialEvents, initialMeta }: AllEventsClientProps) =
     const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     
     // Use props directly - they update when server component re-fetches
     const events = initialEvents;
@@ -112,7 +116,8 @@ const AllEventsClient = ({ initialEvents, initialMeta }: AllEventsClientProps) =
     };
 
     const handleEdit = (event: Event) => {
-        router.push(`/host/dashboard/all-events/${event.id}/edit`);
+        setSelectedEvent(event);
+        setIsEditModalOpen(true);
     };
 
     const handleDelete = async (event: Event) => {
@@ -183,6 +188,16 @@ const AllEventsClient = ({ initialEvents, initialMeta }: AllEventsClientProps) =
                 onOpenChange={setIsCreateModalOpen} 
             />
 
+            {/* Edit Event Modal */}
+            <EditEventModal
+                open={isEditModalOpen}
+                onOpenChange={(open) => {
+                    setIsEditModalOpen(open);
+                    if (!open) setSelectedEvent(null);
+                }}
+                event={selectedEvent}
+            />
+
             {/* Events Grid */}
             <div className="relative">
                 {isPending && (
@@ -219,12 +234,14 @@ const AllEventsClient = ({ initialEvents, initialMeta }: AllEventsClientProps) =
                         >
                             {/* Event Image */}
                             <div className="relative h-48 w-full overflow-hidden bg-muted">
-                                {event.image ? (
+                                {event.image && event.image.trim() !== '' ? (
                                     <Image
                                         src={event.image}
                                         alt={event.title}
                                         fill
                                         className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                        unoptimized
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
@@ -322,6 +339,36 @@ const AllEventsClient = ({ initialEvents, initialMeta }: AllEventsClientProps) =
                                             {' participants'}
                                         </span>
                                     </div>
+                                    {/* Host Info */}
+                                    {event.host && (
+                                        <div className="flex items-center gap-2 text-sm pt-2 border-t">
+                                            <div className="relative h-8 w-8 rounded-full overflow-hidden bg-muted shrink-0">
+                                                {event.host.profilePhoto && event.host.profilePhoto.trim() !== '' ? (
+                                                    <Image
+                                                        src={event.host.profilePhoto}
+                                                        alt={event.host.name}
+                                                        fill
+                                                        className="object-cover"
+                                                        unoptimized
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary text-xs font-semibold">
+                                                        {event.host.name.charAt(0).toUpperCase()}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium text-foreground truncate">
+                                                    {event.host.name}
+                                                </p>
+                                                {event.host.rating && (
+                                                    <p className="text-xs text-muted-foreground">
+                                                        ⭐ {event.host.rating.toFixed(1)}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </CardContent>
 
