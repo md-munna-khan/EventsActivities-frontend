@@ -30,15 +30,13 @@ const NAV_BY_ROLE: Record<string, NavItem[]> = {
   ],
   HOST: [
     { href: "/explore-events", label: "Explore Events" },
-    { href: "/host/dashboard/my-events", label: "My Events (Hosted)" },
+    { href: "/host/dashboard/my-events", label: "My Events" },
     { href: "/host/dashboard", label: "Create Event" },
     { href: "/my-profile", label: "Profile" },
   ],
   ADMIN: [
     { href: "/admin/dashboard", label: "Admin Dashboard" },
-    { href: "/admin/dashboard/clients-management", label: "Manage Users" },
-    { href: "/admin/dashboard/hosts-management", label: "Manage Hosts" },
-    { href: "/admin/dashboard", label: "Manage Events" },
+  
     { href: "/my-profile", label: "Profile" },
   ],
 };

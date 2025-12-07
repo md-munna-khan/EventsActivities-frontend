@@ -1,9 +1,10 @@
 import React from 'react';
+import HostApplicationsList from '@/components/modules/admin/HostApplicationsList';
 
-const HostApplicationsPage = () => {
+const HostApplicationsPage = async () => {
     return (
-        <div>
-            HostApplicationsPage
+        <div className="space-y-6">
+            <HostApplicationsList />
         </div>
     );
 };

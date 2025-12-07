@@ -1,9 +1,10 @@
 import React from 'react';
+import HostsManagement from '@/components/modules/admin/HostsManagement';
 
-const HostsManagementPage = () => {
+const HostsManagementPage = async () => {
     return (
-        <div>
-            HostsManagementPage
+        <div className="space-y-6">
+            <HostsManagement />
         </div>
     );
 };

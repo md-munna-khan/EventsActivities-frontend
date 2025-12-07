@@ -1,9 +1,10 @@
 import React from 'react';
 
-const AdminsManagementPage = () => {
+
+const AdminsManagementPage = async () => {
     return (
-        <div>
-            AdminsManagementPage 
+        <div className="space-y-6">
+            <h1 className="text-2xl font-bold">Admins Management</h1>
         </div>
     );
 };

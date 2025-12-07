@@ -1,9 +1,10 @@
 import React from 'react';
+import ClientsManagement from '@/components/modules/admin/ClientsManagement';
 
-const ClientsManagementPage = () => {
+const ClientsManagementPage = async () => {
     return (
-        <div>
-            ClientsManagementPage
+        <div className="space-y-6">
+            <ClientsManagement />
         </div>
     );
 };

@@ -91,20 +91,15 @@ export const adminNavItems: NavSection[] = [
   {
     title: "User & Role Management",
     items: [
+ 
       {
-        title: "Admins",
-        href: "/admin/dashboard/admins-management",
-        icon: "Shield",
-        roles: ["ADMIN"],
-      },
-      {
-        title: "Hosts",
+        title: "Hosts Management",
         href: "/admin/dashboard/hosts-management",
         icon: "UserCheck",
         roles: ["ADMIN"],
       },
       {
-        title: "Clients",
+        title: "Clients Management",
         href: "/admin/dashboard/clients-management",
         icon: "Users",
         roles: ["ADMIN"],
@@ -122,23 +117,18 @@ export const adminNavItems: NavSection[] = [
   {
     title: "Events Management",
     items: [
-      {
-        title: "All Events",
-        href: "/admin/dashboard/events",
-        icon: "List",
-        roles: ["ADMIN"],
-      },
+   
 
       {
-        title: "Approve / Reject Events",
-        href: "/admin/dashboard/events/pending",
+        title: "Events Management",
+        href: "/admin/dashboard/events-management",
         icon: "CheckCircle",
         roles: ["ADMIN"],
       },
 
       {
-        title: "Event Reviews",
-        href: "/admin/dashboard/reviews",
+        title: "Payment History",
+        href: "/admin/dashboard/payment-history",
         icon: "Star",
         roles: ["ADMIN"],
       },
