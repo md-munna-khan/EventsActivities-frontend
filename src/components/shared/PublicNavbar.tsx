@@ -158,7 +158,7 @@ const PublicNavbar = () => {
     fetchRole();
   }, []);
 
-  if (loading) return null; // loader বা placeholder লাগাতে পারেন
+  if (loading) return null; 
 
   const navItems = NAV_BY_ROLE[role];
 
@@ -187,9 +187,9 @@ const PublicNavbar = () => {
               <Link href="/login">
                 <Button variant="ghost">Login</Button>
               </Link>
-              <Link href="/register">
+              {/* <Link href="/register">
                 <Button>Register</Button>
-              </Link>
+              </Link> */}
             </>
           )}
         </div>
