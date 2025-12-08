@@ -148,7 +148,17 @@ const leaveEvent = async (eventId: string, user: any) => {
   return { id: existing.id };
 };
 
+const getMyBookings = async (user: any) => {
+  const clientId = user.id;
+  const bookings = await prisma.eventParticipant.findMany({
+    where: { clientId },
+    include: { event: true },
+  });
+  return bookings;
+};
+
 export const eventsService = {
   joinEvent,
   leaveEvent,
+  getMyBookings,
 };

@@ -16,6 +16,7 @@ const router = express.Router();
 // Participant: join / leave
 router.post("/:id/join", auth(UserRole.CLIENT), eventsController.joinEvent);
 router.post("/:id/leave", auth(UserRole.CLIENT), eventsController.leaveEvent);
+router.get("/my-bookings", auth(UserRole.CLIENT), eventsController.getMyBookings);
 
 
 

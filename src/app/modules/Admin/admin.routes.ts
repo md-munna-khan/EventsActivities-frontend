@@ -36,11 +36,13 @@ router.delete(
 
 
 // host event approval/rejection routes
+router.get("/pending-host-applications",auth(UserRole.ADMIN),AdminController.fetchPendingHostApplications);
+// approve a host application
 router.patch('/:applicationId/approve', auth(UserRole.ADMIN),  AdminController.HostApprove);
 router.patch('/:applicationId/reject', auth(UserRole.ADMIN),   AdminController.HostReject);
 
 // fetch pending events route
-router.get("/events/pending",auth(UserRole.ADMIN),AdminController.fetchPendingHostApplications);
+router.get("/events/pending-event-applications",auth(UserRole.ADMIN),AdminController.fetchPendingEventApplications);
 // approve an event
 router.patch("/events/:id/approve", auth(UserRole.ADMIN), AdminController.approveEventController);
 

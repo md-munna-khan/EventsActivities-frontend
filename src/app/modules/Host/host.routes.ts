@@ -47,7 +47,7 @@ router.patch(
 );
 
 // Delete event
-router.delete("/:id", auth(), hostController.deleteEvent);
+router.delete("/:id", auth(UserRole.HOST, UserRole.ADMIN), hostController.deleteEvent);
 
 
 

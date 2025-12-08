@@ -123,13 +123,16 @@ const deleteFromDB = async (id: string): Promise<Admin | null> => {
     return result;
 }
 
-const getPendingEvents = async () => {
-  const events = await prisma.event.findMany({
-    where: { status: EventStatus.PENDING },
-    include: { host: true },
-  });
-  return events;
-};
+// const getPendingEvents = async () => {
+//   const events = await prisma.event.findMany({
+//     where: { status: EventStatus.PENDING },
+//     include: { host: true },
+//   });
+//   console.log(events)
+//   return events;
+// };
+
+
  const approveEvent = async (eventId: string) => {
   const event = await prisma.event.findUnique({ where: { id: eventId } });
   if (!event) throw new Error("Event not found");
@@ -162,7 +165,7 @@ export const AdminService = {
     // getByIdFromDB,
     updateIntoDB,
     deleteFromDB,
-    getPendingEvents,
+    // getPendingEvents,
    approveEvent,
    rejectEvent,
 //   

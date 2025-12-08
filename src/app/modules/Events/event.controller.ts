@@ -36,9 +36,20 @@ const leaveEvent = catchAsync(async (req: Request, res: Response) => {
     data: result
   });
 });
-
+const getMyBookings = catchAsync(async (req: Request, res: Response) => {
+  const user = req.cookies; // must be authenticated client
+  if (!user) throw new Error("Unauthorized");   
+  const bookings = await eventsService.getMyBookings(user);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Fetched my bookings successfully",
+    data: bookings,
+  });
+});
 export const eventsController = {
 
   joinEvent,
   leaveEvent,
+  getMyBookings,
 };

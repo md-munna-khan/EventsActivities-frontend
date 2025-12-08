@@ -1,7 +1,7 @@
 model HostApplication {
   id             String    @id @default(uuid())
   name           String
-  status         String @default("PENDING")
+  status       hostsStatus @default(PENDING)
   userId         String
   user           User     @relation(fields: [userId], references: [id])
   createdAt      DateTime @default(now())
