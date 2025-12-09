@@ -103,7 +103,7 @@ const getAllHosts = catchAsync(async (req: Request, res: Response) => {
 const updateEventStatus = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { status } = req.body;
-  const updatedEvent = await hostService.updateEventStatus(id, status);
+  const updatedEvent = await hostService.updateEventStatus(id, status, req);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

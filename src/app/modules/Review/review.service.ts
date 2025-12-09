@@ -17,6 +17,11 @@ export const ReviewService = {
     const event = await prisma.event.findUnique({ where: { id: eventId } });
     if (!event) throw new ApiError(httpStatus.NOT_FOUND, "Event not found");
 
+    // 2.1 Check if event is COMPLETED - users can only review completed events
+    if (event.status !== "COMPLETED") {
+      throw new ApiError(httpStatus.FORBIDDEN, "You can only review completed events");
+    }
+
     // 3. ensure the user is a client and has confirmed participant
     const client = await prisma.client.findUnique({ where: { email: user.email } });
     if (!client) throw new ApiError(httpStatus.UNAUTHORIZED, "Client profile not found");

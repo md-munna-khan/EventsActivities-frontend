@@ -123,14 +123,32 @@ const joinEvent = async (eventId: string, user: any) => {
 };
 
 const leaveEvent = async (eventId: string, user: any) => {
-  const clientId = user.id;
+  // Extract client email
+  let clientEmail: string | undefined;
+  if (user?.email) {
+    clientEmail = user.email;
+  } else if (user?.accessToken) {
+    const decodedData = jwtHelper.verifyToken(user.accessToken, config.jwt.jwt_secret as Secret);
+    clientEmail = (decodedData as any).email;
+  }
+
+  if (!clientEmail) throw new Error("Unable to identify user");
+
+  // Find client by email
+  const client = await prisma.client.findUnique({ where: { email: clientEmail } });
+  if (!client) throw new Error("Client profile not found");
+
+  const clientId = client.id;
+
   const event = await prisma.event.findUnique({
     where: { id: eventId },
     include: { participants: true },
   });
+  
   const existing = await prisma.eventParticipant.findFirst({
     where: { eventId, clientId },
   });
+  
   if (!existing) throw new Error("You are not joined to this event");
 
   // delete participant and restore capacity (no transaction for simplicity but you can wrap if needed)
@@ -148,14 +166,81 @@ const leaveEvent = async (eventId: string, user: any) => {
   return { id: existing.id };
 };
 
-const getMyBookings = async (user: any) => {
-  const clientId = user.id;
-  const bookings = await prisma.eventParticipant.findMany({
-    where: { clientId },
-    include: { event: true },
-  });
-  return bookings;
+export const getMyBookings = async (user: any, eventId?: string) => {
+  try {
+    let clientEmail: string | undefined;
+
+    // Extract client email from user object or JWT
+    if (user?.email) {
+      clientEmail = user.email;
+    } else if (user?.accessToken) {
+      const decodedData = jwtHelper.verifyToken(
+        user.accessToken,
+        config.jwt.jwt_secret as Secret
+      );
+      clientEmail = (decodedData as any).email;
+    }
+
+    if (!clientEmail) {
+      throw new Error("Unable to identify user");
+    }
+
+    // Build Prisma where condition
+    const whereCondition: any = {
+      client: { email: clientEmail } // filter by email
+    };
+
+    if (eventId) {
+      whereCondition.eventId = eventId;
+    }
+
+    // Fetch bookings with all details
+    const bookings = await prisma.eventParticipant.findMany({
+      where: whereCondition,
+      include: {
+        event: {
+          include: {
+            host: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                profilePhoto: true,
+                rating: true
+              }
+            }
+          }
+        },
+        client: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profilePhoto: true
+          }
+        },
+        payment: {
+          select: {
+            id: true,
+            amount: true,
+            status: true,
+            tranId: true,
+            createdAt: true
+          }
+        },
+      
+      },
+    
+      orderBy: { createdAt: 'desc' }
+    });
+
+    return bookings;
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    throw new Error("Failed to fetch bookings");
+  }
 };
+
 
 export const eventsService = {
   joinEvent,

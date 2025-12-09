@@ -55,7 +55,7 @@ router.delete(
 );
 
 // ==================== HOST APPLICATION MANAGEMENT ====================
-router.get("/events/pending-host-applications",auth(UserRole.ADMIN),AdminController.fetchPendingHostApplications);
+router.get("/pending-host-applications",auth(UserRole.ADMIN),AdminController.fetchPendingHostApplications);
 router.patch('/:applicationId/approve', auth(UserRole.ADMIN),  AdminController.HostApprove);
 router.patch('/:applicationId/reject', auth(UserRole.ADMIN),   AdminController.HostReject);
 
