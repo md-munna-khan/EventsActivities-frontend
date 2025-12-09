@@ -1,12 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
-import { getAllHosts } from '@/services/admin/admin.service';
-import UpdateStatusButton from './UpdateStatusButton.client';
-import DeleteButton from './DeleteButton.client';
+
+
+
+import { getAllHosts } from '@/services/host/hostService';
+import UpdateHostStatusButton from './UpdateHostStatusButton';
+import DeleteHostButton from './DeleteHostButton';
 
 const HostsManagement = async () => {
   const res = await getAllHosts({}, { page: 1, limit: 50 });
+
   const hosts = res?.data || [];
+  console.log(hosts)
 
   return (
     <div>
@@ -31,8 +35,8 @@ const HostsManagement = async () => {
                   <td>{h.email}</td>
                   <td>{h.status}</td>
                   <td className="flex gap-2">
-                    <UpdateStatusButton resource="hosts" id={h.id} currentStatus={h.status} />
-                    <DeleteButton resource="hosts" id={h.id} />
+                    <UpdateHostStatusButton hostId={h.id} currentStatus={h.status} />
+                    <DeleteHostButton hostId={h.id} />
                   </td>
                 </tr>
               ))}

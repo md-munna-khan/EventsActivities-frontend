@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* components/modules/admin/DeleteButton.client.tsx */
+/* components/modules/admin/DeleteHostButton.client.tsx */
 "use client";
 
 import React, { useState } from "react";
@@ -12,18 +12,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { deleteUser } from "@/services/user/userService";
 
+import { deleteHost } from "@/services/host/hostService";
 
 type Props = {
-  resource: string; // "users"
-  id: string;
+  hostId: string;
 };
 
-export default function DeleteButton({ resource, id }: Props) {
+export default function DeleteHostButton({ hostId }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,18 +30,18 @@ export default function DeleteButton({ resource, id }: Props) {
     try {
       setLoading(true);
 
-      // call service which uses serverFetch internally
-      const json = await deleteUser(id);
+      const result = await deleteHost(hostId);
 
-      if (json?.success === false) {
-        throw new Error(json?.message || "Failed to delete");
+      if (!result?.success) {
+        throw new Error(result?.message || "Failed to delete host");
       }
 
-      toast.success("Deleted");
+      toast.success("Host deleted successfully");
       setOpen(false);
+
       router.refresh();
     } catch (err: any) {
-      console.error("delete error:", err);
+      console.error("host delete error:", err);
       toast.error(err?.message || "Delete failed");
     } finally {
       setLoading(false);
@@ -53,21 +51,35 @@ export default function DeleteButton({ resource, id }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="destructive">Delete</Button>
+        <Button size="sm" variant="destructive">
+          Delete
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirm delete</DialogTitle>
-          <DialogDescription>Are you sure you want to delete this record? This action cannot be undone.</DialogDescription>
+          <DialogTitle>Are you sure?</DialogTitle>
         </DialogHeader>
 
+        <p className="text-sm text-muted-foreground">
+          This action cannot be undone. The host will be permanently removed.
+        </p>
+
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)} disabled={loading}>
+          <Button
+            variant="ghost"
+            disabled={loading}
+            onClick={() => setOpen(false)}
+          >
             Cancel
           </Button>
-          <Button onClick={handleDelete} variant="destructive" disabled={loading}>
-            {loading ? "Deleting..." : "Delete"}
+
+          <Button
+            variant="destructive"
+            disabled={loading}
+            onClick={handleDelete}
+          >
+            {loading ? "Deleting..." : "Confirm Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

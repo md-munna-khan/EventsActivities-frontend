@@ -1,5 +1,5 @@
 import React from 'react';
-import HostsManagement from '@/components/modules/admin/HostsManagement';
+import HostsManagement from '@/components/modules/Host/HostsManagement';
 
 const HostsManagementPage = async () => {
     return (

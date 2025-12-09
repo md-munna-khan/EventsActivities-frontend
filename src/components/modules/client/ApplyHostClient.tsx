@@ -128,7 +128,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { getUserInfo } from "@/services/auth/getUserInfo";
-import { applyHost } from "@/services/user/applyHost";
+import { applyHost } from "@/services/user/userService";
 
 export const ApplyHostClient = () => {
   const [loading, setLoading] = useState(false);

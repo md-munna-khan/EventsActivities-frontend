@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { serverFetch } from "@/lib/server-fetch";
+import { IAdminFilters, IPaginationOptions } from "../user/userService";
 
 export interface IEventFormData {
     title: string;
@@ -492,4 +493,39 @@ export async function getMyEvents(filters?: IEventFilters) {
                     : "Failed to fetch events",
         };
     }
+}
+
+
+export async function getAllHosts(filters: IAdminFilters = {}, options: IPaginationOptions = {}) {
+  try {
+    const qs = new URLSearchParams();
+    Object.entries(filters).forEach(([k, v]) => { if (v !== undefined && v !== null) qs.set(k, String(v)); });
+    Object.entries(options).forEach(([k, v]) => { if (v !== undefined && v !== null) qs.set(k, String(v)); });
+    const res = await serverFetch.get(`/admin/hosts?${qs.toString()}`);
+    return await res.json();
+  } catch (error: any) {
+    console.error('getAllHosts error', error?.message || error);
+    return { success: false, message: error?.message || 'Failed to fetch hosts' };
+  }
+} 
+
+export async function updateHostStatus(Id: string, status: string) {
+  try {
+    const res = await serverFetch.patch(`/admin/hosts/${Id}/status`, { body: JSON.stringify({ status }), headers: { 'Content-Type': 'application/json' } });
+    return await res.json();
+  } catch (error: any) {
+    console.error('updateHostStatus error', error?.message || error);
+    return { success: false, message: error?.message || 'Failed to update host status' };
+  }
+}
+
+export async function deleteHost(Id: string) {
+  try {
+    const res = await serverFetch.delete(`/admin/hosts/${Id}`);
+    return await res.json();
+  } catch (error: any) {
+    console.error('deleteHost error', error?.message || error);
+    return { success: false, message: error?.message || 'Failed to delete host' };
+  }
+
 }

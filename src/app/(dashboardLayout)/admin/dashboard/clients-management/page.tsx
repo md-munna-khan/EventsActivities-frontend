@@ -1,5 +1,6 @@
-import React from 'react';
 import ClientsManagement from '@/components/modules/admin/ClientsManagement';
+
+
 
 const ClientsManagementPage = async () => {
     return (

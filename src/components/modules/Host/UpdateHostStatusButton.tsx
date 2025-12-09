@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* components/modules/admin/UpdateStatusButton.client.tsx */
+/* components/modules/admin/UpdateHostStatusButton.client.tsx */
 "use client";
 
 import React, { useState } from "react";
@@ -15,18 +15,17 @@ import {
 } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { toast } from "sonner";
-import { updateUserStatus } from "@/services/user/userService";
 
+import { updateHostStatus } from "@/services/host/hostService";
 
 type Props = {
-  resource: string; // "users"
-  id: string;
-  currentStatus?: string;
+  hostId: string;
+  currentStatus: string;
 };
 
-const STATUS_OPTIONS = ["ACTIVE", "INACTIVE", "SUSPENDED", "BANNED"];
+const HOST_STATUS_OPTIONS = ["ACTIVE", "INACTIVE", "PENDING", "SUSPENDED"];
 
-export default function UpdateStatusButton({ resource, id, currentStatus = "ACTIVE" }: Props) {
+export default function UpdateHostStatusButton({ hostId, currentStatus }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<string>(currentStatus);
@@ -36,19 +35,18 @@ export default function UpdateStatusButton({ resource, id, currentStatus = "ACTI
     try {
       setLoading(true);
 
-      // use service which uses serverFetch internally
-      const json = await updateUserStatus(id, status);
+      const result = await updateHostStatus(hostId, status);
 
-      if (json?.success === false) {
-        throw new Error(json?.message || "Failed to update status");
+      if (!result?.success) {
+        throw new Error(result?.message || "Failed to update host status");
       }
 
-      toast.success("Status updated");
+      toast.success("Host status updated successfully");
       setOpen(false);
       router.refresh();
     } catch (err: any) {
-      console.error("update status error:", err);
-      toast.error(err?.message || "Update failed");
+      console.error("Host status update error:", err);
+      toast.error(err?.message || "Status update failed");
     } finally {
       setLoading(false);
     }
@@ -57,24 +55,26 @@ export default function UpdateStatusButton({ resource, id, currentStatus = "ACTI
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline">Update</Button>
+        <Button size="sm" variant="outline">Update Status</Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Update user status</DialogTitle>
+          <DialogTitle>Update Host Status</DialogTitle>
         </DialogHeader>
 
         <div className="mt-2">
           <label className="block text-sm font-medium mb-2">Status</label>
-          <Select onValueChange={(v) => setStatus(v)} defaultValue={currentStatus}>
+
+          <Select onValueChange={setStatus} defaultValue={status}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select status" />
+              <SelectValue placeholder="Select new status" />
             </SelectTrigger>
+
             <SelectContent>
-              {STATUS_OPTIONS.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {s}
+              {HOST_STATUS_OPTIONS.map((item) => (
+                <SelectItem key={item} value={item}>
+                  {item}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -82,10 +82,18 @@ export default function UpdateStatusButton({ resource, id, currentStatus = "ACTI
         </div>
 
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)} disabled={loading}>
+          <Button
+            variant="ghost"
+            onClick={() => setOpen(false)}
+            disabled={loading}
+          >
             Cancel
           </Button>
-          <Button onClick={handleUpdate} disabled={loading} >
+
+          <Button
+            onClick={handleUpdate}
+            disabled={loading}
+          >
             {loading ? "Saving..." : "Save"}
           </Button>
         </DialogFooter>
