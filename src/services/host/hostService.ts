@@ -367,6 +367,29 @@ export async function deleteEvent(eventId: string) {
     }
 }
 
+export async function updateEventStatus(eventId: string, status: string) {
+    try {
+        const response = await serverFetch.patch(`/hosts/event-status/${eventId}`, {
+            body: JSON.stringify({ status }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        const result = await response.json();
+        return result;
+    } catch (error: any) {
+        console.error("Error updating event status:", error);
+        return {
+            success: false,
+            message:
+                process.env.NODE_ENV === "development"
+                    ? error.message
+                    : "Failed to update event status",
+        };
+    }
+}
+
 export async function getMyEvents(filters?: IEventFilters) {
     try {
         // Build query string from filters

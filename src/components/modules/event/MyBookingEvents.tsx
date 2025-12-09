@@ -1,5 +1,6 @@
-// app/events/my-bookings/page.tsx
+/* app/events/my-bookings/page.tsx */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React from "react";
 import Image from "next/image";
 
@@ -19,8 +20,8 @@ const formatDate = (iso?: string) => {
   }
 };
 
-const StatusBadge = ({ status }: { status?: string }) => {
-  const s = status ?? "PENDING";
+const ParticipantStatusBadge = ({ status }: { status?: string }) => {
+  const s = (status ?? "PENDING").toUpperCase();
   const className =
     s === "CONFIRMED"
       ? "bg-green-100 text-green-800"
@@ -33,9 +34,26 @@ const StatusBadge = ({ status }: { status?: string }) => {
   return <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${className}`}>{s}</span>;
 };
 
+const EventStatusBadge = ({ status }: { status?: string }) => {
+  const s = (status ?? "UNKNOWN").toUpperCase();
+  const className =
+    s === "COMPLETED"
+      ? "bg-green-100 text-green-800"
+      : s === "UPCOMING"
+      ? "bg-blue-100 text-blue-800"
+      : s === "CANCELLED" || s === "CANCELED"
+      ? "bg-red-100 text-red-800"
+      : s === "ONGOING"
+      ? "bg-purple-100 text-purple-800"
+      : "bg-gray-100 text-gray-800";
+
+  return <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${className}`}>{s}</span>;
+};
+
 const MyBookingEvents = async () => {
   const res = await getUserBookings();
   const bookings: any[] = res?.data || [];
+  console.log(bookings);
 
   return (
     <div className="max-w-6xl mx-auto py-10 px-4">
@@ -53,6 +71,7 @@ const MyBookingEvents = async () => {
           {bookings.map((booking: any) => {
             const ev = booking.event ?? {};
             const participantStatus = booking.participantStatus ?? booking.status ?? "PENDING";
+            const eventStatus = ev.status ?? ev.eventStatus ?? "UNKNOWN";
 
             return (
               <Card key={booking.id} className="overflow-hidden">
@@ -93,7 +112,12 @@ const MyBookingEvents = async () => {
                     </div>
 
                     <div className="flex flex-col items-end gap-2">
-                      <StatusBadge status={participantStatus} />
+                      {/* Show both participant status and the event's own status */}
+                      <div className="flex flex-col items-end gap-1">
+                        Participant Status <ParticipantStatusBadge status={participantStatus} />
+                       Event Status <EventStatusBadge status={eventStatus} />
+                      </div>
+
                       <div className="text-sm text-muted-foreground">{formatDate(booking.createdAt)}</div>
                     </div>
                   </div>

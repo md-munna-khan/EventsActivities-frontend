@@ -17,7 +17,9 @@ import {
     Eye, 
     Edit, 
     Trash2,
-    MoreVertical
+    MoreVertical,
+    Check,
+    XCircle
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { formatDateTime } from '@/lib/formatters';
@@ -140,6 +142,67 @@ const MyEventsClient = ({ initialEvents, initialMeta }: MyEventsClientProps) => 
                 toast.error('An error occurred while deleting the event');
             }
         });
+    };
+
+    const handleStatusUpdate = async (event: Event, newStatus: string) => {
+        // Frontend validation based on backend business rules
+        const participantCount = event.participantCount || 0;
+
+        // Validation messages
+        if (newStatus === 'OPEN') {
+            toast.error('Only admin can approve and open events');
+            return;
+        }
+
+        if (event.status === 'PENDING' && newStatus !== 'CANCELLED') {
+            toast.error('Pending events can only be cancelled by host');
+            return;
+        }
+
+        if (event.status === 'OPEN' && newStatus === 'CANCELLED' && participantCount > 0) {
+            toast.error('Cannot cancel event with confirmed bookings. Contact admin.');
+            return;
+        }
+
+        // Confirmation dialogs
+        let confirmMessage = '';
+        if (newStatus === 'CANCELLED') {
+            confirmMessage = `Are you sure you want to cancel "${event.title}"?`;
+        } else if (newStatus === 'COMPLETED') {
+            confirmMessage = `Mark "${event.title}" as completed?`;
+        }
+
+        if (confirmMessage && !confirm(confirmMessage)) {
+            return;
+        }
+
+        startTransition(async () => {
+            try {
+                const { updateEventStatus } = await import('@/services/host/hostService');
+                const result = await updateEventStatus(event.id, newStatus);
+
+                if (result.success) {
+                    toast.success(`Event status updated to ${newStatus}`);
+                    router.refresh();
+                } else {
+                    toast.error(result.message || 'Failed to update event status');
+                }
+            } catch (error) {
+                toast.error('An error occurred while updating the event status');
+            }
+        });
+    };
+
+    const canCancelEvent = (event: Event) => {
+        const participantCount = event.participantCount || 0;
+        return (
+            (event.status === 'PENDING') ||
+            (event.status === 'OPEN' && participantCount === 0)
+        );
+    };
+
+    const canCompleteEvent = (event: Event) => {
+        return event.status === 'OPEN' || event.status === 'FULL';
     };
 
     const getStatusColor = (status: string) => {
@@ -288,6 +351,24 @@ const MyEventsClient = ({ initialEvents, initialMeta }: MyEventsClientProps) => 
                                                 <Edit className="mr-2 h-4 w-4" />
                                                 Edit Event
                                             </DropdownMenuItem>
+                                            {canCompleteEvent(event) && (
+                                                <DropdownMenuItem 
+                                                    onClick={() => handleStatusUpdate(event, 'COMPLETED')}
+                                                    className="text-blue-600"
+                                                >
+                                                    <Check className="mr-2 h-4 w-4" />
+                                                    Mark as Completed
+                                                </DropdownMenuItem>
+                                            )}
+                                            {canCancelEvent(event) && (
+                                                <DropdownMenuItem 
+                                                    onClick={() => handleStatusUpdate(event, 'CANCELLED')}
+                                                    className="text-orange-600"
+                                                >
+                                                    <XCircle className="mr-2 h-4 w-4" />
+                                                    Cancel Event
+                                                </DropdownMenuItem>
+                                            )}
                                             <DropdownMenuItem 
                                                 onClick={() => handleDelete(event)}
                                                 className="text-destructive"
