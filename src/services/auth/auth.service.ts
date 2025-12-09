@@ -24,7 +24,16 @@ export async function updateMyProfile(formData: FormData) {
         const data: any = {};
         formData.forEach((value, key) => {
             if (key !== 'file' && value) {
-                data[key] = value;
+                // Parse interests if it's a JSON string
+                if (key === 'interests' && typeof value === 'string') {
+                    try {
+                        data[key] = JSON.parse(value);
+                    } catch {
+                        data[key] = value;
+                    }
+                } else {
+                    data[key] = value;
+                }
             }
         });
 

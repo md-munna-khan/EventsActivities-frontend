@@ -142,6 +142,7 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
         startTransition(async () => {
             try {
                 const result = await joinEvent(event.id);
+                console.log(result)
                 if (result.success) {
                     if (result.data?.paymentUrl) {
                         // Redirect to payment page

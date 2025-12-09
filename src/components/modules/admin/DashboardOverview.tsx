@@ -1,4 +1,5 @@
-import { getPendingEvents} from "@/services/admin/admin.service";
+import { getPendingEvents } from "@/services/admin/admin.service";
+
 
 
 const DashboardOverview = async () => {

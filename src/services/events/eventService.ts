@@ -1,12 +1,23 @@
+// "use server";
+
+// /* eslint-disable @typescript-eslint/no-explicit-any */
+
+
 "use server";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { serverFetch } from "@/lib/server-fetch";
 
+
+
+
 export async function joinEvent(eventId: string) {
   try {
     const response = await serverFetch.post(`/events/${eventId}/join`);
+    // DEBUG: show raw response status + headers if available
+    console.log("joinEvent response status:", response.status);
     const result = await response.json();
+    console.log("joinEvent parsed result:", result);
     return result;
   } catch (error: any) {
     console.error("Error joining event:", error);

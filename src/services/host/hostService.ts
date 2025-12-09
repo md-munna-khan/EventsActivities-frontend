@@ -27,12 +27,6 @@ export interface IEventFilters {
 }
 
 
-
-
-
-
-
-
 // Server action for form submission
 export async function createEventAction(_prevState: any, formData: FormData) {
     try {
