@@ -206,7 +206,8 @@ export const getMyBookings = async (user: any, eventId?: string) => {
                 name: true,
                 email: true,
                 profilePhoto: true,
-                rating: true
+                rating: true,
+               
               }
             }
           }

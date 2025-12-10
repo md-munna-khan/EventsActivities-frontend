@@ -427,7 +427,7 @@ const updateEventStatus = async (id: string, status: string, req?: Request) => {
   }
 
   // Rule 5: If event is FULL, host can mark as COMPLETED
-  if (existing.status === EventStatus.FULL && newStatus === EventStatus.COMPLETED) {
+  if (existing.status === EventStatus.FULL || newStatus === EventStatus.COMPLETED) {
     const updated = await prisma.event.update({
       where: { id },
       data: { status: EventStatus.COMPLETED },
