@@ -2,7 +2,7 @@
 import React from "react";
 import DashboardSidebar from '@/components/modules/Dashboard/DashboardSidebar';
 import DashboardNavbar from '@/components/modules/Dashboard/DashboardNavbar';
-
+export const dynamic = 'force-dynamic';
 const CommonDashboardLayout = async ({
   children,
 }: {

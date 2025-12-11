@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle, ArrowLeft, Home } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Suspense } from "react";
 
-export default function NotFound() {
+ function NotFoundContent() {
   const router = useRouter();
 
   return (
@@ -62,5 +63,16 @@ export default function NotFound() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function NotFoundPage() {
+  return (
+    <Suspense fallback={<div>
+      <p>loading...</p>
+      <h1>404</h1>
+      </div>}>
+      <NotFoundContent />
+    </Suspense>
   );
 }
