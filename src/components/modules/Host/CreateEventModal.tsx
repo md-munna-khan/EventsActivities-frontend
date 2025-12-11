@@ -126,6 +126,13 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
         setSelectedFile(null);
         setPreview(null);
     };
+    // Format date for datetime-local input
+const formatForDatetimeLocal = (date?: string) => {
+  if (!date) return "";
+  const d = new Date(date);
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
 
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
@@ -133,21 +140,29 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
 
         setIsPending(true);
         try {
+
+            if (new Date(formData.date) <= new Date()) {
+  toast.error("Please select a future date");
+  setIsPending(false);
+  return;
+}
+
+
+   const [datePart, timePart] = formData.date.split("T");
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hours, minutes] = timePart.split(":").map(Number);
+    const localDate = new Date(year, month - 1, day, hours, minutes);
             const data = {
                 title: formData.title,
                 category: formData.category,
                 description: formData.description,
                 // date: getLocalDateTimeNow(),
-                date: formData.date,
+                date: localDate.toISOString(),
                 location: formData.location,
                 joiningFee: Number(formData.joiningFee),
                 capacity: Number(formData.capacity),
             };
-if (new Date(formData.date) <= new Date()) {
-  toast.error("Please select a future date");
-  setIsPending(false);
-  return;
-}
+
 
             const result = await createEvent(data, selectedFile || undefined);
 
@@ -264,14 +279,23 @@ if (new Date(formData.date) <= new Date()) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Field>
                                 <FieldLabel htmlFor="date">Event Date *</FieldLabel>
-                                <Input
+                                {/* <Input
                                     id="date"
                                     type="datetime-local"
                                     value={formData.date}
                                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                                     required
                                     disabled={isPending}
-                                />
+                                /> */}
+
+                                <Input
+  id="date"
+  type="datetime-local"
+  value={formatForDatetimeLocal(formData.date)}
+  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+  required
+  disabled={isPending}
+/>
                             </Field>
 
                             <Field>
