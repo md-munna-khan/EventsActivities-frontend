@@ -118,10 +118,18 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
     }, [event.id, event.participants, isHost]);
 
     useEffect(() => {
+        // Clear reviews immediately when event changes to prevent showing stale reviews
+        setReviews([]);
+        setIsLoadingReviews(true);
+
+        let isMounted = true; // Track if component is still mounted to prevent state updates after unmount
+
         const fetchReviews = async () => {
-            setIsLoadingReviews(true);
             try {
                 const res = await getEventReviews(event.id);
+                
+                if (!isMounted) return; // Prevent state updates if component unmounted
+                
                 if (res && res.success === false) {
                     toast.error(res.message || 'Failed to load reviews');
                     setReviews([]);
@@ -136,16 +144,27 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
                             ? (res as any)
                             : [];
 
-                setReviews(data);
+                if (isMounted) {
+                    setReviews(data);
+                }
             } catch (error: any) {
-                toast.error(error?.message || 'Failed to load reviews');
-                setReviews([]);
+                if (isMounted) {
+                    toast.error(error?.message || 'Failed to load reviews');
+                    setReviews([]);
+                }
             } finally {
-                setIsLoadingReviews(false);
+                if (isMounted) {
+                    setIsLoadingReviews(false);
+                }
             }
         };
 
         fetchReviews();
+
+        // Cleanup function to prevent state updates from outdated requests
+        return () => {
+            isMounted = false;
+        };
     }, [event.id]);
 
     const getStatusColor = (status: string) => {
