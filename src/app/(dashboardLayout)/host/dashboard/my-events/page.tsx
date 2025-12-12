@@ -1,7 +1,7 @@
 import  { Suspense } from 'react';
 import { getMyEvents, IEventFilters } from '@/services/host/hostService';
 import { TableSkeleton } from '@/components/shared/TableSkeleton';
-import MyEventsHost from '@/components/modules/Host/MyEventsClient';
+import MyEventsHost from '@/components/modules/Host/MyEventsHost';
 
 
 interface MyEventsPageProps {

@@ -2,7 +2,7 @@
 import  { Suspense } from 'react';
 import { getMyEvents, IEventFilters } from '@/services/host/hostService';
 import { TableSkeleton } from '@/components/shared/TableSkeleton';
-import MyEventsClient from '@/components/modules/Host/MyEventsClient';
+import MyEventsClient from '@/components/modules/Host/MyEventsHost';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Users, TrendingUp, DollarSign } from 'lucide-react';
 
