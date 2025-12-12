@@ -12,7 +12,7 @@ const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://events-activities-frontend-chi.vercel.app'],
     credentials: true
 }));
 //parser
@@ -20,7 +20,7 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
     res.send({
-        Message: "Ph health care server.."
+        Message: "Events Management server.."
     });
 });
 app.use('/api/v1', routes_1.default);

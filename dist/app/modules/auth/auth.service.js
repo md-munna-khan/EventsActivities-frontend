@@ -160,6 +160,9 @@ const applyHost = (user) => __awaiter(void 0, void 0, void 0, function* () {
     // run in transaction: create HostApplication and set user.status = PENDING
     const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const userData = yield tx.user.findUniqueOrThrow({ where: { email } });
+        if (userData.status === client_1.UserStatus.PENDING) {
+            throw new Error('User already has a pending host application');
+        }
         // Prevent duplicate applications
         const existingApp = yield tx.hostApplication.findFirst({ where: { userId: userData.id } });
         if (existingApp) {

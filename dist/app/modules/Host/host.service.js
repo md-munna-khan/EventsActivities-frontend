@@ -14,9 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hostService = void 0;
 const cloudinary_config_1 = require("../../../config/cloudinary.config");
+const client_1 = require("@prisma/client");
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const jwtHelper_1 = require("../../../helpers/jwtHelper");
 const config_1 = __importDefault(require("../../../config"));
+const EVENT_CATEGORIES = Object.values(client_1.EventCategory);
+const EVENT_STATUSES = Object.values(client_1.EventStatus);
 const createEvent = (req, user) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const accessToken = user.accessToken;
@@ -73,16 +76,98 @@ const createEvent = (req, user) => __awaiter(void 0, void 0, void 0, function* (
     });
     return event;
 });
+// const getEvents = async (options: QueryOptions = {}) => {
+//   const filter = options.filter ?? {};
+//   const pagination = options.pagination ?? { page: 1, limit: 10 };
+//   const where: any = {};
+//   // build where from filter (category, status, fromDate, toDate, search)
+//   if (filter.category) where.category = filter.category;
+//   if (filter.status) where.status = filter.status;
+//   if (filter.search) {
+//     where.OR = [
+//       { title: { contains: filter.search, mode: "insensitive" } },
+//       { description: { contains: filter.search, mode: "insensitive" } },
+//       { location: { contains: filter.search, mode: "insensitive" } },
+//     ];
+//   }
+//   if (filter.fromDate || filter.toDate) {
+//     where.date = {};
+//     if (filter.fromDate) where.date.gte = new Date(filter.fromDate);
+//     if (filter.toDate) where.date.lte = new Date(filter.toDate);
+//   }
+//   const page = Math.max(1, Number(pagination.page) || 1);
+//   const limit = Math.max(1, Number(pagination.limit) || 10);
+//   const skip = (page - 1) * limit;
+//   const [total, events] = await Promise.all([
+//     prisma.event.count({ where }),
+//     prisma.event.findMany({
+//       where,
+//       skip,
+//       take: limit,
+//       orderBy: { date: "asc" },
+//       include: {
+//         host: { select: { id: true, name: true, email: true, profilePhoto: true, rating: true } },
+//         participants: true, // can be used to get count
+//       },
+//     }),
+//   ]);
+//   // map to include participantCount
+//   const data = events.map((e) => ({
+//     ...e,
+//     participantCount: e.participants?.length ?? 0,
+//   }));
+//   return {
+//     meta: { page, limit, total, pages: Math.ceil(total / limit) },
+//     data,
+//   };
+// };
+const getMyEvents = (hostEmail) => __awaiter(void 0, void 0, void 0, function* () {
+    const host = yield prisma_1.default.host.findFirst({ where: { email: hostEmail } });
+    if (!host)
+        throw new Error("Host profile not found");
+    const events = yield prisma_1.default.event.findMany({
+        where: { hostId: String(host.id) },
+        orderBy: { date: "asc" },
+        include: {
+            participants: true,
+            host: { select: { id: true, name: true, email: true, profilePhoto: true, rating: true } },
+        },
+    });
+    const data = events.map((e) => {
+        var _a, _b;
+        return (Object.assign(Object.assign({}, e), { participantCount: (_b = (_a = e.participants) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0 }));
+    });
+    return data;
+});
 const getEvents = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (options = {}) {
-    var _a, _b;
+    var _a, _b, _c;
     const filter = (_a = options.filter) !== null && _a !== void 0 ? _a : {};
     const pagination = (_b = options.pagination) !== null && _b !== void 0 ? _b : { page: 1, limit: 10 };
     const where = {};
-    // build where from filter (category, status, fromDate, toDate, search)
-    if (filter.category)
-        where.category = filter.category;
-    if (filter.status)
-        where.status = filter.status;
+    if (filter.category) {
+        const normalized = String(filter.category)
+            .trim()
+            .replace(/[\s-]+/g, "_")
+            .replace(/[^A-Za-z0-9_]/g, "")
+            .toUpperCase();
+        const aliasMap = { ONLINE: "ONLINE_EVENT", "BOARD GAME": "BOARDGAME" };
+        const mapped = (_c = aliasMap[normalized]) !== null && _c !== void 0 ? _c : normalized;
+        if (!EVENT_CATEGORIES.includes(mapped)) {
+            throw new Error(`Invalid category '${filter.category}'. Allowed: ${EVENT_CATEGORIES.join(", ")}`);
+        }
+        where.category = mapped;
+    }
+    if (filter.status) {
+        const normalized = String(filter.status)
+            .trim()
+            .replace(/[\s-]+/g, "_")
+            .replace(/[^A-Za-z0-9_]/g, "")
+            .toUpperCase();
+        if (!EVENT_STATUSES.includes(normalized)) {
+            throw new Error(`Invalid status '${filter.status}'. Allowed: ${EVENT_STATUSES.join(", ")}`);
+        }
+        where.status = normalized;
+    }
     if (filter.search) {
         where.OR = [
             { title: { contains: filter.search, mode: "insensitive" } },
@@ -109,19 +194,12 @@ const getEvents = (...args_1) => __awaiter(void 0, [...args_1], void 0, function
             orderBy: { date: "asc" },
             include: {
                 host: { select: { id: true, name: true, email: true, profilePhoto: true, rating: true } },
-                participants: true, // can be used to get count
+                participants: true,
             },
         }),
     ]);
-    // map to include participantCount
-    const data = events.map((e) => {
-        var _a, _b;
-        return (Object.assign(Object.assign({}, e), { participantCount: (_b = (_a = e.participants) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0 }));
-    });
-    return {
-        meta: { page, limit, total, pages: Math.ceil(total / limit) },
-        data,
-    };
+    const data = events.map((e) => { var _a, _b; return (Object.assign(Object.assign({}, e), { participantCount: (_b = (_a = e.participants) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0 })); });
+    return { meta: { page, limit, total, pages: Math.ceil(total / limit) }, data };
 });
 const getSingleEvent = (id) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
@@ -226,10 +304,103 @@ const deleteEvent = (id, req) => __awaiter(void 0, void 0, void 0, function* () 
     ]);
     return { id };
 });
+const getAllHosts = () => __awaiter(void 0, void 0, void 0, function* () {
+    const hosts = yield prisma_1.default.host.findMany({
+        select: { id: true, name: true, email: true, profilePhoto: true, rating: true, bio: true },
+    });
+    return hosts;
+});
+const updateEventStatus = (id, status, req) => __awaiter(void 0, void 0, void 0, function* () {
+    const existing = yield prisma_1.default.event.findUnique({
+        where: { id },
+        include: {
+            participants: {
+                where: {
+                    participantStatus: "CONFIRMED"
+                }
+            }
+        }
+    });
+    if (!existing)
+        throw new Error("Event not found");
+    // ownership check  
+    if (!req)
+        throw new Error("Request required for authorization");
+    const requester = req.user;
+    if (!requester)
+        throw new Error("Unauthorized: missing user info");
+    const host = yield prisma_1.default.host.findFirst({ where: { email: requester.email } });
+    if (!host)
+        throw new Error("Unauthorized: host profile not found for your account");
+    if (String(host.id) !== String(existing.hostId)) {
+        throw new Error("Unauthorized to update this event");
+    }
+    const normalized = String(status)
+        .trim()
+        .replace(/[\s-]+/g, "_")
+        .replace(/[^A-Za-z0-9_]/g, "")
+        .toUpperCase();
+    if (!EVENT_STATUSES.includes(normalized)) {
+        throw new Error(`Invalid status '${status}'. Allowed: ${EVENT_STATUSES.join(", ")}`);
+    }
+    // Business rules for host updating event status
+    const newStatus = normalized;
+    // Rule 1: Host cannot set event to OPEN (only admin can approve pending events)
+    if (newStatus === client_1.EventStatus.OPEN) {
+        throw new Error("Only admin can approve and open events");
+    }
+    // Rule 2: If event is PENDING, host can cancel
+    if (existing.status === client_1.EventStatus.PENDING) {
+        if (newStatus === client_1.EventStatus.CANCELLED) {
+            const updated = yield prisma_1.default.event.update({
+                where: { id },
+                data: { status: client_1.EventStatus.CANCELLED },
+            });
+            return updated;
+        }
+        else {
+            throw new Error("Pending events can only be cancelled by host");
+        }
+    }
+    // Rule 3: If event is OPEN and has no confirmed bookings, host can cancel
+    if (existing.status === client_1.EventStatus.OPEN) {
+        const hasBookings = existing.participants.length > 0;
+        if (newStatus === client_1.EventStatus.CANCELLED && hasBookings) {
+            throw new Error("Cannot cancel event with confirmed bookings. Contact admin.");
+        }
+        if (newStatus === client_1.EventStatus.CANCELLED && !hasBookings) {
+            const updated = yield prisma_1.default.event.update({
+                where: { id },
+                data: { status: client_1.EventStatus.CANCELLED },
+            });
+            return updated;
+        }
+        // Rule 4: Host can mark event as COMPLETED
+        if (newStatus === client_1.EventStatus.COMPLETED) {
+            const updated = yield prisma_1.default.event.update({
+                where: { id },
+                data: { status: client_1.EventStatus.COMPLETED },
+            });
+            return updated;
+        }
+    }
+    // Rule 5: If event is FULL, host can mark as COMPLETED
+    if (existing.status === client_1.EventStatus.FULL || newStatus === client_1.EventStatus.COMPLETED) {
+        const updated = yield prisma_1.default.event.update({
+            where: { id },
+            data: { status: client_1.EventStatus.COMPLETED },
+        });
+        return updated;
+    }
+    throw new Error(`Cannot update event status from ${existing.status} to ${newStatus}`);
+});
 exports.hostService = {
     createEvent,
     getEvents,
     getSingleEvent,
     updateEvent,
     deleteEvent,
+    getMyEvents,
+    getAllHosts,
+    updateEventStatus
 };

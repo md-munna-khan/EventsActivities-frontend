@@ -18,14 +18,15 @@ router.post("/create-admin", (0, auth_1.default)(client_1.UserRole.ADMIN), multe
     req.body = user_validation_1.userValidation.createAdmin.parse(JSON.parse(req.body.data));
     return user_controller_1.userController.createAdmin(req, res, next);
 });
-// dummy
 router.post("/create-client", multer_config_1.multerUpload.single('file'), (req, res, next) => {
     req.body = user_validation_1.userValidation.createClient.parse(JSON.parse(req.body.data));
+    console.log(req.body);
     return user_controller_1.userController.createClient(req, res, next);
 });
 router.patch('/:id/status', (0, auth_1.default)(client_1.UserRole.ADMIN), (0, validateRequest_1.default)(user_validation_1.userValidation.updateStatus), user_controller_1.userController.changeProfileStatus);
-router.patch("/update-my-profile", (0, auth_1.default)(client_1.UserRole.ADMIN, client_1.UserRole.CLIENT), multer_config_1.multerUpload.single('file'), (req, res, next) => {
+router.patch("/update-my-profile", (0, auth_1.default)(client_1.UserRole.ADMIN, client_1.UserRole.CLIENT, client_1.UserRole.HOST), multer_config_1.multerUpload.single('file'), (req, res, next) => {
     req.body = JSON.parse(req.body.data);
     return user_controller_1.userController.updateMyProfile(req, res, next);
 });
+router.delete('/:id', (0, auth_1.default)(client_1.UserRole.ADMIN), user_controller_1.userController.deleteUser);
 exports.userRoutes = router;

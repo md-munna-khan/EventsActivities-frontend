@@ -10,5 +10,5 @@ const auth_1 = __importDefault(require("../../middlewares/auth"));
 const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
 // Admin and Host dashboard meta
-router.get('/', (0, auth_1.default)(client_1.UserRole.ADMIN, client_1.UserRole.HOST), meta_controller_1.MetaController.fetchDashboardMetaData);
+router.get('/', (0, auth_1.default)(client_1.UserRole.ADMIN), meta_controller_1.MetaController.fetchDashboardMetaData);
 exports.MetaRoutes = router;

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.eventsService = void 0;
+exports.eventsService = exports.getMyBookings = void 0;
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const config_1 = __importDefault(require("../../../config"));
 const jwtHelper_1 = require("../../../helpers/jwtHelper");
@@ -127,7 +127,22 @@ const joinEvent = (eventId, user) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 const leaveEvent = (eventId, user) => __awaiter(void 0, void 0, void 0, function* () {
-    const clientId = user.id;
+    // Extract client email
+    let clientEmail;
+    if (user === null || user === void 0 ? void 0 : user.email) {
+        clientEmail = user.email;
+    }
+    else if (user === null || user === void 0 ? void 0 : user.accessToken) {
+        const decodedData = jwtHelper_1.jwtHelper.verifyToken(user.accessToken, config_1.default.jwt.jwt_secret);
+        clientEmail = decodedData.email;
+    }
+    if (!clientEmail)
+        throw new Error("Unable to identify user");
+    // Find client by email
+    const client = yield prisma_1.default.client.findUnique({ where: { email: clientEmail } });
+    if (!client)
+        throw new Error("Client profile not found");
+    const clientId = client.id;
     const event = yield prisma_1.default.event.findUnique({
         where: { id: eventId },
         include: { participants: true },
@@ -149,7 +164,74 @@ const leaveEvent = (eventId, user) => __awaiter(void 0, void 0, void 0, function
     }
     return { id: existing.id };
 });
+const getMyBookings = (user, eventId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let clientEmail;
+        // Extract client email from user object or JWT
+        if (user === null || user === void 0 ? void 0 : user.email) {
+            clientEmail = user.email;
+        }
+        else if (user === null || user === void 0 ? void 0 : user.accessToken) {
+            const decodedData = jwtHelper_1.jwtHelper.verifyToken(user.accessToken, config_1.default.jwt.jwt_secret);
+            clientEmail = decodedData.email;
+        }
+        if (!clientEmail) {
+            throw new Error("Unable to identify user");
+        }
+        // Build Prisma where condition
+        const whereCondition = {
+            client: { email: clientEmail } // filter by email
+        };
+        if (eventId) {
+            whereCondition.eventId = eventId;
+        }
+        // Fetch bookings with all details
+        const bookings = yield prisma_1.default.eventParticipant.findMany({
+            where: whereCondition,
+            include: {
+                event: {
+                    include: {
+                        host: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                profilePhoto: true,
+                                rating: true,
+                            }
+                        }
+                    }
+                },
+                client: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        profilePhoto: true
+                    }
+                },
+                payment: {
+                    select: {
+                        id: true,
+                        amount: true,
+                        status: true,
+                        tranId: true,
+                        createdAt: true
+                    }
+                },
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+        return bookings;
+    }
+    catch (error) {
+        console.error("Error fetching bookings:", error);
+        throw new Error("Failed to fetch bookings");
+    }
+});
+exports.getMyBookings = getMyBookings;
 exports.eventsService = {
     joinEvent,
     leaveEvent,
+    getMyBookings: exports.getMyBookings,
 };

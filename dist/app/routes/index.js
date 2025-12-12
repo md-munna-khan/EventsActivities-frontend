@@ -39,7 +39,7 @@ const moduleRoutes = [
         route: payment_routes_1.PaymentRoutes
     },
     {
-        path: '/reviews',
+        path: '/review',
         route: review_routes_1.ReviewRoutes
     },
     {

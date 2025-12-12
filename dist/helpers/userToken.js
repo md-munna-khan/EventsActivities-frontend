@@ -46,6 +46,9 @@ const createNewAccessTokenWithRefreshToken = (refreshToken) => __awaiter(void 0,
     if (user.status === "PENDING") {
         throw new ApiError_1.default(http_status_codes_1.default.BAD_REQUEST, `Your Host account is still pending for approval. Please wait for the admin to approve your account!.`);
     }
+    if (user.status === "INACTIVE") {
+        throw new ApiError_1.default(http_status_codes_1.default.BAD_REQUEST, `Your Host account is still inactive. Please wait for the admin to activate your account!.`);
+    }
     const jwtPayload = {
         userId: user.id,
         email: user.email,

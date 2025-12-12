@@ -12,4 +12,5 @@ const router = express_1.default.Router();
 // Participant: join / leave
 router.post("/:id/join", (0, auth_1.default)(client_1.UserRole.CLIENT), event_controller_1.eventsController.joinEvent);
 router.post("/:id/leave", (0, auth_1.default)(client_1.UserRole.CLIENT), event_controller_1.eventsController.leaveEvent);
+router.get("/my-bookings", (0, auth_1.default)(client_1.UserRole.CLIENT), event_controller_1.eventsController.getMyBookings);
 exports.eventsRoutes = router;

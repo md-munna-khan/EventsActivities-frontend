@@ -59,7 +59,7 @@ exports.createClient = zod_1.z.object({
 });
 const updateStatus = zod_1.z.object({
     body: zod_1.z.object({
-        status: zod_1.z.enum([client_1.UserStatus.ACTIVE, client_1.UserStatus.PENDING, client_1.UserStatus.DELETED, client_1.UserStatus.SUSPENDED]),
+        status: zod_1.z.enum([client_1.UserStatus.ACTIVE, client_1.UserStatus.PENDING, client_1.UserStatus.DELETED, client_1.UserStatus.SUSPENDED, client_1.UserStatus.INACTIVE]),
     }),
 });
 exports.userValidation = {

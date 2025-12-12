@@ -19,17 +19,16 @@ router.get('/', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1
 // );
 router.patch('/:id', (0, auth_1.default)(client_1.UserRole.ADMIN), (0, validateRequest_1.default)(admin_validations_1.adminValidationSchemas.update), admin_controller_1.AdminController.updateIntoDB);
 router.delete('/:id', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.deleteFromDB);
-// list clients and hosts
-// router.get('/user-clients', auth(UserRole.ADMIN), AdminController.getAllClients);
-// router.get('/user-hosts', auth(UserRole.ADMIN), AdminController.getAllHosts);
-// dashboard / metadata
-// host event approval/rejection routes
+// ==================== HOST MANAGEMENT ====================
+router.get('/hosts', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.getAllHosts);
+router.patch('/hosts/:id/status', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.updateHostStatus);
+router.delete('/hosts/:id', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.deleteHost);
+// ==================== HOST APPLICATION MANAGEMENT ====================
+router.get("/pending-host-applications", (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.fetchPendingHostApplications);
 router.patch('/:applicationId/approve', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.HostApprove);
 router.patch('/:applicationId/reject', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.HostReject);
-// fetch pending events route
-router.get("/events/pending", (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.fetchPendingHostApplications);
-// approve an event
+// ==================== EVENT MANAGEMENT ====================
+router.get("/events/pending-event-applications", (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.fetchPendingEventApplications);
 router.patch("/events/:id/approve", (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.approveEventController);
-// reject an event
 router.patch("/events/:id/reject", (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.rejectEventController);
 exports.AdminRoutes = router;

@@ -15,6 +15,7 @@ router.post("/create-event", (0, auth_1.default)(client_1.UserRole.HOST), multer
     req.body = host_validation_1.eventValidation.createHostValidation.parse(JSON.parse(req.body.data));
     return host_controller_1.hostController.createEvent(req, res, next);
 });
+router.get("/my-events", (0, auth_1.default)(client_1.UserRole.HOST), host_controller_1.hostController.getMyEvents);
 // Get list with filters & pagination (public)
 router.get("/", host_controller_1.hostController.getEvents);
 // Get single event
@@ -26,5 +27,8 @@ multer_config_1.multerUpload.single('file'), (req, res, next) => {
     return host_controller_1.hostController.updateEvent(req, res, next);
 });
 // Delete event
-router.delete("/:id", (0, auth_1.default)(), host_controller_1.hostController.deleteEvent);
+router.delete("/:id", (0, auth_1.default)(client_1.UserRole.HOST, client_1.UserRole.ADMIN), host_controller_1.hostController.deleteEvent);
+router.get("/", host_controller_1.hostController.getAllHosts);
+// update event status
+router.patch("/event-status/:id", (0, auth_1.default)(client_1.UserRole.HOST), host_controller_1.hostController.updateEventStatus);
 exports.hostsRoutes = router;

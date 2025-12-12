@@ -155,59 +155,97 @@ const rejectEvent = (eventId) => __awaiter(void 0, void 0, void 0, function* () 
         include: { host: true },
     });
 });
-// // fetch clients with pagination and optional search
-// const getAllClients = async (params: { searchTerm?: string }, options: IPaginationOptions) => {
-//     const { page, limit, skip } = paginationHelper.calculatePagination(options);
-//     const { searchTerm } = params;
-//     const where: any = { isDeleted: false };
-//     if (searchTerm) {
-//         where.OR = [
-//             { name: { contains: searchTerm, mode: 'insensitive' } },
-//             { email: { contains: searchTerm, mode: 'insensitive' } },
-//         ];
-//     }
-//     const data = await prisma.client.findMany({
-//         where,
-//         skip,
-//         take: limit,
-//         orderBy: { createdAt: 'desc' },
-//     });
-//     const total = await prisma.client.count({ where });
-//     return {
-//         meta: { page, limit, total },
-//         data,
-//     };
-// };
-// // fetch hosts with pagination and optional search
-// const getAllHosts = async (params: { searchTerm?: string }, options: IPaginationOptions) => {
-//     const { page, limit, skip } = paginationHelper.calculatePagination(options);
-//     const { searchTerm } = params;
-//     const where: any = { isDeleted: false };
-//     if (searchTerm) {
-//         where.OR = [
-//             { name: { contains: searchTerm, mode: 'insensitive' } },
-//             { email: { contains: searchTerm, mode: 'insensitive' } },
-//         ];
-//     }
-//     const data = await prisma.host.findMany({
-//         where,
-//         skip,
-//         take: limit,
-//         orderBy: { createdAt: 'desc' },
-//     });
-//     const total = await prisma.host.count({ where });
-//     return {
-//         meta: { page, limit, total },
-//         data,
-//     };
-// };
+// ==================== HOST MANAGEMENT ====================
+const getAllHosts = (params, options) => __awaiter(void 0, void 0, void 0, function* () {
+    const { page, limit, skip } = paginationHelper_1.paginationHelper.calculatePagination(options);
+    const { searchTerm, status } = params, filterData = __rest(params, ["searchTerm", "status"]);
+    const andConditions = [];
+    if (searchTerm) {
+        andConditions.push({
+            OR: [
+                { name: { contains: searchTerm, mode: 'insensitive' } },
+                { email: { contains: searchTerm, mode: 'insensitive' } },
+                { location: { contains: searchTerm, mode: 'insensitive' } }
+            ]
+        });
+    }
+    if (status) {
+        andConditions.push({ status });
+    }
+    andConditions.push({ isDeleted: false });
+    const whereConditions = { AND: andConditions };
+    const result = yield prisma_1.default.host.findMany({
+        where: whereConditions,
+        skip,
+        take: limit,
+        orderBy: options.sortBy && options.sortOrder ? {
+            [options.sortBy]: options.sortOrder
+        } : {
+            createdAt: 'desc'
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    email: true,
+                    status: true
+                }
+            },
+            _count: {
+                select: {
+                    events: true,
+                    reviews: true
+                }
+            }
+        }
+    });
+    const total = yield prisma_1.default.host.count({ where: whereConditions });
+    return {
+        meta: { page, limit, total },
+        data: result
+    };
+});
+const updateHostStatus = (hostId, status) => __awaiter(void 0, void 0, void 0, function* () {
+    const host = yield prisma_1.default.host.findUniqueOrThrow({
+        where: { id: hostId, isDeleted: false }
+    });
+    const updatedHost = yield prisma_1.default.host.update({
+        where: { id: hostId },
+        data: { status: status },
+        include: {
+            user: true
+        }
+    });
+    return updatedHost;
+});
+const deleteHost = (hostId) => __awaiter(void 0, void 0, void 0, function* () {
+    const host = yield prisma_1.default.host.findUniqueOrThrow({
+        where: { id: hostId }
+    });
+    const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        // Soft delete host
+        const deletedHost = yield tx.host.update({
+            where: { id: hostId },
+            data: { isDeleted: true }
+        });
+        // Update user status
+        yield tx.user.update({
+            where: { email: host.email },
+            data: { status: client_1.UserStatus.DELETED }
+        });
+        return deletedHost;
+    }));
+    return result;
+});
 exports.AdminService = {
     getAllFromDB,
-    // getByIdFromDB,
     updateIntoDB,
     deleteFromDB,
     getPendingEvents,
     approveEvent,
     rejectEvent,
-    //   
+    // Host Management
+    getAllHosts,
+    updateHostStatus,
+    deleteHost
 }; // 

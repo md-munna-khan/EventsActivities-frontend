@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdminController = exports.HostReject = exports.HostApprove = exports.rejectEventController = exports.approveEventController = void 0;
+exports.AdminController = void 0;
 const admin_service_1 = require("./admin.service");
 const pick_1 = __importDefault(require("../../../shared/pick"));
 const admin_constant_1 = require("./admin.constant");
@@ -63,31 +63,16 @@ const deleteFromDB = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
         data: result
     });
 }));
-// const getAllClients = catchAsync(async (req: Request, res: Response) => {
-//   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
-//   const searchTerm = (req.query.searchTerm as string) ?? undefined;
-//   const result = await AdminService.getAllClients({ searchTerm }, options as any);
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: 'Clients fetched successfully',
-//     meta: result.meta,
-//     data: result.data,
-//   });
-// });
-// const getAllHosts = catchAsync(async (req: Request, res: Response) => {
-//   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
-//   const searchTerm = (req.query.searchTerm as string) ?? undefined;
-//   const result = await AdminService.getAllHosts({ searchTerm }, options as any);
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: 'Hosts fetched successfully',
-//     meta: result.meta,
-//     data: result.data,
-//   });
-// });
-exports.approveEventController = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const fetchPendingEventApplications = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield admin_service_1.AdminService.getPendingEvents();
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'Pending event applications fetched',
+        data: result
+    });
+}));
+const approveEventController = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id: eventId } = req.params;
     const updatedEvent = yield admin_service_1.AdminService.approveEvent(eventId);
     (0, sendResponse_1.sendResponse)(res, {
@@ -97,7 +82,7 @@ exports.approveEventController = (0, catchAsync_1.catchAsync)((req, res) => __aw
         data: updatedEvent,
     });
 }));
-exports.rejectEventController = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const rejectEventController = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id: eventId } = req.params;
     const updatedEvent = yield admin_service_1.AdminService.rejectEvent(eventId);
     (0, sendResponse_1.sendResponse)(res, {
@@ -108,7 +93,7 @@ exports.rejectEventController = (0, catchAsync_1.catchAsync)((req, res) => __awa
     });
 }));
 // Approve host application (transactional):
-exports.HostApprove = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const HostApprove = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { applicationId } = req.params; // use application id in route
     // load application + user
     const application = yield prisma_1.default.hostApplication.findUniqueOrThrow({
@@ -156,7 +141,7 @@ exports.HostApprove = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 
     });
 }));
 // Reject host application (transactional):
-exports.HostReject = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const HostReject = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { applicationId } = req.params;
     const application = yield prisma_1.default.hostApplication.findUniqueOrThrow({
         where: { id: applicationId },
@@ -191,14 +176,52 @@ const fetchPendingHostApplications = (0, catchAsync_1.catchAsync)((req, res) => 
         data: pending,
     });
 }));
+// ==================== HOST MANAGEMENT ====================
+const getAllHosts = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const filters = (0, pick_1.default)(req.query, ['searchTerm', 'status']);
+    const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+    const result = yield admin_service_1.AdminService.getAllHosts(filters, options);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'Hosts fetched successfully',
+        meta: result.meta,
+        data: result.data
+    });
+}));
+const updateHostStatus = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const { status } = req.body;
+    const result = yield admin_service_1.AdminService.updateHostStatus(id, status);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'Host status updated successfully',
+        data: result
+    });
+}));
+const deleteHost = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield admin_service_1.AdminService.deleteHost(id);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'Host deleted successfully',
+        data: result
+    });
+}));
 exports.AdminController = {
     getAllFromDB,
-    // getByIdFromDB,
     updateIntoDB,
     deleteFromDB,
-    HostApprove: exports.HostApprove,
-    HostReject: exports.HostReject,
+    HostApprove,
+    HostReject,
     fetchPendingHostApplications,
-    approveEventController: exports.approveEventController,
-    rejectEventController: exports.rejectEventController
+    approveEventController,
+    rejectEventController,
+    fetchPendingEventApplications,
+    // Host Management
+    getAllHosts,
+    updateHostStatus,
+    deleteHost
 };

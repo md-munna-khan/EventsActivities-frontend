@@ -20,7 +20,7 @@ const event_service_1 = require("./event.service");
 // participant controllers
 const joinEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id: eventId } = req.params;
-    const user = req.cookies; // must be authenticated client
+    const user = req.user; // must be authenticated client
     if (!user)
         throw new Error("Unauthorized");
     const participant = yield event_service_1.eventsService.joinEvent(eventId, user);
@@ -33,7 +33,7 @@ const joinEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, v
 }));
 const leaveEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id: eventId } = req.params;
-    const user = req.cookies; // must be authenticated client
+    const user = req.user; // must be authenticated client
     if (!user)
         throw new Error("Unauthorized");
     const result = yield event_service_1.eventsService.leaveEvent(eventId, user);
@@ -44,7 +44,20 @@ const leaveEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, 
         data: result
     });
 }));
+const getMyBookings = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user; // must be authenticated client
+    if (!user)
+        throw new Error("Unauthorized");
+    const bookings = yield event_service_1.eventsService.getMyBookings(user);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Fetched my bookings successfully",
+        data: bookings,
+    });
+}));
 exports.eventsController = {
     joinEvent,
     leaveEvent,
+    getMyBookings,
 };

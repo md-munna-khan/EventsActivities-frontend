@@ -142,6 +142,7 @@ const createClient = (req) => __awaiter(void 0, void 0, void 0, function* () {
             });
             return createdClientData;
         }));
+        console.log(result);
         return result;
     }
     catch (error) {
@@ -153,6 +154,124 @@ const createClient = (req) => __awaiter(void 0, void 0, void 0, function* () {
             catch (err) {
                 // If cleanup fails, log it but rethrow the original error below
                 // console.error('Failed to delete uploaded image from Cloudinary', err);
+            }
+        }
+        throw error;
+    }
+});
+const getMyProfile = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    const userInfo = yield prisma_1.default.user.findUnique({
+        where: {
+            email: user === null || user === void 0 ? void 0 : user.email,
+            status: client_1.UserStatus.ACTIVE,
+        },
+        select: {
+            id: true,
+            email: true,
+            needPasswordChange: true,
+            role: true,
+            status: true,
+            admin: true,
+            client: true,
+            host: true,
+        },
+    });
+    if (!userInfo) {
+        return null;
+    }
+    let profileInfo;
+    if (userInfo.role === client_1.UserRole.ADMIN) {
+        profileInfo = yield prisma_1.default.admin.findUnique({
+            where: {
+                email: userInfo.email,
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                profilePhoto: true,
+                contactNumber: true,
+                isDeleted: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+        });
+    }
+    else if (userInfo.role === client_1.UserRole.CLIENT) {
+        profileInfo = yield prisma_1.default.client.findUnique({
+            where: {
+                email: userInfo.email,
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                profilePhoto: true,
+                contactNumber: true,
+                isDeleted: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+        });
+    }
+    return Object.assign(Object.assign({}, userInfo), profileInfo);
+});
+const updateMyProfile = (user, req) => __awaiter(void 0, void 0, void 0, function* () {
+    const userInfo = yield prisma_1.default.user.findUniqueOrThrow({
+        where: {
+            email: user === null || user === void 0 ? void 0 : user.email,
+            status: client_1.UserStatus.ACTIVE
+        }
+    });
+    const file = req.file;
+    let uploadedPublicId;
+    if (file) {
+        if (file.buffer) {
+            const uploaded = yield (0, cloudinary_config_1.uploadBufferToCloudinary)(file.buffer, file.originalname || 'profile');
+            req.body.profilePhoto = uploaded === null || uploaded === void 0 ? void 0 : uploaded.secure_url;
+            uploadedPublicId = uploaded === null || uploaded === void 0 ? void 0 : uploaded.public_id;
+        }
+        else if (file.path) {
+            const uploaded = yield cloudinary_config_1.cloudinaryUpload.uploader.upload(file.path, { resource_type: 'auto' });
+            req.body.profilePhoto = uploaded === null || uploaded === void 0 ? void 0 : uploaded.secure_url;
+            uploadedPublicId = uploaded === null || uploaded === void 0 ? void 0 : uploaded.public_id;
+        }
+    }
+    let profileInfo;
+    try {
+        if (userInfo.role === client_1.UserRole.ADMIN) {
+            profileInfo = yield prisma_1.default.admin.update({
+                where: {
+                    email: userInfo.email
+                },
+                data: req.body
+            });
+        }
+        if (userInfo.role === client_1.UserRole.HOST) {
+            profileInfo = yield prisma_1.default.host.update({
+                where: {
+                    email: userInfo.email
+                },
+                data: req.body
+            });
+        }
+        else if (userInfo.role === client_1.UserRole.CLIENT) {
+            profileInfo = yield prisma_1.default.client.update({
+                where: {
+                    email: userInfo.email
+                },
+                data: req.body
+            });
+        }
+        return Object.assign({}, profileInfo);
+    }
+    catch (error) {
+        if (uploadedPublicId) {
+            try {
+                yield cloudinary_config_1.cloudinaryUpload.uploader.destroy(uploadedPublicId);
+            }
+            catch (cleanupErr) {
+                // ignore cleanup errors
             }
         }
         throw error;
@@ -230,109 +349,13 @@ const changeProfileStatus = (id, status) => __awaiter(void 0, void 0, void 0, fu
     });
     return updateUserStatus;
 });
-const getMyProfile = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    const userInfo = yield prisma_1.default.user.findUniqueOrThrow({
+const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const deletedUser = yield prisma_1.default.user.delete({
         where: {
-            email: user === null || user === void 0 ? void 0 : user.email,
-            status: client_1.UserStatus.ACTIVE,
-        },
-        select: {
-            id: true,
-            email: true,
-            needPasswordChange: true,
-            role: true,
-            status: true,
-        },
-    });
-    let profileInfo;
-    if (userInfo.role === client_1.UserRole.ADMIN) {
-        profileInfo = yield prisma_1.default.admin.findUnique({
-            where: {
-                email: userInfo.email,
-            },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                profilePhoto: true,
-                contactNumber: true,
-                isDeleted: true,
-                createdAt: true,
-                updatedAt: true,
-            },
-        });
-    }
-    else if (userInfo.role === client_1.UserRole.CLIENT) {
-        profileInfo = yield prisma_1.default.client.findUnique({
-            where: {
-                email: userInfo.email,
-            },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                profilePhoto: true,
-                contactNumber: true,
-                isDeleted: true,
-                createdAt: true,
-                updatedAt: true,
-            },
-        });
-    }
-    return Object.assign(Object.assign({}, userInfo), profileInfo);
-});
-const updateMyProfile = (user, req) => __awaiter(void 0, void 0, void 0, function* () {
-    const userInfo = yield prisma_1.default.user.findUniqueOrThrow({
-        where: {
-            email: user === null || user === void 0 ? void 0 : user.email,
-            status: client_1.UserStatus.ACTIVE
+            id
         }
     });
-    const file = req.file;
-    let uploadedPublicId;
-    if (file) {
-        if (file.buffer) {
-            const uploaded = yield (0, cloudinary_config_1.uploadBufferToCloudinary)(file.buffer, file.originalname || 'profile');
-            req.body.profilePhoto = uploaded === null || uploaded === void 0 ? void 0 : uploaded.secure_url;
-            uploadedPublicId = uploaded === null || uploaded === void 0 ? void 0 : uploaded.public_id;
-        }
-        else if (file.path) {
-            const uploaded = yield cloudinary_config_1.cloudinaryUpload.uploader.upload(file.path, { resource_type: 'auto' });
-            req.body.profilePhoto = uploaded === null || uploaded === void 0 ? void 0 : uploaded.secure_url;
-            uploadedPublicId = uploaded === null || uploaded === void 0 ? void 0 : uploaded.public_id;
-        }
-    }
-    let profileInfo;
-    try {
-        if (userInfo.role === client_1.UserRole.ADMIN) {
-            profileInfo = yield prisma_1.default.admin.update({
-                where: {
-                    email: userInfo.email
-                },
-                data: req.body
-            });
-        }
-        else if (userInfo.role === client_1.UserRole.CLIENT) {
-            profileInfo = yield prisma_1.default.client.update({
-                where: {
-                    email: userInfo.email
-                },
-                data: req.body
-            });
-        }
-        return Object.assign({}, profileInfo);
-    }
-    catch (error) {
-        if (uploadedPublicId) {
-            try {
-                yield cloudinary_config_1.cloudinaryUpload.uploader.destroy(uploadedPublicId);
-            }
-            catch (cleanupErr) {
-                // ignore cleanup errors
-            }
-        }
-        throw error;
-    }
+    return deletedUser;
 });
 exports.userService = {
     createAdmin,
@@ -340,5 +363,6 @@ exports.userService = {
     getAllFromDB,
     changeProfileStatus,
     getMyProfile,
-    updateMyProfile
+    updateMyProfile,
+    deleteUser
 };

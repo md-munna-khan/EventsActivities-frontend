@@ -11,12 +11,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReviewController = void 0;
 const catchAsync_1 = require("../../../shared/catchAsync");
-const review_service_1 = require("./review.service");
 const sendResponse_1 = require("../../../shared/sendResponse");
+const review_service_1 = require("./review.service");
 const createReview = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
     const { id: eventId } = req.params; // route: /events/:id/reviews
-    const user = (_b = (_a = req.user) !== null && _a !== void 0 ? _a : req.body.user) !== null && _b !== void 0 ? _b : req.user; // adapt to your auth middleware
+    const user = req.user || req.cookies; // Get user from auth middleware
+    if (!user) {
+        throw new Error("User information is missing in the request");
+    }
     const payload = { rating: Number(req.body.rating), comment: req.body.comment };
     const review = yield review_service_1.ReviewService.createReview(eventId, user, payload);
     (0, sendResponse_1.sendResponse)(res, {
@@ -40,4 +42,13 @@ const listHostReviews = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(voi
         data: result.data,
     });
 }));
+// const allReviews = catchAsync(async (req: Request, res: Response) => {
+//   const result = await ReviewService.allReviews();
+//   sendResponse(res, { 
+//     statusCode: 200,
+//     success: true,
+//     message: "All reviews fetched",
+//     data: result 
+//   });
+// });
 exports.ReviewController = { createReview, listHostReviews };

@@ -225,6 +225,10 @@ const cancelPayment = async (payload: Record<string, any>) => _failOrCancel(payl
 const listAllPayments = async () => {
   return await prisma.payment.findMany({
     orderBy: { createdAt: 'desc' },
+    include: {
+      client: { select: { id: true, name: true, email: true } },
+      event: { select: { id: true, title: true } },
+    },
   });
 };
 

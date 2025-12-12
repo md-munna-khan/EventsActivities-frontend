@@ -29,12 +29,33 @@ const createEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+const getMyEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const requester = req.user;
+    if (!requester)
+        throw new Error("Unauthorized");
+    const result = yield host_service_1.hostService.getMyEvents(requester.email);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Host's events fetched successfully",
+        data: result,
+    });
+}));
 const getEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // parse filters & pagination from query
-    const filter = (0, pick_1.default)(req.query, ["category", "status", "search", "fromDate", "toDate"]);
+    const filter = (0, pick_1.default)(req.query, [
+        "category",
+        "status",
+        "search",
+        "fromDate",
+        "toDate",
+    ]);
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
-    const result = yield host_service_1.hostService.getEvents({ filter, pagination: { page, limit } });
+    const result = yield host_service_1.hostService.getEvents({
+        filter,
+        pagination: { page, limit },
+    });
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -74,10 +95,33 @@ const deleteEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+const getAllHosts = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield host_service_1.hostService.getAllHosts();
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Hosts fetched successfully",
+        data: result,
+    });
+}));
+const updateEventStatus = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const { status } = req.body;
+    const updatedEvent = yield host_service_1.hostService.updateEventStatus(id, status, req);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Event status updated successfully",
+        data: updatedEvent,
+    });
+}));
 exports.hostController = {
     createEvent,
     getEvents,
     getSingleEvent,
     updateEvent,
     deleteEvent,
+    getMyEvents,
+    getAllHosts,
+    updateEventStatus,
 };
