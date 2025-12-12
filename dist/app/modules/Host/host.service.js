@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hostService = void 0;
+exports.hostService = exports.getMyEvents = void 0;
 const cloudinary_config_1 = require("../../../config/cloudinary.config");
 const client_1 = require("@prisma/client");
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
@@ -76,69 +76,74 @@ const createEvent = (req, user) => __awaiter(void 0, void 0, void 0, function* (
     });
     return event;
 });
-// const getEvents = async (options: QueryOptions = {}) => {
-//   const filter = options.filter ?? {};
-//   const pagination = options.pagination ?? { page: 1, limit: 10 };
-//   const where: any = {};
-//   // build where from filter (category, status, fromDate, toDate, search)
-//   if (filter.category) where.category = filter.category;
-//   if (filter.status) where.status = filter.status;
-//   if (filter.search) {
-//     where.OR = [
-//       { title: { contains: filter.search, mode: "insensitive" } },
-//       { description: { contains: filter.search, mode: "insensitive" } },
-//       { location: { contains: filter.search, mode: "insensitive" } },
-//     ];
-//   }
-//   if (filter.fromDate || filter.toDate) {
-//     where.date = {};
-//     if (filter.fromDate) where.date.gte = new Date(filter.fromDate);
-//     if (filter.toDate) where.date.lte = new Date(filter.toDate);
-//   }
-//   const page = Math.max(1, Number(pagination.page) || 1);
-//   const limit = Math.max(1, Number(pagination.limit) || 10);
-//   const skip = (page - 1) * limit;
-//   const [total, events] = await Promise.all([
-//     prisma.event.count({ where }),
-//     prisma.event.findMany({
-//       where,
-//       skip,
-//       take: limit,
-//       orderBy: { date: "asc" },
-//       include: {
-//         host: { select: { id: true, name: true, email: true, profilePhoto: true, rating: true } },
-//         participants: true, // can be used to get count
-//       },
-//     }),
-//   ]);
-//   // map to include participantCount
-//   const data = events.map((e) => ({
-//     ...e,
-//     participantCount: e.participants?.length ?? 0,
-//   }));
-//   return {
-//     meta: { page, limit, total, pages: Math.ceil(total / limit) },
-//     data,
-//   };
-// };
-const getMyEvents = (hostEmail) => __awaiter(void 0, void 0, void 0, function* () {
+const getMyEvents = (hostEmail_1, ...args_1) => __awaiter(void 0, [hostEmail_1, ...args_1], void 0, function* (hostEmail, options = {}) {
+    var _a, _b, _c;
+    const filter = (_a = options.filter) !== null && _a !== void 0 ? _a : {};
+    const pagination = (_b = options.pagination) !== null && _b !== void 0 ? _b : { page: 1, limit: 10 };
+    // find host
     const host = yield prisma_1.default.host.findFirst({ where: { email: hostEmail } });
     if (!host)
         throw new Error("Host profile not found");
-    const events = yield prisma_1.default.event.findMany({
-        where: { hostId: String(host.id) },
-        orderBy: { date: "asc" },
-        include: {
-            participants: true,
-            host: { select: { id: true, name: true, email: true, profilePhoto: true, rating: true } },
-        },
-    });
-    const data = events.map((e) => {
-        var _a, _b;
-        return (Object.assign(Object.assign({}, e), { participantCount: (_b = (_a = e.participants) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0 }));
-    });
-    return data;
+    // Build where
+    const where = { hostId: String(host.id) };
+    if (filter.category) {
+        const normalized = String(filter.category)
+            .trim()
+            .replace(/[\s-]+/g, "_")
+            .replace(/[^A-Za-z0-9_]/g, "")
+            .toUpperCase();
+        const aliasMap = { ONLINE: "ONLINE_EVENT", "BOARD GAME": "BOARDGAME" };
+        const mapped = (_c = aliasMap[normalized]) !== null && _c !== void 0 ? _c : normalized;
+        if (!EVENT_CATEGORIES.includes(mapped)) {
+            throw new Error(`Invalid category '${filter.category}'. Allowed: ${EVENT_CATEGORIES.join(", ")}`);
+        }
+        where.category = mapped;
+    }
+    if (filter.status) {
+        const normalized = String(filter.status)
+            .trim()
+            .replace(/[\s-]+/g, "_")
+            .replace(/[^A-Za-z0-9_]/g, "")
+            .toUpperCase();
+        if (!EVENT_STATUSES.includes(normalized)) {
+            throw new Error(`Invalid status '${filter.status}'. Allowed: ${EVENT_STATUSES.join(", ")}`);
+        }
+        where.status = normalized;
+    }
+    if (filter.search) {
+        where.OR = [
+            { title: { contains: filter.search, mode: "insensitive" } },
+            { description: { contains: filter.search, mode: "insensitive" } },
+            { location: { contains: filter.search, mode: "insensitive" } },
+        ];
+    }
+    if (filter.fromDate || filter.toDate) {
+        where.date = {};
+        if (filter.fromDate)
+            where.date.gte = new Date(filter.fromDate);
+        if (filter.toDate)
+            where.date.lte = new Date(filter.toDate);
+    }
+    const page = Math.max(1, Number(pagination.page) || 1);
+    const limit = Math.max(1, Number(pagination.limit) || 10);
+    const skip = (page - 1) * limit;
+    const [total, events] = yield Promise.all([
+        prisma_1.default.event.count({ where }),
+        prisma_1.default.event.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: { date: "asc" },
+            include: {
+                host: { select: { id: true, name: true, email: true, profilePhoto: true, rating: true } },
+                participants: true,
+            },
+        }),
+    ]);
+    const data = events.map((e) => { var _a, _b; return (Object.assign(Object.assign({}, e), { participantCount: (_b = (_a = e.participants) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0 })); });
+    return { meta: { page, limit, total, pages: Math.ceil(total / limit) }, data };
 });
+exports.getMyEvents = getMyEvents;
 const getEvents = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (options = {}) {
     var _a, _b, _c;
     const filter = (_a = options.filter) !== null && _a !== void 0 ? _a : {};
@@ -400,7 +405,7 @@ exports.hostService = {
     getSingleEvent,
     updateEvent,
     deleteEvent,
-    getMyEvents,
+    getMyEvents: exports.getMyEvents,
     getAllHosts,
     updateEventStatus
 };

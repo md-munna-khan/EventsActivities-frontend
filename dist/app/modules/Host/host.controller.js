@@ -29,16 +29,30 @@ const createEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+// hostController.ts
 const getMyEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const requester = req.user;
     if (!requester)
         throw new Error("Unauthorized");
-    const result = yield host_service_1.hostService.getMyEvents(requester.email);
+    const filter = (0, pick_1.default)(req.query, [
+        "category",
+        "status",
+        "search",
+        "fromDate",
+        "toDate",
+    ]);
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const result = yield host_service_1.hostService.getMyEvents(requester.email, {
+        filter,
+        pagination: { page, limit },
+    });
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
         message: "Host's events fetched successfully",
-        data: result,
+        data: result.data,
+        meta: result.meta,
     });
 }));
 const getEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
