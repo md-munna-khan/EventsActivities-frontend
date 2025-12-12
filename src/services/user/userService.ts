@@ -29,6 +29,7 @@ export async function applyHost() {
     if (result.success) {
 
     await deleteCookie("accessToken");
+    await deleteCookie("refreshToken");
     }
  
     return result;
