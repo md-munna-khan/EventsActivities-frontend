@@ -105,7 +105,7 @@ const ExploreEventsClient = ({ initialEvents, initialMeta }: ExploreEventsClient
     };
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 container mx-auto ">
             {/* Header Actions */}
             <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4 flex-1">

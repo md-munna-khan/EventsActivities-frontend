@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useTransition, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import TablePagination from '@/components/shared/TablePagination';
 import SearchFilter from '@/components/shared/SearchFilter';
@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import CreateEventModal from './CreateEventModal';
 import EditEventModal from './EditEventModal';
+import DeleteConfirmationDialog from '@/components/shared/DeleteConfirmationDialog';
 
 interface Event {
     id: string;
@@ -71,11 +72,13 @@ interface MyEventsClientProps {
 
 const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
     const router = useRouter();
-    const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     
     // Use props directly - they update when server component re-fetches
     const events = initialEvents;
@@ -122,24 +125,35 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
         setIsEditModalOpen(true);
     };
 
-    const handleDelete = async (event: Event) => {
-        if (!confirm(`Are you sure you want to delete "${event.title}"?`)) {
-            return;
-        }
+    const openDeleteModal = (event: Event) => {
+        setEventToDelete(event);
+        setIsDeleteDialogOpen(true);
+    };
+
+    // NOTE: deletion is handled via modal (openDeleteModal + confirmDelete)
+
+    const confirmDelete = async () => {
+        if (!eventToDelete) return;
+        setIsDeleting(true);
 
         startTransition(async () => {
             try {
                 const { deleteEvent } = await import('@/services/host/hostService');
-                const result = await deleteEvent(event.id);
+                const result = await deleteEvent(eventToDelete.id);
 
                 if (result.success) {
                     toast.success('Event deleted successfully');
+                    setIsDeleteDialogOpen(false);
+                    setEventToDelete(null);
                     router.refresh();
                 } else {
                     toast.error(result.message || 'Failed to delete event');
                 }
-            } catch (error) {
+            } catch (err) {
+                console.error(err);
                 toast.error('An error occurred while deleting the event');
+            } finally {
+                setIsDeleting(false);
             }
         });
     };
@@ -193,7 +207,8 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                 } else {
                     toast.error(result.message || 'Failed to update event status');
                 }
-            } catch (error) {
+            } catch (err) {
+                console.error(err);
                 toast.error('An error occurred while updating the event status');
             }
         });
@@ -296,7 +311,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {events.map((event) => (
                         <Card 
                             key={event.id} 
@@ -314,7 +329,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
+                                    <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-primary/20 to-primary/5">
                                         <Calendar className="h-16 w-16 text-primary/30" />
                                     </div>
                                 )}
@@ -377,7 +392,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                                                 </DropdownMenuItem>
                                             )}
                                             <DropdownMenuItem 
-                                                onClick={() => handleDelete(event)}
+                                                onClick={() => openDeleteModal(event)}
                                                 className="text-destructive"
                                             >
                                                 <Trash2 className="mr-2 h-4 w-4" />
@@ -395,7 +410,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                                 </p>
 
                                 {/* Event Details */}
-                                <div className="space-y-2">
+                                <div className="space-y-2  ">
                                     <div className="flex items-center gap-2 text-sm">
                                         <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
                                         <span className="text-muted-foreground">
@@ -427,7 +442,12 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                                             {' participants'}
                                         </span>
                                     </div>
-                                    {/* Host Info */}
+                                 
+                                </div>
+                            </CardContent>
+
+                            <CardFooter className="flex gap-2 justify-between pt-0">
+                                   {/* Host Info */}
                                     {event.host && (
                                         <div className="flex items-center gap-2 text-sm pt-2 border-t">
                                             <div className="relative h-8 w-8 rounded-full overflow-hidden bg-muted shrink-0">
@@ -457,26 +477,23 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                                             </div>
                                         </div>
                                     )}
-                                </div>
-                            </CardContent>
-
-                            <CardFooter className="flex gap-2 pt-0">
-                                <Button 
-                                    variant="outline" 
-                                    className="flex-1"
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    title="View"
                                     onClick={() => handleView(event)}
                                 >
-                                    <Eye className="mr-2 h-4 w-4" />
-                                    View
+                                    <Eye className="h-full w-full" />
                                 </Button>
-                                <Button 
-                                    variant="outline" 
-                                    className="flex-1"
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    title="Edit"
                                     onClick={() => handleEdit(event)}
                                 >
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    Edit
+                                    <Edit className="h-4 w-4" />
                                 </Button>
+                              
                             </CardFooter>
                         </Card>
                     ))}
@@ -485,6 +502,17 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
             </div>
 
             {/* Pagination */}
+            {/* Delete confirmation modal */}
+            <DeleteConfirmationDialog
+                open={isDeleteDialogOpen}
+                onOpenChange={setIsDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                title="Delete Event"
+                description={eventToDelete ? `Are you sure you want to delete "${eventToDelete.title}"? This action cannot be undone.` : undefined}
+                itemName={eventToDelete?.title}
+                isDeleting={isDeleting}
+            />
+
             {meta.pages > 1 && (
                 <TablePagination
                     currentPage={meta.page}

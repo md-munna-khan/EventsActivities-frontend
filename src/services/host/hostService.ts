@@ -94,7 +94,7 @@ export async function createEvent(data: IEventFormData, file?: File) {
         return {
             success: false,
             message:
-                process.env.NODE_ENV === "development"
+                process.env.NODE_ENV === "development" 
                     ? error.message
                     : "Failed to create event",
         };

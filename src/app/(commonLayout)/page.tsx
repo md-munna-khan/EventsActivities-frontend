@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,29 +9,41 @@ import {
   Users, 
   Star, 
   ArrowRight, 
-  CheckCircle2,
-  Sparkles,
+ 
   TrendingUp,
   Shield,
-  Heart,
+ 
   Zap
 } from 'lucide-react';
 import { getEvents } from '@/services/host/hostService';
 import Image from 'next/image';
+import { getAllUsers } from '@/services/user/userService';
 
 const HomePage = async () => {
+  // Fetch counts
+  const usersResult = await getAllUsers({}, { page: 1, limit: 1 });
+  const hostsResult = await getAllUsers({ role: 'HOST' }, { page: 1, limit: 1 });
+
+  const usersCount = usersResult?.meta?.total ?? (Array.isArray(usersResult?.data) ? usersResult.data.length : 0);
+  const hostsCount = hostsResult?.meta?.total ?? (Array.isArray(hostsResult?.data) ? hostsResult.data.length : 0);
+
   // Fetch featured events
-  const eventsResult = await getEvents({ 
-    status: 'OPEN', 
+  const eventsResult = await getEvents({
+    status: 'OPEN',
     limit: 6,
-    page: 1 
+    page: 1,
   });
+  const eventsCountResult = await getEvents({ page: 1, limit: 1 });
+  const eventsCount = eventsCountResult?.meta?.total ?? (Array.isArray(eventsCountResult?.data) ? eventsCountResult.data.length : 0);
+  // Fetch top-rated hosts (limit 3)
+  const topHostsResult = await getAllUsers({ role: 'HOST' }, { page: 1, limit: 3, sortBy: 'rating', sortOrder: 'desc' });
+  const topHosts = Array.isArray(topHostsResult?.data) ? topHostsResult.data : [];
   const featuredEvents = eventsResult.success && eventsResult.data ? eventsResult.data.slice(0, 6) : [];
 
   return (
-    <main className="flex flex-col">
+    <main className="flex flex-col ">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary/10 via-background to-primary/5 py-20 px-4">
+      <section className="relative bg-linear-to-br from-primary/10 via-background to-primary/5 py-20 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
@@ -55,6 +67,39 @@ const HomePage = async () => {
                     Create Event
                   </Button>
                 </Link>
+              </div>
+
+              {/* Stats row */}
+              <div className="flex items-center gap-4 mt-6">
+                <div className="flex items-center gap-3 bg-background/80 p-3 rounded-lg shadow-sm">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <Users className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{usersCount}</div>
+                    <div className="text-sm text-muted-foreground">Users</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 bg-background/80 p-3 rounded-lg shadow-sm">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <Shield className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{hostsCount}</div>
+                    <div className="text-sm text-muted-foreground">Hosts</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 bg-background/80 p-3 rounded-lg shadow-sm">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <Calendar className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{eventsCount}</div>
+                    <div className="text-sm text-muted-foreground">Events</div>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="relative">
@@ -278,26 +323,56 @@ const HomePage = async () => {
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="text-center">
-                <CardHeader>
-                  <div className="mx-auto mb-4 h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Users className="h-10 w-10 text-primary" />
-                  </div>
-                  <CardTitle>Host {i}</CardTitle>
-                  <div className="flex items-center justify-center gap-1 mt-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>
-                    Experienced event organizer with {10 + i * 5} successful events
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
+            {topHosts.length > 0 ? (
+              topHosts.map((host: any) => (
+                <Card key={host.id} className="text-center">
+                  <CardHeader>
+                    <div className="mx-auto mb-4 h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+                      {host.profilePhoto ? (
+                        <Image src={host.profilePhoto} alt={host.name || host.email} width={80} height={80} className="object-cover" />
+                      ) : (
+                        <Users className="h-10 w-10 text-primary" />
+                      )}
+                    </div>
+                    <CardTitle>{host.name || host.email || 'Host'}</CardTitle>
+                    <div className="flex items-center justify-center gap-1 mt-2">
+                      {Array.from({ length: 5 }).map((_, idx) => (
+                        <Star
+                          key={idx}
+                          className={`h-4 w-4 ${idx < (host.rating ?? 0) ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
+                        />
+                      ))}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription>
+                      {host.bio || `${host.completedEventsCount ?? 0} successful events`}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              [1, 2, 3].map((i) => (
+                <Card key={i} className="text-center">
+                  <CardHeader>
+                    <div className="mx-auto mb-4 h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Users className="h-10 w-10 text-primary" />
+                    </div>
+                    <CardTitle>Host {i}</CardTitle>
+                    <div className="flex items-center justify-center gap-1 mt-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription>
+                      Experienced event organizer with {10 + i * 5} successful events
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -352,7 +427,7 @@ const HomePage = async () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-primary text-primary-foreground">
+      {/* <section className="py-20 px-4 bg-primary text-primary-foreground">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-4xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-xl mb-8 opacity-90">
@@ -371,7 +446,7 @@ const HomePage = async () => {
             </Link>
           </div>
         </div>
-      </section>
+      </section> */}
     </main>
   );
 };

@@ -22,10 +22,10 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
   return (
     <form action={formAction}>
       {/* Quick-fill credentials for testing/demo */}
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex gap-2  mx-auto justify-center">
         <Button
           type="button"
-          variant="outline"
+          variant="default"
           onClick={() => {
             const e = emailRef.current;
             const p = passwordRef.current;
@@ -38,7 +38,7 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
 
         <Button
           type="button"
-          variant="outline"
+          variant="default"
           onClick={() => {
             const e = emailRef.current;
             const p = passwordRef.current;
@@ -51,7 +51,7 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
 
         <Button
           type="button"
-          variant="outline"
+          variant="default"
           onClick={() => {
             const e = emailRef.current;
             const p = passwordRef.current;
