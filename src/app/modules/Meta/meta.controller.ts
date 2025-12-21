@@ -22,6 +22,19 @@ const fetchDashboardMetaData = catchAsync(async (req: Request, res: Response) =>
     })
 });
 
+
+const fetchHomeMetaData = catchAsync(async (req: Request, res: Response) => {
+  const result = await MetaService.fetchHomeMetaData();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Home meta data retrieval successfully!",
+    data: result,
+  });
+});
+
 export const MetaController = {
-    fetchDashboardMetaData
-}
+  fetchDashboardMetaData,
+  fetchHomeMetaData,
+};

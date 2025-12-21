@@ -24,10 +24,11 @@ const createReview = catchAsync(async (req: Request, res: Response) => {
 });
 
 const listHostReviews = catchAsync(async (req: Request, res: Response) => {
-  const { hostId } = req.params;
+  const {id } = req.params;
   const page = Number(req.query.page ?? 1);
   const limit = Number(req.query.limit ?? 20);
-  const result = await ReviewService.listHostReviews(hostId, page, limit);
+  const result = await ReviewService.listHostReviews(id, page, limit);
+console.log(result)
   sendResponse(res, {
     statusCode: 200,
     success: true,

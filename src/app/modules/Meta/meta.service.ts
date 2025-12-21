@@ -93,6 +93,22 @@ const fetchDashboardMetaData = async (user: any) => {
   return { role: role ?? 'UNKNOWN', totals: { users } };
 };
 
+const fetchHomeMetaData = async () => {
+  // public/home meta: show events and hosts counts
+  const [totalEvents, totalHosts, totalUsers] = await Promise.all([
+    prisma.event.count(),
+    prisma.host.count(),
+    prisma.user.count()
+  ]);
+
+  return {
+    totalEvents,
+    totalHosts,
+    totalUsers
+  };
+};
+
 export const MetaService = {
   fetchDashboardMetaData,
+  fetchHomeMetaData,
 };

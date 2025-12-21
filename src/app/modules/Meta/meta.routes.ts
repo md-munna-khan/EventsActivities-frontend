@@ -7,5 +7,6 @@ const router = express.Router();
 
 // Admin and Host dashboard meta
 router.get('/', auth(UserRole.ADMIN), MetaController.fetchDashboardMetaData);
+router.get('/home-meta', MetaController.fetchHomeMetaData);
 
 export const MetaRoutes = router;

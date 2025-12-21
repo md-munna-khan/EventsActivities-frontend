@@ -130,11 +130,11 @@ export const ReviewService = {
     });
   },
 
-  async listHostReviews(hostId: string, page = 1, limit = 20) {
+  async listHostReviews(id: string, page = 1, limit = 20) {
     const skip = (page - 1) * limit;
     const [data, total] = await Promise.all([
       prisma.review.findMany({
-        where: { hostId },
+        where: { eventId: id },
         include: {
           client: {
             select: { id: true, name: true, profilePhoto: true },
@@ -145,7 +145,7 @@ export const ReviewService = {
         skip,
         take: limit,
       }),
-      prisma.review.count({ where: { hostId } }),
+      prisma.review.count({ where: { eventId: id } }),
     ]);
     return { data, meta: { total, page, limit } };
   },
