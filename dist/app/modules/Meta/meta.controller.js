@@ -28,6 +28,16 @@ const fetchDashboardMetaData = (0, catchAsync_1.catchAsync)((req, res) => __awai
         data: result
     });
 }));
+const fetchHomeMetaData = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield meta_service_1.MetaService.fetchHomeMetaData();
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Home meta data retrieval successfully!",
+        data: result,
+    });
+}));
 exports.MetaController = {
-    fetchDashboardMetaData
+    fetchDashboardMetaData,
+    fetchHomeMetaData,
 };

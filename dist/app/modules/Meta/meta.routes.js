@@ -11,4 +11,5 @@ const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
 // Admin and Host dashboard meta
 router.get('/', (0, auth_1.default)(client_1.UserRole.ADMIN), meta_controller_1.MetaController.fetchDashboardMetaData);
+router.get('/home-meta', meta_controller_1.MetaController.fetchHomeMetaData);
 exports.MetaRoutes = router;

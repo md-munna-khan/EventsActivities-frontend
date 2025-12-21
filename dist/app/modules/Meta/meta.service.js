@@ -97,6 +97,20 @@ const fetchDashboardMetaData = (user) => __awaiter(void 0, void 0, void 0, funct
     const users = yield prisma_1.default.user.count();
     return { role: role !== null && role !== void 0 ? role : 'UNKNOWN', totals: { users } };
 });
+const fetchHomeMetaData = () => __awaiter(void 0, void 0, void 0, function* () {
+    // public/home meta: show events and hosts counts
+    const [totalEvents, totalHosts, totalUsers] = yield Promise.all([
+        prisma_1.default.event.count(),
+        prisma_1.default.host.count(),
+        prisma_1.default.user.count()
+    ]);
+    return {
+        totalEvents,
+        totalHosts,
+        totalUsers
+    };
+});
 exports.MetaService = {
     fetchDashboardMetaData,
+    fetchHomeMetaData,
 };

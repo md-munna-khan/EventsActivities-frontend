@@ -121,12 +121,12 @@ exports.ReviewService = {
             }));
         });
     },
-    listHostReviews(hostId_1) {
-        return __awaiter(this, arguments, void 0, function* (hostId, page = 1, limit = 20) {
+    listHostReviews(id_1) {
+        return __awaiter(this, arguments, void 0, function* (id, page = 1, limit = 20) {
             const skip = (page - 1) * limit;
             const [data, total] = yield Promise.all([
                 prisma_1.default.review.findMany({
-                    where: { hostId },
+                    where: { eventId: id },
                     include: {
                         client: {
                             select: { id: true, name: true, profilePhoto: true },
@@ -137,7 +137,7 @@ exports.ReviewService = {
                     skip,
                     take: limit,
                 }),
-                prisma_1.default.review.count({ where: { hostId } }),
+                prisma_1.default.review.count({ where: { eventId: id } }),
             ]);
             return { data, meta: { total, page, limit } };
         });

@@ -38,7 +38,7 @@ router.delete(
 // ==================== HOST MANAGEMENT ====================
 router.get(
     '/hosts',
-    auth(UserRole.ADMIN),
+   
     AdminController.getAllHosts
 );
 

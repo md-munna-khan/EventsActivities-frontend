@@ -30,10 +30,11 @@ const createReview = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
 }));
 const listHostReviews = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
-    const { hostId } = req.params;
+    const { id } = req.params;
     const page = Number((_a = req.query.page) !== null && _a !== void 0 ? _a : 1);
     const limit = Number((_b = req.query.limit) !== null && _b !== void 0 ? _b : 20);
-    const result = yield review_service_1.ReviewService.listHostReviews(hostId, page, limit);
+    const result = yield review_service_1.ReviewService.listHostReviews(id, page, limit);
+    console.log(result);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: 200,
         success: true,
