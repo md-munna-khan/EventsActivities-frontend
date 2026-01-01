@@ -42,11 +42,11 @@ console.log(topHostsLimited,"top host ")
     <main className="flex flex-col ">
       {/* Hero Section */}
       <section className="relative bg-linear-to-br from-primary/10 via-background to-primary/5 py-20 px-4">
-        <div className="container mx-auto max-w-6xl">
+        <div className=" mx-auto max-w-7xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-                Discover Amazing
+                Discover Amazing 
                 <span className="text-primary"> Events & Activities</span>
               </h1>
               <p className="text-xl text-muted-foreground">
@@ -111,7 +111,7 @@ console.log(topHostsLimited,"top host ")
 
       {/* How It Works Section */}
       <section className="py-20 px-4 bg-background">
-        <div className="container mx-auto max-w-6xl">
+        <div className=" mx-auto max-w-7xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">How It Works</h2>
             <p className="text-xl text-muted-foreground">
@@ -164,7 +164,7 @@ console.log(topHostsLimited,"top host ")
 
       {/* Featured/Popular Events Section */}
       <section className="py-20 px-4 bg-muted/50">
-        <div className="container mx-auto max-w-6xl">
+        <div className=" mx-auto max-w-7xl">
           <div className="flex justify-between items-center mb-12">
             <div>
               <h2 className="text-4xl font-bold mb-4">Popular Events</h2>
@@ -229,7 +229,7 @@ console.log(topHostsLimited,"top host ")
 
       {/* Event Categories Section */}
       <section className="py-20 px-4 bg-background">
-        <div className="container mx-auto max-w-6xl">
+        <div className=" mx-auto max-w-7xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Event Categories</h2>
             <p className="text-xl text-muted-foreground">
@@ -255,7 +255,7 @@ console.log(topHostsLimited,"top host ")
 
       {/* Why Choose Us Section */}
       <section className="py-20 px-4 bg-muted/50">
-        <div className="container mx-auto max-w-6xl">
+        <div className=" mx-auto max-w-7xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Why Choose Us</h2>
             <p className="text-xl text-muted-foreground">
@@ -313,7 +313,7 @@ console.log(topHostsLimited,"top host ")
 
       {/* Top-Rated Hosts Section */}
       <section className="py-20 px-4 bg-background">
-        <div className="container mx-auto max-w-6xl">
+        <div className=" mx-auto max-w-7xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Top-Rated Hosts</h2>
             <p className="text-xl text-muted-foreground">
@@ -377,7 +377,7 @@ console.log(topHostsLimited,"top host ")
 
       {/* Testimonials/Reviews Section */}
       <section className="py-20 px-4 bg-muted/50">
-        <div className="container mx-auto max-w-6xl">
+        <div className=" mx-auto max-w-7xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">What People Say</h2>
             <p className="text-xl text-muted-foreground">

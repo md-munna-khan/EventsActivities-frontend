@@ -37,7 +37,7 @@ const MyEventsPage = async ({ searchParams }: MyEventsPageProps) => {
     console.log("MyEventsPage - Meta:", meta);
 
     return (
-        <div className="space-y-6">
+        <div className=" container mx-auto space-y-6">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">My Events</h1>
                 <p className="text-muted-foreground">

@@ -16,7 +16,7 @@ const ContactPage = () => {
                     <div className="absolute left-10 top-10 h-64 w-64 rounded-full bg-primary/30" />
                     <div className="absolute right-10 bottom-10 h-64 w-64 rounded-full bg-accent/30" />
                 </div>
-                <div className="max-w-6xl mx-auto px-6 pt-16 pb-8 text-center">
+                <div className="max-w-7xl mx-auto px-6 pt-16 pb-8 text-center">
                     <h1 className="text-3xl md:text-5xl font-black tracking-tight">
                         Let’s build your next unforgettable event
                     </h1>
@@ -26,7 +26,7 @@ const ContactPage = () => {
                 </div>
             </div>
 
-            <div className="max-w-6xl mx-auto px-6 pb-24 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="max-w-7xl mx-auto px-6 pb-24 grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Contact Info */}
                 <Card className="lg:col-span-1 border-0 shadow-xl bg-linear-to-br from-card to-card/50">
                     <CardHeader>

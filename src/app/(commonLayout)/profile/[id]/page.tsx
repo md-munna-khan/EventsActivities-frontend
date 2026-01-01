@@ -39,7 +39,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   const joinedEvents = joinedEventsResult.success ? joinedEventsResult.data || [] : [];
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="space-y-6">
         {/* Profile Header */}
         <Card>

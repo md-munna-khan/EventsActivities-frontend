@@ -12,7 +12,7 @@ import { Suspense } from "react";
   return (
     <>
       <div className="flex min-h-screen items-center justify-center bg-linear-to-b from-background to-muted/20">
-        <div className="container flex flex-col items-center justify-center gap-8 px-4 text-center">
+        <div className="max-w-7xl mx-auto flex flex-col items-center justify-center gap-8 px-4 text-center">
           <div className="scale-in">
             <div className="relative">
               {/* Animated Circle */}

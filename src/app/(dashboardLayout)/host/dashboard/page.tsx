@@ -45,7 +45,7 @@ const HostDashboardPage = async ({ searchParams }: HostDashboardPageProps) => {
   const meta = paginatedResult.meta || { page: 1, limit: 10, total: 0, pages: 0 };
 
   return (
-    <div className="space-y-6">
+    <div className=" container mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Host Dashboard</h1>
         <p className="text-muted-foreground">

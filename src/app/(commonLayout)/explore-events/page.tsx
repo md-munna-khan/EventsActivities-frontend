@@ -36,7 +36,7 @@ const ExploreEventsPage = async ({ searchParams }: ExploreEventsPageProps) => {
     console.log("ExploreEventsPage - Meta:", meta);
 
     return (
-        <div className="space-y-6 mx-auto p-4 md:p-8 container mx-auto">
+        <div className="space-y-6 max-w-7xl p-4 md:p-8 mx-auto">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight ">Explore Events</h1>
                 <p className="text-muted-foreground">

@@ -83,7 +83,7 @@ const MyBookingEventsClient = ({ bookings }: MyBookingEventsClientProps) => {
           }}
         />
       )}
-      <div className="max-w-6xl mx-auto py-10 px-4">
+      <div className="container mx-auto py-10 px-4">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl md:text-3xl font-semibold">My Booked Events</h1>
           <div className="text-sm text-muted-foreground">{bookings.length} booking(s)</div>
@@ -94,7 +94,7 @@ const MyBookingEventsClient = ({ bookings }: MyBookingEventsClientProps) => {
             You have no bookings yet.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {bookings.map((booking: any) => {
               const ev = booking.event ?? {};
               const participantStatus = booking.participantStatus ?? booking.status ?? "PENDING";

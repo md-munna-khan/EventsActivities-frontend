@@ -105,7 +105,7 @@ const ExploreEventsClient = ({ initialEvents, initialMeta }: ExploreEventsClient
     };
 
     return (
-        <div className="space-y-4 container mx-auto ">
+        <div className="space-y-4 max-w-7xl mx-auto ">
             {/* Header Actions */}
             <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4 flex-1">
@@ -152,7 +152,7 @@ const ExploreEventsClient = ({ initialEvents, initialMeta }: ExploreEventsClient
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {events.map((event) => (
                         <Card 
                             key={event.id} 
@@ -271,7 +271,7 @@ const ExploreEventsClient = ({ initialEvents, initialMeta }: ExploreEventsClient
                             <CardFooter className="flex gap-2 pt-0">
                                 <Button 
                                     variant="default" 
-                                    className="flex-1"
+                                    className="flex-1 mt-auto"
                                     onClick={() => handleView(event)}
                                 >
                                     <Eye className="mr-2 h-4 w-4" />
