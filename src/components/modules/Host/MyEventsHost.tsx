@@ -295,7 +295,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                 )}
                 
                 {events.length === 0 ? (
-                    <Card className="py-12">
+                    <Card className="py-12 ">
                         <CardContent className="flex flex-col items-center justify-center text-center">
                             <div className="rounded-full bg-muted p-4 mb-4">
                                 <Calendar className="h-8 w-8 text-muted-foreground" />
@@ -315,7 +315,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                     {events.map((event) => (
                         <Card 
                             key={event.id} 
-                            className="group hover:shadow-lg transition-all duration-300 overflow-hidden"
+                            className="group hover:shadow-lg transition-all duration-300 pt-0 overflow-hidden"
                         >
                             {/* Event Image */}
                             <div className="relative h-48 w-full overflow-hidden bg-muted">

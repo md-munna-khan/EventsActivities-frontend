@@ -182,7 +182,7 @@ console.log(topHostsLimited,"top host ")
           {featuredEvents.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredEvents.map((event: any) => (
-                <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <Card key={event.id} className="overflow-hidden hover:shadow-lg pt-0 transition-shadow">
                   {event.image && (
                     <div className="relative h-48 w-full">
                       <Image

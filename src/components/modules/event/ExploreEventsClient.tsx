@@ -156,7 +156,7 @@ const ExploreEventsClient = ({ initialEvents, initialMeta }: ExploreEventsClient
                     {events.map((event) => (
                         <Card 
                             key={event.id} 
-                            className="group hover:shadow-lg transition-all duration-300 overflow-hidden"
+                            className="group hover:shadow-lg transition-all pt-0  duration-300 overflow-hidden"
                         >
                             {/* Event Image */}
                             <div className="relative h-48 w-full overflow-hidden bg-muted">

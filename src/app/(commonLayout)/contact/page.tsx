@@ -68,7 +68,7 @@ const ContactPage = () => {
                 </Card>
 
                 {/* Contact Form */}
-                <Card className="lg:col-span-2 border-0 shadow-xl bg-linear-to-br from-card to-card/50">
+                <Card className="lg:col-span-2 border-0 shadow-xl bg-linear-to-br text-2xl from-card to-card/50">
                     <CardHeader>
                         <CardTitle>Send us a message</CardTitle>
                     </CardHeader>
