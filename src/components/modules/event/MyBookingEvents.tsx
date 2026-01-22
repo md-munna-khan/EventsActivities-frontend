@@ -94,7 +94,7 @@ const MyBookingEventsClient = ({ bookings }: MyBookingEventsClientProps) => {
             You have no bookings yet.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1  lg:grid-cols-3 gap-6">
             {bookings.map((booking: any) => {
               const ev = booking.event ?? {};
               const participantStatus = booking.participantStatus ?? booking.status ?? "PENDING";
@@ -156,9 +156,9 @@ const MyBookingEventsClient = ({ bookings }: MyBookingEventsClientProps) => {
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <a href={`/events/${ev.id}`} className="text-sm underline">
+                      {/* <a href={`/events/${ev.id}`} className="text-sm underline">
                         View event
-                      </a>
+                      </a> */}
 
                       {eventStatus === "COMPLETED" && (
                         <Button

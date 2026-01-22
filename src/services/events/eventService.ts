@@ -14,7 +14,7 @@ import { serverFetch } from "@/lib/server-fetch";
 export async function joinEvent(eventId: string) {
   try {
     const response = await serverFetch.post(`/events/${eventId}/join`);
-    // DEBUG: show raw response status + headers if available
+  
     console.log("joinEvent response status:", response.status);
     const result = await response.json();
 

@@ -37,7 +37,7 @@ export const HomeMeta = async () => {
   const topHosts = Array.isArray(topHostsResult?.data) ? topHostsResult.data : [];
   topHosts.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0));
   const topHostsLimited = topHosts.slice(0, 3);
-console.log(topHostsLimited,"top host ")
+
   return (
     <main className="flex flex-col ">
       {/* Hero Section */}

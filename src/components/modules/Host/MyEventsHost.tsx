@@ -80,18 +80,18 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
     const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     
-    // Use props directly - they update when server component re-fetches
+ 
     const events = initialEvents;
     const meta = initialMeta;
 
-    // Debug logging
+ 
     useEffect(() => {
         console.log("MyEventsClient - Events received:", events.length);
         console.log("MyEventsClient - Events data:", events);
         console.log("MyEventsClient - Meta:", meta);
     }, [events, meta]);
 
-    // Category options (adjust based on your backend enum)
+
     const categoryOptions = [
         { label: 'All Categories', value: 'All' },
         { label: 'Sports', value: 'SPORTS' },
@@ -105,7 +105,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
         { label: 'Other', value: 'OTHER' },
     ];
 
-    // Status options - must match backend EventStatus enum
+ 
     const statusOptions = [
         { label: 'All Statuses', value: 'All' },
         { label: 'Pending', value: 'PENDING' },
@@ -130,7 +130,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
         setIsDeleteDialogOpen(true);
     };
 
-    // NOTE: deletion is handled via modal (openDeleteModal + confirmDelete)
+
 
     const confirmDelete = async () => {
         if (!eventToDelete) return;
@@ -159,7 +159,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
     };
 
     const handleStatusUpdate = async (event: Event, newStatus: string) => {
-        // Frontend validation based on backend business rules
+      
         const participantCount = event.participantCount || 0;
         const isEventPast = new Date(event.date) < new Date();
 
