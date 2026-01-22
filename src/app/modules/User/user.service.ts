@@ -67,7 +67,7 @@ const createClient = async (req: Request): Promise<Client> => {
 
     let uploadedPublicId: string | undefined;
     if (file) {
-        // If multer stored the file in memory (buffer available), upload buffer to Cloudinary
+   
         if ((file as any).buffer) {
             const uploadedProfileImage = await uploadBufferToCloudinary((file as any).buffer, (file as any).originalname || 'profile');
             req.body.client.profilePhoto = uploadedProfileImage?.secure_url;
@@ -107,12 +107,11 @@ console.log(result)
         return result;
     } catch (error) {
         if (uploadedPublicId) {
-            // Try to remove the uploaded image from Cloudinary using the public_id
+ 
             try {
                 await cloudinaryUpload.uploader.destroy(uploadedPublicId as string);
             } catch (err) {
-                // If cleanup fails, log it but rethrow the original error below
-                // console.error('Failed to delete uploaded image from Cloudinary', err);
+            
             }
         }
         throw error;

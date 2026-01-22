@@ -234,13 +234,13 @@ const deleteHost = async (hostId: string) => {
   });
 
   const result = await prisma.$transaction(async (tx) => {
-    // Soft delete host
+ 
     const deletedHost = await tx.host.update({
       where: { id: hostId },
       data: { isDeleted: true }
     });
 
-    // Update user status
+ 
     await tx.user.update({
       where: { email: host.email },
       data: { status: UserStatus.DELETED }
@@ -260,7 +260,7 @@ export const AdminService = {
     approveEvent,
     rejectEvent,
     
-    // Host Management
+
     getAllHosts,
     updateHostStatus,
     deleteHost

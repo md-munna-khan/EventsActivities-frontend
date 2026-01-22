@@ -13,7 +13,7 @@ const getTransactionId = () => {
 
 const joinEvent = async (eventId: string, user: any) => {
   try {
-    // user can be either decoded token (req.user) or object with accessToken
+
     let email: string | undefined;
     if (user && typeof user.email === 'string') {
       email = user.email;
@@ -24,15 +24,15 @@ const joinEvent = async (eventId: string, user: any) => {
 
     if (!email) throw new Error('Unauthorized: missing user email');
 
-    // Find the client linked to this user
+
     const client = await prisma.client.findUnique({ where: { email } });
     if (!client) throw new Error("Unauthorized: Client profile not found");
 
     const clientId = client.id;
 
-    // Use a transaction callback so DB changes roll back if SSL init fails
+  
     const result = await prisma.$transaction(async (tx) => {
-      // re-fetch event inside transaction and include participants count
+ 
       const event = await tx.event.findUnique({
         where: { id: eventId },
         include: { participants: true },
@@ -40,19 +40,19 @@ const joinEvent = async (eventId: string, user: any) => {
       if (!event) throw new Error("Event not found");
       if (event.status !== EventStatus.OPEN) throw new Error("Cannot join an inactive event");
 
-      // prevent duplicate join
+
       const alreadyJoined = await tx.eventParticipant.findFirst({
         where: { eventId, clientId },
       });
       if (alreadyJoined) throw new Error("You have already joined this event");
 
-      // check capacity
+  
       if (event.capacity <= 0) throw new Error("Event is full");
 
       const amount = event.joiningFee;
       const tranId = getTransactionId();
 
-      // create payment (PENDING)
+   
       const payment = await tx.payment.create({
         data: {
           amount,
@@ -65,7 +65,7 @@ const joinEvent = async (eventId: string, user: any) => {
         },
       });
 
-      // create participant with PENDING status and link payment
+
       const participant = await tx.eventParticipant.create({
         data: {
           eventId,
@@ -75,7 +75,7 @@ const joinEvent = async (eventId: string, user: any) => {
         },
       });
 
-      // decrement capacity and possibly set event status to FULL
+  
       const newCapacity = event.capacity - 1;
       const newStatus = newCapacity <= 0 ? EventStatus.FULL : event.status;
       await tx.event.update({
@@ -83,7 +83,7 @@ const joinEvent = async (eventId: string, user: any) => {
         data: { capacity: newCapacity, status: newStatus },
       });
 
-      // prepare ssl payload using client info (use fields you have on client)
+     
       const sslPayload = {
         address: client.location ?? "N/A",
         email: client.email,
@@ -91,13 +91,13 @@ const joinEvent = async (eventId: string, user: any) => {
         name: client.name,
         amount,
         transactionId: tranId,
-        success_url: `${config.sslcommerz.success_backend_url}`, // server endpoints
+        success_url: `${config.sslcommerz.success_backend_url}`, 
         fail_url: `${config.sslcommerz.fail_backend_url}`,
         cancel_url: `${config.sslcommerz.cancel_backend_url}`,
         ipn_url: `${config.sslcommerz.ipn_url}`,
       };
 
-      // initiate SSLCommerz payment (external). If this throws, transaction will rollback.
+
       const sslResponse = await SSLService.sslPaymentInit(sslPayload);
 
       return {
@@ -107,7 +107,7 @@ const joinEvent = async (eventId: string, user: any) => {
         eventId: event.id,
         tranId,
       };
-    }); // end transaction
+    }); 
 
     return {
       paymentUrl: result.paymentUrl,
@@ -151,7 +151,7 @@ const leaveEvent = async (eventId: string, user: any) => {
   
   if (!existing) throw new Error("You are not joined to this event");
 
-  // delete participant and restore capacity (no transaction for simplicity but you can wrap if needed)
+
   await prisma.eventParticipant.delete({ where: { id: existing.id } });
 
   if (event) {
@@ -170,7 +170,7 @@ export const getMyBookings = async (user: any, eventId?: string) => {
   try {
     let clientEmail: string | undefined;
 
-    // Extract client email from user object or JWT
+
     if (user?.email) {
       clientEmail = user.email;
     } else if (user?.accessToken) {
@@ -185,16 +185,16 @@ export const getMyBookings = async (user: any, eventId?: string) => {
       throw new Error("Unable to identify user");
     }
 
-    // Build Prisma where condition
+
     const whereCondition: any = {
-      client: { email: clientEmail } // filter by email
+      client: { email: clientEmail } 
     };
 
     if (eventId) {
       whereCondition.eventId = eventId;
     }
 
-    // Fetch bookings with all details
+   
     const bookings = await prisma.eventParticipant.findMany({
       where: whereCondition,
       include: {

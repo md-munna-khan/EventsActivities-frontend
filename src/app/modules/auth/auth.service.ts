@@ -181,30 +181,30 @@ const getMe = async (user: any) => {
 };
 
 const applyHost = async (user: any) => {
-  // user is taken from req.cookies (set by login)
+
   const accessToken = user?.accessToken;
   if (!accessToken) {
     throw new Error('Unauthorized');
   }
 
-  // decode token to get email
+
   const decoded = jwtHelper.verifyToken(accessToken, config.jwt.jwt_secret as Secret) as any;
   const email = decoded?.email;
   if (!email) throw new Error('Unauthorized');
 
-  // run in transaction: create HostApplication and set user.status = PENDING
+
   const result = await prisma.$transaction(async (tx) => {
     const userData = await tx.user.findUniqueOrThrow({ where: { email } });
 if(userData.status === UserStatus.PENDING){
     throw new Error('User already has a pending host application');
 }
-    // Prevent duplicate applications
+
     const existingApp = await tx.hostApplication.findFirst({ where: { userId: userData.id } });
     if (existingApp) {
       return { message: 'Host application already exists', application: existingApp };
     }
 
-    // create host application
+
     const application = await tx.hostApplication.create({
       data: {
         name: userData.email.split('@')[0],
@@ -213,7 +213,7 @@ if(userData.status === UserStatus.PENDING){
       },
     });
 
-    // set user status to PENDING so login is blocked until approval
+
     await tx.user.update({
       where: { id: userData.id },
       data: { status: UserStatus.PENDING },

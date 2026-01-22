@@ -13,9 +13,6 @@ cloudinary.config({
 });
 
 
-// cloudinary.v2.uploader.upload(file, options).then(callback);
-// this is the system of cloudinary but we will do it using a package.
-// this package will take the file and will do the work and will return the url inside the req.file object 
 
 export const deleteImageFromCloudinary=async (url:string)=>{
 
@@ -32,26 +29,21 @@ export const deleteImageFromCloudinary=async (url:string)=>{
       catch (error:any) {
         throw new ApiError (401, "Cloudinary image deletion failed",error.message)
       }}
-      // This function converts your Buffer into a stream and uploads it.
+    
 export const uploadBufferToCloudinary = async (buffer: Buffer, fileName: string) : Promise<UploadApiResponse | undefined>  => {
-    // It returns a Promise that will eventually resolve to "Hello".
+
 
     try {
-        // cloudinary upload function doesn’t return a Promise, so you must manually wrap it
+      
 
         return new Promise((resolve, reject) => {
             const public_id = `pdf/${fileName}-${Date.now()}`
 
 
-            // converting the buffer in stream 
+
             const bufferStream = new stream.PassThrough()
-            // PassThrough is a special Node.js stream that lets you push a Buffer and treat it as a readable stream.
             bufferStream.end(buffer)
 
-            // Writes the last chunk of data (buffer) to the stream.
-
-
-            // template cloudinary.uploader.upload_stream(options, callback)
 
             cloudinary.uploader.upload_stream(
                 {
@@ -66,9 +58,7 @@ export const uploadBufferToCloudinary = async (buffer: Buffer, fileName: string)
                     resolve(result)
                 }
             ).end(buffer)
-            // You immediately .end(buffer) → This writes the entire buffer to that stream.
-            // .end(buffer) Writes your entire buffer to the Cloudinary stream.
-            // Closes the stream so Cloudinary can finish uploading.
+
 
 
 

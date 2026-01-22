@@ -8,7 +8,7 @@ import { eventsService } from "./event.service";
 
 
 
-// participant controllers
+
 const joinEvent = catchAsync(async (req: Request, res: Response) => {
   const { id: eventId } = req.params;
   const user = (req as any).user;// must be authenticated client
@@ -25,7 +25,7 @@ const joinEvent = catchAsync(async (req: Request, res: Response) => {
 
 const leaveEvent = catchAsync(async (req: Request, res: Response) => {
   const { id: eventId } = req.params;
-  const user = (req as any).user;// must be authenticated client
+  const user = (req as any).user;
   if (!user) throw new Error("Unauthorized");
 
   const result = await eventsService.leaveEvent(eventId, user);
@@ -37,7 +37,7 @@ const leaveEvent = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getMyBookings = catchAsync(async (req: Request, res: Response) => {
-  const user = (req as any).user; // must be authenticated client
+  const user = (req as any).user; 
   if (!user) throw new Error("Unauthorized");   
   const bookings = await eventsService.getMyBookings(user);
   sendResponse(res, {

@@ -34,10 +34,10 @@ router.get("/", hostController.getEvents);
 // Get single event
 router.get("/:id", hostController.getSingleEvent);
 
-// Update event (host/admin) - allow optional file upload
+
 router.patch(
   "/:id",
-  auth(UserRole.HOST,UserRole.ADMIN), // allow host or admin; inside service we check ownership
+  auth(UserRole.HOST,UserRole.ADMIN), 
  multerUpload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
         req.body = eventValidation.updateHostValidation.parse(JSON.parse(req.body.data))
@@ -45,13 +45,13 @@ router.patch(
     }
 );
 
-// Delete event
+
 router.delete("/:id", auth(UserRole.HOST, UserRole.ADMIN), hostController.deleteEvent);
 
 
 router.get("/", hostController.getAllHosts);
 
-// update event status
+
   router.patch(
     "/event-status/:id",
     auth(UserRole.HOST),

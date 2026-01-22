@@ -6,8 +6,8 @@ import { sendResponse } from "../../../shared/sendResponse";
 import { ReviewService } from "./review.service";
 
 const createReview = catchAsync(async (req: Request, res: Response) => {
-  const { id: eventId } = req.params; // route: /events/:id/reviews
-  const user = (req as any).user || req.cookies // Get user from auth middleware
+  const { id: eventId } = req.params; 
+  const user = (req as any).user || req.cookies 
   
   if (!user) {
     throw new Error("User information is missing in the request");
@@ -38,14 +38,6 @@ console.log(result)
   });
 });
 
-// const allReviews = catchAsync(async (req: Request, res: Response) => {
-//   const result = await ReviewService.allReviews();
-//   sendResponse(res, { 
-//     statusCode: 200,
-//     success: true,
-//     message: "All reviews fetched",
-//     data: result 
-//   });
-// });
+
 
 export const ReviewController = { createReview, listHostReviews };
