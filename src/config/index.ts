@@ -28,7 +28,7 @@ export default {
     fail_backend_url: requireEnv("SSL_FAIL_BACKEND_URL"),
     cancel_backend_url: requireEnv("SSL_CANCEL_BACKEND_URL"),
 
-    // Frontend redirects (to return user)
+    // Frontend redirects to return user
     success_frontend_url: requireEnv("SSL_SUCCESS_FRONTEND_URL"),
     fail_frontend_url: requireEnv("SSL_FAIL_FRONTEND_URL"),
     cancel_frontend_url: requireEnv("SSL_CANCEL_FRONTEND_URL"),

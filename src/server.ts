@@ -18,7 +18,7 @@ async function bootstrap() {
       console.log(`Server is running on http://localhost:${config.port}`);
     });
 
-    // Function to gracefully shut down the server
+    //  ==== Function to gracefully shut down the server
     const exitHandler = () => {
       if (server) {
         server.close(() => {
@@ -30,7 +30,7 @@ async function bootstrap() {
       }
     };
 
-    // Handle unhandled promise rejections
+    // =====Handle unhandled promise rejections
     process.on('unhandledRejection', (error) => {
       console.log('Unhandled Rejection is detected, we are closing our server...');
       if (server) {

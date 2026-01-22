@@ -20,7 +20,7 @@ router.get('/', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1
 router.patch('/:id', (0, auth_1.default)(client_1.UserRole.ADMIN), (0, validateRequest_1.default)(admin_validations_1.adminValidationSchemas.update), admin_controller_1.AdminController.updateIntoDB);
 router.delete('/:id', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.deleteFromDB);
 // ==================== HOST MANAGEMENT ====================
-router.get('/hosts', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.getAllHosts);
+router.get('/hosts', admin_controller_1.AdminController.getAllHosts);
 router.patch('/hosts/:id/status', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.updateHostStatus);
 router.delete('/hosts/:id', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.deleteHost);
 // ==================== HOST APPLICATION MANAGEMENT ====================

@@ -2,12 +2,8 @@
 import prisma from '../../../shared/prisma';
 import { UserRole, PaymentStatus, EventStatus } from '@prisma/client';
 
-/**
- * Fetch dashboard meta data based on user role.
- * Accepts a `user` object (as set by auth middleware) or a cookie object fallback.
- */
 const fetchDashboardMetaData = async (user: any) => {
-  // support both req.user (auth middleware) and req.cookies fallback
+
   const ctx = user?.user || user?.cookies || user;
   const role = (ctx && (ctx.role || ctx?.role)) as UserRole | string | undefined;
 
@@ -22,7 +18,7 @@ const fetchDashboardMetaData = async (user: any) => {
         prisma.event.groupBy({ by: ['status'], _count: { _all: true } }).catch(() => []),
         prisma.payment.count({ where: { status: PaymentStatus.PAID } }).catch(() => 0),
         prisma.payment.aggregate({ _sum: { amount: true }, where: { status: PaymentStatus.PAID } }).catch(() => ({ _sum: { amount: 0 } })),
-        // host applications pending (if model exists)
+  
         prisma.hostApplication.count({ where: { status: 'PENDING' } }).catch(() => 0),
         prisma.event.findMany({ take: 10, orderBy: { createdAt: 'desc' }, select: { id: true, title: true, status: true, createdAt: true, hostId: true } }).catch(() => []),
       ]);
@@ -32,7 +28,7 @@ const fetchDashboardMetaData = async (user: any) => {
       eventsStatusCounts[r.status] = r._count?._all ?? r._count ?? 0;
     });
 
-    // classify success/failed roughly
+
     const successCount = eventsStatusCounts[EventStatus.COMPLETED] ?? 0;
     const failedCount = (eventsStatusCounts[EventStatus.CANCELLED] ?? 0) + (eventsStatusCounts[EventStatus.REJECTED] ?? 0);
 
@@ -94,7 +90,7 @@ const fetchDashboardMetaData = async (user: any) => {
 };
 
 const fetchHomeMetaData = async () => {
-  // public/home meta: show events and hosts counts
+
   const [totalEvents, totalHosts, totalUsers] = await Promise.all([
     prisma.event.count(),
     prisma.host.count(),

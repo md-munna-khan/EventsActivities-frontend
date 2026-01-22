@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { EventCategory, EventStatus } from "@prisma/client";
 
-// Create Event Validation Schema
+
 export const createHostValidation = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
   category: z.nativeEnum(EventCategory, {
@@ -16,7 +16,7 @@ export const createHostValidation = z.object({
 
   capacity: z.number().int().positive("Capacity must be a positive number"),
 
-  // status is optional because Prisma sets default PENDING
+
   status: z.nativeEnum(EventStatus).optional(),
 
 

@@ -1,21 +1,21 @@
 
 
-// src/app/modules/Payment/payment.controller.ts
+
 import { Request, Response } from "express";
 import { PaymentService } from "./payment.service";
 import { catchAsync } from "../../../shared/catchAsync";
 import config from "../../../config";
 
 const _getPayload = (req: Request) => {
-  // SSLCommerz sometimes sends form-urlencoded (POST) or query params (GET)
+
   if (req.method === "POST") {
-    // If body empty but urlencoded available, Express should parse it if middleware present
+ 
     if (req.body && Object.keys(req.body).length) return req.body;
-    // also check raw query fallback
+
     if (req.query && Object.keys(req.query).length) return req.query;
     return {};
   }
-  // GET or others
+
   return (req.query && Object.keys(req.query).length) ? req.query : {};
 };
 
@@ -25,7 +25,7 @@ const successPayment = catchAsync(async (req: Request, res: Response) => {
 console.log("Method:", req.method);
 console.log("URL:", req.originalUrl);
 console.log("Headers:", JSON.stringify(req.headers, null, 2));
-console.log("Raw body:", req.body);   // express.urlencoded should have parsed this
+console.log("Raw body:", req.body);   
 console.log("Query:", req.query);
 
 

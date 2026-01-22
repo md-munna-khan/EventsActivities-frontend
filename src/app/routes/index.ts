@@ -44,7 +44,7 @@ const moduleRoutes = [
         path: '/meta',
         route: MetaRoutes
     },
-    // Add more module routes here
+
     
 ];
 

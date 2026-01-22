@@ -25,17 +25,6 @@ const getAllFromDB: RequestHandler = catchAsync(async (req: Request, res: Respon
     })
 })
 
-// const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
-//     const { id } = req.params;
-
-//     const result = await AdminService.getByIdFromDB(id);
-//     sendResponse(res, {
-//         statusCode: httpStatus.OK,
-//         success: true,
-//         message: "Admin data fetched by id!",
-//         data: result
-//     });
-// })
 
 
 const updateIntoDB = catchAsync(async (req: Request, res: Response) => {
@@ -101,19 +90,19 @@ const fetchPendingEventApplications = catchAsync(async (req: Request, res: Respo
 
 
 
-// Approve host application (transactional):
+
  const HostApprove = catchAsync(async (req: Request, res: Response) => {
-  const { applicationId } = req.params; // use application id in route
-  // load application + user
+  const { applicationId } = req.params;
+
   const application = await prisma.hostApplication.findUniqueOrThrow({
     where: { id: applicationId },
   });
 console.log(application)
   const result = await prisma.$transaction(async (tx) => {
-    // fetch user
+
     const userData = await tx.user.findUniqueOrThrow({ where: { id: application.userId } });
 
-    // create Host record
+
     const host = await tx.host.create({
       data: {
         email: userData.email,
@@ -126,19 +115,19 @@ console.log(application)
       },
     });
 
-    // remove Client profile if exists (prevent double profiles)
+
     const client = await tx.client.findUnique({ where: { email: userData.email } });
     if (client) {
       await tx.client.delete({ where: { id: client.id } });
     }
 
-    // update user role -> HOST and reactivate user
+
     await tx.user.update({
       where: { id: userData.id },
       data: { role: UserRole.HOST, status: UserStatus.ACTIVE },
     });
 
-    // mark application approved
+    
     const updatedApp = await tx.hostApplication.update({
       where: { id: applicationId },
       data: { status: 'APPROVED' },
@@ -155,7 +144,7 @@ console.log(application)
   });
 });
 
-// Reject host application (transactional):
+// Reject host application 
  const HostReject = catchAsync(async (req: Request, res: Response) => {
   const { applicationId } = req.params;
 
@@ -164,13 +153,13 @@ console.log(application)
   });
 
   const result = await prisma.$transaction(async (tx) => {
-    // set application status rejected
+  
     const updatedApp = await tx.hostApplication.update({
       where: { id: applicationId },
       data: { status: 'REJECTED' },
     });
 
-    // restore user status to ACTIVE so they can login again
+
     await tx.user.update({
       where: { id: application.userId },
       data: { status: UserStatus.ACTIVE },
@@ -187,7 +176,7 @@ console.log(application)
   });
 });
 
-// fetch pending host applications
+
 const fetchPendingHostApplications = catchAsync(async (req: Request, res: Response) => {
   const pending = await prisma.hostApplication.findMany({ where: { status: 'PENDING' } });
   sendResponse(res, {
@@ -248,7 +237,7 @@ export const AdminController = {
     approveEventController,
     rejectEventController,
     fetchPendingEventApplications,
-    // Host Management
+
     getAllHosts,
     updateHostStatus,
     deleteHost

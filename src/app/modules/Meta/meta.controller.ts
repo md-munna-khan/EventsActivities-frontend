@@ -10,7 +10,7 @@ import { sendResponse } from "../../../shared/sendResponse";
 
 
 const fetchDashboardMetaData = catchAsync(async (req: Request, res: Response) => {
-    // prefer authenticated user set by auth middleware, fallback to cookies
+
     const user = (req as any).user || req.cookies;
     const result = await MetaService.fetchDashboardMetaData(user);
 

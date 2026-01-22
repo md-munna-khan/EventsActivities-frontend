@@ -15,11 +15,6 @@ router.get(
     AdminController.getAllFromDB
 );
 
-// router.get(
-//     '/:id',
-//     auth( UserRole.ADMIN),
-//     AdminController.getByIdFromDB
-// );
 
 router.patch(
     '/:id',

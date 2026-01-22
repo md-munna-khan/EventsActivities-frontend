@@ -252,32 +252,32 @@ const getSingleEvent = async (id: string) => {
 };
 
 const updateEvent = async (id: string, payload: any, req?: Request) => {
-  // optional: check host ownership before update (recommended)
+
   const existing = await prisma.event.findUnique({ where: { id },
   include: { host: true } });
 
   if (!existing) throw new Error("Event not found");
 
- // 2) require auth info
+
   if (!req) throw new Error("Request required for authorization");
   const requester = (req as any).user;
   if (!requester) throw new Error("Unauthorized: missing user info");
 
-  // 3) admin can update anything
+
   if (requester.role === "ADMIN") {
-    // continue to update below
+   
   } else {
-    // 4) non-admin: find host record for this requester by email
+  
     const host = await prisma.host.findFirst({ where: { email: requester.email } });
     if (!host) throw new Error("Unauthorized: host profile not found for your account");
 
-    // 5) check ownership: host.id must match event.hostId
+  
     if (String(host.id) !== String(existing.hostId)) {
       throw new Error("Unauthorized to update this event");
     }
   }
 
-  // handle file if new upload provided
+
   const file = (req as any)?.file;
   let uploadedPublicId: string | undefined;
   if (file) {
@@ -360,7 +360,7 @@ const updateEventStatus = async (id: string, status: string, req?: Request) => {
   
   if (!existing) throw new Error("Event not found");  
   
-  // ownership check  
+ 
   if (!req) throw new Error("Request required for authorization");  
   const requester = (req as any).user;
   if (!requester) throw new Error("Unauthorized: missing user info");
@@ -382,15 +382,15 @@ const updateEventStatus = async (id: string, status: string, req?: Request) => {
     throw new Error(`Invalid status '${status}'. Allowed: ${EVENT_STATUSES.join(", ")}`);
   }
 
-  // Business rules for host updating event status
+
   const newStatus = normalized as EventStatus;
   
-  // Rule 1: Host cannot set event to OPEN (only admin can approve pending events)
+
   if (newStatus === EventStatus.OPEN) {
     throw new Error("Only admin can approve and open events");
   }
 
-  // Rule 2: If event is PENDING, host can cancel
+
   if (existing.status === EventStatus.PENDING) {
     if (newStatus === EventStatus.CANCELLED) {
       const updated = await prisma.event.update({
@@ -403,7 +403,7 @@ const updateEventStatus = async (id: string, status: string, req?: Request) => {
     }
   }
 
-  // Rule 3: If event is OPEN and has no confirmed bookings, host can cancel
+
   if (existing.status === EventStatus.OPEN) {
     const hasBookings = existing.participants.length > 0;
     
@@ -419,7 +419,7 @@ const updateEventStatus = async (id: string, status: string, req?: Request) => {
       return updated;
     }
 
-    // Rule 4: Host can mark event as COMPLETED
+
     if (newStatus === EventStatus.COMPLETED) {
       const updated = await prisma.event.update({
         where: { id },
@@ -429,7 +429,7 @@ const updateEventStatus = async (id: string, status: string, req?: Request) => {
     }
   }
 
-  // Rule 5: If event is FULL, host can mark as COMPLETED
+
   if (existing.status === EventStatus.FULL || newStatus === EventStatus.COMPLETED) {
     const updated = await prisma.event.update({
       where: { id },

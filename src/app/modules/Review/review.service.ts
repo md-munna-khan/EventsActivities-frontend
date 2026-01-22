@@ -12,7 +12,7 @@ export const ReviewService = {
     user: any,
     payload: { rating: number; comment?: string }
   ) {
-    // 0. basic payload validation
+
     const ratingRaw = Number(payload.rating);
     if (!Number.isFinite(ratingRaw)) {
       throw new ApiError(httpStatus.BAD_REQUEST, "Invalid rating value");
@@ -22,30 +22,30 @@ export const ReviewService = {
       throw new ApiError(httpStatus.BAD_REQUEST, "Rating must be between 1 and 5");
     }
 
-    // 1. Resolve user email or id safely
+   
     let userId: string | undefined;
     let email: string | undefined;
 
     if (user?.id) userId = user.id;
     if (user?.email) email = user.email;
 
-    // if user provided only accessToken, decode it
+
     if (!userId && !email && user?.accessToken) {
       try {
         const decoded = jwtHelper.verifyToken(
           user.accessToken,
           config.jwt.jwt_secret as Secret
         ) as any;
-        // try common fields
+      
         userId = decoded?.id ?? decoded?.userId ?? decoded?.sub ?? userId;
         email = decoded?.email ?? email;
       } catch (err) {
-        // invalid token
+  
         throw new ApiError(httpStatus.UNAUTHORIZED, "Invalid or expired token");
       }
     }
 
-    // if only userId available, fetch user to get email (because client relation uses email)
+ 
     if (userId && !email) {
       const u = await prisma.user.findUnique({ where: { id: userId } });
       if (!u) throw new ApiError(httpStatus.UNAUTHORIZED, "User not found");
@@ -56,7 +56,7 @@ export const ReviewService = {
       throw new ApiError(httpStatus.UNAUTHORIZED, "Unable to identify user");
     }
 
-    // 2. fetch event and validate status
+   
     const event = await prisma.event.findUnique({ where: { id: eventId } });
     if (!event) throw new ApiError(httpStatus.NOT_FOUND, "Event not found");
     if (event.status !== "COMPLETED") {
@@ -66,13 +66,13 @@ export const ReviewService = {
       );
     }
 
-    // 3. fetch client by email
+  
     const client = await prisma.client.findUnique({ where: { email } });
     if (!client) {
       throw new ApiError(httpStatus.UNAUTHORIZED, "Client profile not found");
     }
 
-    // 4. Check if user attended the event (confirmed participant)
+
     const participant = await prisma.eventParticipant.findFirst({
       where: {
         eventId,
@@ -87,7 +87,7 @@ export const ReviewService = {
       );
     }
 
-    // 5. Prevent duplicate review for same event by same client
+
     const existing = await prisma.review.findFirst({
       where: { eventId, clientId: client.id },
     });
@@ -98,7 +98,7 @@ export const ReviewService = {
       );
     }
 
-    // 6. Create review and update host's rating atomically
+    
     return await prisma.$transaction(async (tx) => {
       const review = await tx.review.create({
         data: {
@@ -110,7 +110,7 @@ export const ReviewService = {
         },
       });
 
-      // Update host aggregate rating
+   
       const host = await tx.host.findUnique({ where: { id: event.hostId } });
       if (!host)
         throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Host not found");
@@ -118,7 +118,7 @@ export const ReviewService = {
       const currentCount = host.ratingCount ?? 0;
       const currentRating = host.rating ?? 0;
       const newCount = currentCount + 1;
-      // calculate weighted average correctly
+
       const newRating = ((currentRating * currentCount) + rating) / newCount;
 
       await tx.host.update({
@@ -150,20 +150,5 @@ export const ReviewService = {
     return { data, meta: { total, page, limit } };
   },
 
-  // fixed allReviews method syntax
-  // async allReviews() {
-  //   const reviews = await prisma.review.findMany({
-  //     include: {
-  //       client: {
-  //         select: { id: true, name: true, profilePhoto: true },
-  //       },
-  //       event: { select: { id: true, title: true } },
-  //       host: {
-  //         select: { id: true, name: true, email: true },
-  //       },
-  //     },
-  //     orderBy: { createdAt: "desc" },
-  //   });
-  //   return reviews;
-  // },
+
 };
