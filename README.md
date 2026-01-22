@@ -11,7 +11,7 @@
 **Video Walkthrough:** [https://drive.google.com/file/d/1IrgrVmQaY6CqQvTg5ChHipD2k1jyZXRN/view?usp=sharing](https://drive.google.com/file/d/1IrgrVmQaY6CqQvTg5ChHipD2k1jyZXRN/view?usp=sharing)
 
 ---
-
+# Readme Confict Fixed
 ## 📌 Project Overview
 
 Events & Activities is a role-based event management platform where users can **discover**, **join**, **create**, and **manage** real-life activities such as trips, concerts, workshops, meetups, sports events, and hobby gatherings.
