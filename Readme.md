@@ -5,7 +5,7 @@
 This is the backend service for the **Events & Activities Platform**, built with **Node.js**, **Express.js**, and **Prisma ORM**. It provides APIs for user authentication, event management, payment processing via SSLCommerz, booking, reviews, and admin/host/client dashboards.
 
 ---
-hello 
+
 ## Features
 
 * User Authentication (JWT-Based)
