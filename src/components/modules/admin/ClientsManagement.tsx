@@ -39,7 +39,7 @@ const ClientsManagement = async () => {
             <ShieldAlert className="h-6 w-6 text-destructive" />
           </div>
           <div>
-            <CardTitle className="text-destructive font-black uppercase italic">
+            <CardTitle className="text-destructive font-black uppercase ">
               Access Denied
             </CardTitle>
             <CardDescription>
@@ -66,7 +66,7 @@ const ClientsManagement = async () => {
         <div className="space-y-1">
           <h2 className="text-2xl md:text-4xl font-black tracking-tighter uppercase  text-foreground">
             Client{" "}
-            <span className="text-primary not-italic text-secondary-foreground">
+            <span className="text-primary  text-secondary-foreground">
               Database
             </span>
           </h2>
@@ -172,7 +172,7 @@ const ClientsManagement = async () => {
               <div className="h-20 w-20 bg-muted rounded-full flex items-center justify-center mb-6">
                 <UserCircle2 className="h-10 w-10 text-muted-foreground/20" />
               </div>
-              <h3 className="text-xl font-black italic uppercase text-muted-foreground">
+              <h3 className="text-xl font-black  uppercase text-muted-foreground">
                 Zero Clients Registered
               </h3>
               <p className="text-muted-foreground text-sm max-w-xs mt-2">

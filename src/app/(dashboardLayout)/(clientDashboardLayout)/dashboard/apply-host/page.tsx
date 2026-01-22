@@ -9,8 +9,8 @@ const ApplyHostPage = () => {
         
     
         <div className="text-center space-y-4 mb-16 animate-in fade-in slide-in-from-top-4 duration-700">
-          <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground italic">
-            SHARE YOUR PASSION, <span className="text-primary not-italic">BECOME A HOST</span>
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground ">
+            SHARE YOUR PASSION, <span className="text-primary ">BECOME A HOST</span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">
             Join our elite community of organizers. Turn your skills into memorable experiences and earn while doing what you love.
@@ -107,7 +107,7 @@ const BenefitCard = ({ icon: Icon, title, desc }: any) => (
     <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500">
       <Icon className="w-7 h-7" />
     </div>
-    <h4 className="font-black text-xl mb-3 tracking-tight uppercase italic group-hover:not-italic transition-all">{title}</h4>
+    <h4 className="font-black text-xl mb-3 tracking-tight uppercase  group-hover: transition-all">{title}</h4>
     <p className="text-muted-foreground text-sm leading-relaxed font-medium">{desc}</p>
   </div>
 );
@@ -120,7 +120,7 @@ const Step = ({ num, title, desc }: any) => (
     </div>
    
     <div className="w-[calc(100%-4rem)] md:w-[45%] p-4 rounded-xl bg-muted/30 border border-transparent hover:border-border transition-colors">
-      <h5 className="font-black text-foreground uppercase tracking-tighter italic">{title}</h5>
+      <h5 className="font-black text-foreground uppercase tracking-tighter ">{title}</h5>
       <p className="text-xs text-muted-foreground font-medium mt-1">{desc}</p>
     </div>
   </div>

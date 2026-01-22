@@ -51,8 +51,8 @@ const HostsManagement = async () => {
     
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-1">
-          <h2 className="text-3xl md:text-4xl font-black tracking-tighter uppercase italic">
-            Hosts <span className="text-primary not-italic">Management</span>
+          <h2 className="text-3xl md:text-4xl font-black tracking-tighter uppercase ">
+            Hosts <span className="text-primary ">Management</span>
           </h2>
           <p className="text-muted-foreground font-medium">Verify credentials and manage status for all platform hosts.</p>
         </div>
@@ -130,7 +130,7 @@ const HostsManagement = async () => {
                <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mb-4">
                   <ShieldCheck className="h-8 w-8 text-muted-foreground/30" />
                </div>
-               <p className="font-black italic uppercase text-muted-foreground">No host records found</p>
+               <p className="font-black  uppercase text-muted-foreground">No host records found</p>
             </div>
           )}
           

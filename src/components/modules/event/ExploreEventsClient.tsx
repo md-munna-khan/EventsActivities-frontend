@@ -91,8 +91,8 @@ const ExploreEventsClient = ({ initialEvents, initialMeta }: ExploreEventsClient
         
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="space-y-2">
-                    <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic">
-                        Discover <span className="text-primary not-italic">Events</span>
+                    <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase ">
+                        Discover <span className="text-primary ">Events</span>
                     </h1>
                     <p className="text-muted-foreground font-medium max-w-md">
                         Explore the best activities, workshops, and gatherings in your city.
@@ -141,7 +141,7 @@ const ExploreEventsClient = ({ initialEvents, initialMeta }: ExploreEventsClient
                         <div className="bg-muted p-6 rounded-full">
                             <Calendar className="h-12 w-12 text-muted-foreground" />
                         </div>
-                        <h3 className="text-2xl font-black italic uppercase">No events found</h3>
+                        <h3 className="text-2xl font-black  uppercase">No events found</h3>
                         <p className="text-muted-foreground max-w-xs">Adjust your search or filters to find what you&apos;re looking for.</p>
                         <Button onClick={() => router.push('/explore-events')} variant="link" className="text-primary font-bold">
                             Clear all filters
@@ -152,7 +152,7 @@ const ExploreEventsClient = ({ initialEvents, initialMeta }: ExploreEventsClient
                         {events.map((event) => (
                             <Card 
                                 key={event.id} 
-                                className="group h-full border-none shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col bg-card"
+                                className="group h-full border-none shadow-lg hover:shadow-2xl transition-all duration-500 pt-0 overflow-hidden flex flex-col bg-card"
                             >
                               
                                 <div className="relative h-56 overflow-hidden">
@@ -192,7 +192,7 @@ const ExploreEventsClient = ({ initialEvents, initialMeta }: ExploreEventsClient
 
                            
                                 <CardHeader className="p-5 pb-2">
-                                    <CardTitle className="text-xl font-black italic uppercase tracking-tighter line-clamp-2 group-hover:text-primary transition-colors">
+                                    <CardTitle className="text-xl font-black  uppercase tracking-tighter line-clamp-2 group-hover:text-primary transition-colors">
                                         {event.title}
                                     </CardTitle>
                                 </CardHeader>

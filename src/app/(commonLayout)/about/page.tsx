@@ -31,7 +31,7 @@ const AboutPage = () => {
           <span className="inline-block px-4 py-1.5 mb-6 text-sm font-medium tracking-wider uppercase bg-primary/10 text-primary rounded-full">
             Our Story
           </span>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8">
+          <h1 className="text-2xl md:text-3xl lg:text-5xl font-bold tracking-tight mb-8">
             We craft experiences that <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-accent">bring people together.</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">

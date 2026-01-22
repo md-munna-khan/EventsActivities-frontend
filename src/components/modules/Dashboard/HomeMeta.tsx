@@ -122,7 +122,7 @@ export const HomeMeta = async () => {
 
         <div className="mx-auto max-w-7xl relative">
           <div className="text-center mb-16 space-y-4">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tighter">
+            <h2 className="text-2xl md:text-4xl font-black tracking-tighter">
               Your journey starts in <span className="text-primary">three steps</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -191,7 +191,7 @@ export const HomeMeta = async () => {
         
           <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
             <div className="space-y-3 text-center md:text-left">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tighter">
+              <h2 className="text-2xl md:text-4xl font-black tracking-tighter">
                 Popular <span className="text-primary">Experiences</span>
               </h2>
               <p className="text-lg text-muted-foreground max-w-md">
@@ -209,7 +209,7 @@ export const HomeMeta = async () => {
           {featuredEvents.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredEvents.map((event: any) => (
-                <Card key={event.id} className="group overflow-hidden border-none shadow-md hover:shadow-2xl transition-all duration-500 pt-0  bg-card">
+                <Card key={event.id} className="group overflow-hidden border-none shadow-md hover:shadow-2xl  transition-all duration-500 pt-0  bg-card">
               
                   <div className="relative h-64 w-full overflow-hidden">
                     <Image
@@ -284,7 +284,7 @@ export const HomeMeta = async () => {
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-6">
             <div className="text-center md:text-left space-y-2">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tighter">
+              <h2 className="text-2xl md:text-4xl font-black tracking-tighter">
                 Explore by <span className="text-primary">Interest</span>
               </h2>
               <p className="text-lg text-muted-foreground">
@@ -341,7 +341,7 @@ export const HomeMeta = async () => {
         <div className="mx-auto max-w-7xl relative">
           <div className="flex flex-col lg:flex-row items-end justify-between mb-16 gap-6">
             <div className="max-w-2xl space-y-4 text-center lg:text-left">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tighter leading-tight">
+              <h2 className="text-2xl md:text-4xl font-black tracking-tighter leading-tight">
                 Designed for <br className="hidden md:block" />
                 <span className="text-primary">seamless</span> connections.
               </h2>
@@ -406,7 +406,7 @@ export const HomeMeta = async () => {
       <section className="py-14 px-4 bg-background overflow-hidden">
         <div className="mx-auto max-w-7xl">
           <div className="text-center mb-16 space-y-4">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tighter">
+            <h2 className="text-2xl md:text-4xl font-black tracking-tighter">
               Meet Our <span className="text-primary">Elite Hosts</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -469,7 +469,7 @@ export const HomeMeta = async () => {
                       </span>
                     </div>
 
-                    <p className="text-sm text-muted-foreground leading-relaxed italic">
+                    <p className="text-sm text-muted-foreground leading-relaxed ">
                       {host.bio || "Specialist in organizing immersive local community events and workshops."}
                     </p>
 
@@ -501,7 +501,7 @@ export const HomeMeta = async () => {
       <section className="py-14 px-4 bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col items-center text-center mb-16 space-y-4">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tighter">
+            <h2 className="text-2xl md:text-4xl font-black tracking-tighter">
               Stories from our <span className="text-primary">Community</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl">
@@ -535,7 +535,7 @@ export const HomeMeta = async () => {
             ].map((testimonial, i) => (
               <div 
                 key={i} 
-                className="relative bg-card p-10 rounded-[2.5rem] border border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 group"
+                className="relative bg-card p-8 rounded-[2.5rem] border border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 group"
               >
              
                 <span className="absolute top-6 left-8 text-8xl text-primary/5 font-serif select-none group-hover:text-primary/10 transition-colors">

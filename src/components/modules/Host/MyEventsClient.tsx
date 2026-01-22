@@ -484,7 +484,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                 )}
             </div>
 
-            {/* Pagination */}
+   
             {meta.pages > 1 && (
                 <TablePagination
                     currentPage={meta.page}

@@ -11,7 +11,7 @@ interface MyEventsPageProps {
 const MyEventsPage = async ({ searchParams }: MyEventsPageProps) => {
     const params = await searchParams;
     
-    // Extract filters from search params
+ 
     const filters: IEventFilters = {
         category: typeof params.category === 'string' ? params.category : undefined,
         status: typeof params.status === 'string' ? params.status : undefined,
@@ -22,17 +22,17 @@ const MyEventsPage = async ({ searchParams }: MyEventsPageProps) => {
         limit: params.limit ? Number(params.limit) : 10,
     };
 
-    // Fetch events
+
     const result = await getMyEvents(filters);
  
-    // Debug logging
+
     console.log("MyEventsPage - Filters:", filters);
     console.log("MyEventsPage - Result:", JSON.stringify(result, null, 2));
 
     const events = result.success && result.data ? result.data : [];
     const meta = result.meta || { page: 1, limit: 10, total: 0, pages: 0 };
 
-    // Debug logging
+
     console.log("MyEventsPage - Events count:", events.length);
     console.log("MyEventsPage - Meta:", meta);
 

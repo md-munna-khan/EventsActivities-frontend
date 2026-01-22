@@ -79,7 +79,7 @@ export const MyProfile = () => {
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div className="space-y-1">
                         <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase ">
-                            Profile <span className="text-primary not-italic">Settings</span>
+                            Profile <span className="text-primary ">Settings</span>
                         </h1>
                         <p className="text-muted-foreground font-medium">Update your identity and discoverable preferences.</p>
                     </div>

@@ -51,13 +51,13 @@ const HostDashboardPage = async ({ searchParams }: HostDashboardPageProps) => {
     const meta = paginatedResult.meta || { page: 1, limit: 10, total: 0, pages: 0 };
 
     return (
-        <div className="container mx-auto px-4 py-8 space-y-10 ">
+        <div className="container  mx-auto px-4 py-8 space-y-10 ">
             
-            {/* Header Section */}
+           
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="space-y-2">
-                    <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase ">
-                        Host <span className="text-primary not-italic">Dashboard</span>
+                    <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase ">
+                        Host <span className="text-primary ">Dashboard</span>
                     </h1>
                     <p className="text-muted-foreground font-medium max-w-md leading-relaxed">
                         Analyze your event performance, manage attendees, and track your revenue growth.
@@ -67,7 +67,7 @@ const HostDashboardPage = async ({ searchParams }: HostDashboardPageProps) => {
              
             </div>
 
-            {/* Performance Analytics Grid */}
+        
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <DashboardStat 
                     label="Total Events" 
@@ -99,12 +99,12 @@ const HostDashboardPage = async ({ searchParams }: HostDashboardPageProps) => {
                 />
             </div>
 
-            {/* Event Management Table Section */}
+          
             <Card className="border-none shadow-2xl bg-card overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b p-6">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="space-y-1">
-                            <CardTitle className="text-2xl font-black uppercase italic tracking-tight">Event Catalog</CardTitle>
+                            <CardTitle className="text-2xl font-black uppercase  tracking-tight">Event Catalog</CardTitle>
                             <CardDescription className="font-medium">
                                 Showing <span className="text-foreground font-bold">{events.length}</span> of {meta.total} total events
                             </CardDescription>
@@ -131,7 +131,7 @@ const HostDashboardPage = async ({ searchParams }: HostDashboardPageProps) => {
                 </CardContent>
             </Card>
 
-            {/* Support Footer */}
+        
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                 <div className="p-6 bg-secondary/20 rounded-2xl border border-border flex items-center justify-between group cursor-pointer hover:bg-secondary/30 transition-colors">
                     <div className="space-y-1">
@@ -152,7 +152,7 @@ const HostDashboardPage = async ({ searchParams }: HostDashboardPageProps) => {
     );
 };
 
-/* --- Refined Stat Component --- */
+
 
 const DashboardStat = ({ label, value, icon: Icon, desc, trend, variant }: any) => {
     const isPrimary = variant === 'primary';

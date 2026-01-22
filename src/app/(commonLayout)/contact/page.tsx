@@ -27,7 +27,7 @@ const ContactPage = () => {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-              <h1 className="text-5xl md:text-6xl font-black tracking-tight leading-[1.1]">
+              <h1 className="text-2xl md:text-4xl font-black tracking-tight leading-[1.1]">
                 Let’s build <br />
                 <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-accent">
                   something big.
