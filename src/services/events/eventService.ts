@@ -1,6 +1,4 @@
-// "use server";
 
-// /* eslint-disable @typescript-eslint/no-explicit-any */
 
 
 "use server";
@@ -48,7 +46,7 @@ export async function checkEventParticipation(eventId: string) {
     const result = await response.json();
     return result;
   } catch (error: any) {
-    // If endpoint doesn't exist, return not joined
+ 
     return {
       success: false,
       data: { isJoined: false },

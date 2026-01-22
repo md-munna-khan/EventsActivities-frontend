@@ -51,12 +51,12 @@ const HostDashboardPage = async ({ searchParams }: HostDashboardPageProps) => {
     const meta = paginatedResult.meta || { page: 1, limit: 10, total: 0, pages: 0 };
 
     return (
-        <div className="container mx-auto px-4 py-8 space-y-10 max-w-7xl">
+        <div className="container mx-auto px-4 py-8 space-y-10 ">
             
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="space-y-2">
-                    <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic">
+                    <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase ">
                         Host <span className="text-primary not-italic">Dashboard</span>
                     </h1>
                     <p className="text-muted-foreground font-medium max-w-md leading-relaxed">
@@ -64,12 +64,7 @@ const HostDashboardPage = async ({ searchParams }: HostDashboardPageProps) => {
                     </p>
                 </div>
                 
-                <Link href="/dashboard/host/events/create">
-                    <Button className="h-12 px-8 rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-primary/20 group">
-                        <Plus className="mr-2 h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
-                        Create New Event
-                    </Button>
-                </Link>
+             
             </div>
 
             {/* Performance Analytics Grid */}

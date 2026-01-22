@@ -27,10 +27,10 @@ export interface IEventFilters {
 }
 
 
-// Server action for form submission
+
 export async function createEventAction(_prevState: any, formData: FormData) {
     try {
-        // Extract form data
+     
         const data: IEventFormData = {
             title: formData.get('title') as string,
             category: formData.get('category') as string,
@@ -41,10 +41,10 @@ export async function createEventAction(_prevState: any, formData: FormData) {
             capacity: Number(formData.get('capacity')),
         };
 
-        // Get file if exists
+      
         const file = formData.get('file') as File | null;
 
-        // Create FormData for API call
+
         const uploadFormData = new FormData();
         uploadFormData.append('data', JSON.stringify(data));
         
@@ -74,10 +74,10 @@ export async function createEvent(data: IEventFormData, file?: File) {
     try {
         const formData = new FormData();
         
-        // Add the data as JSON string
+     
         formData.append('data', JSON.stringify(data));
         
-        // Add the file if it exists
+  
         if (file && file instanceof File && file.size > 0) {
             formData.append('file', file);
         }
@@ -103,15 +103,15 @@ export async function createEvent(data: IEventFormData, file?: File) {
 
 export async function getEvents(filters?: IEventFilters) {
     try {
-        // Build query string from filters
+       
         const queryParams = new URLSearchParams();
         
-        // Convert category to uppercase to match Prisma enum
+     
         if (filters?.category && filters.category !== 'All') {
             queryParams.append("category", filters.category.toUpperCase());
         }
         
-        // Convert status to uppercase to match Prisma enum
+      
         if (filters?.status && filters.status !== 'All') {
             queryParams.append("status", filters.status.toUpperCase());
         }
@@ -127,7 +127,7 @@ export async function getEvents(filters?: IEventFilters) {
         
         const response = await serverFetch.get(endpoint);
         
-        // Check if response is OK
+       
         if (!response.ok) {
             const errorText = await response.text();
             console.error("getEvents - Response not OK:", response.status, errorText);
@@ -146,10 +146,9 @@ export async function getEvents(filters?: IEventFilters) {
         console.log("getEvents - Response status:", response.status);
         console.log("getEvents - Response:", JSON.stringify(result, null, 2));
 
-        // Handle different response structures
-        // Case 1: Standard response with success field (most common)
+ 
         if (result.success !== undefined) {
-            // Check if we have data array
+           
             if (result.success && Array.isArray(result.data)) {
                 return {
                     success: true,
@@ -162,7 +161,7 @@ export async function getEvents(filters?: IEventFilters) {
                     },
                 };
             }
-            // If success is true but no data array, return empty
+          
             if (result.success && !result.data) {
                 return {
                     success: true,
@@ -175,11 +174,11 @@ export async function getEvents(filters?: IEventFilters) {
                     },
                 };
             }
-            // If success is false, return as is
+         
             return result;
         }
 
-        // Case 2: Response might have data directly (array)
+      
         if (Array.isArray(result.data)) {
             return {
                 success: true,
@@ -193,7 +192,7 @@ export async function getEvents(filters?: IEventFilters) {
             };
         }
 
-        // Case 3: Response is an array directly (unlikely but possible)
+
         if (Array.isArray(result)) {
             return {
                 success: true,
@@ -207,7 +206,7 @@ export async function getEvents(filters?: IEventFilters) {
             };
         }
 
-        // Default: return empty structure if we can't parse it
+
         console.warn("getEvents - Unexpected response structure:", result);
         return {
             success: false,
@@ -272,10 +271,10 @@ export async function updateEvent(
     try {
         const formData = new FormData();
         
-        // Add the data as JSON string
+       
         formData.append('data', JSON.stringify(data));
         
-        // Add the file if it exists
+
         if (file && file instanceof File && file.size > 0) {
             formData.append('file', file);
         }
@@ -298,10 +297,10 @@ export async function updateEvent(
     }
 }
 
-// Server action for form submission (update)
+
 export async function updateEventAction(eventId: string, _prevState: any, formData: FormData) {
     try {
-        // Extract form data
+        
         const data: Partial<IEventFormData> = {};
         
         const title = formData.get('title') as string;
@@ -320,10 +319,9 @@ export async function updateEventAction(eventId: string, _prevState: any, formDa
         if (joiningFee) data.joiningFee = Number(joiningFee);
         if (capacity) data.capacity = Number(capacity);
 
-        // Get file if exists
+   
         const file = formData.get('file') as File | null;
 
-        // Create FormData for API call
         const uploadFormData = new FormData();
         uploadFormData.append('data', JSON.stringify(data));
         
@@ -392,15 +390,15 @@ export async function updateEventStatus(eventId: string, status: string) {
 
 export async function getMyEvents(filters?: IEventFilters) {
     try {
-        // Build query string from filters
+      
         const queryParams = new URLSearchParams();
         
-        // Convert category to uppercase to match Prisma enum
+
         if (filters?.category && filters.category !== 'All') {
             queryParams.append("category", filters.category.toUpperCase());
         }
         
-        // Convert status to uppercase to match Prisma enum
+
         if (filters?.status && filters.status !== 'All') {
             queryParams.append("status", filters.status.toUpperCase());
         }
@@ -416,7 +414,7 @@ export async function getMyEvents(filters?: IEventFilters) {
         
         const response = await serverFetch.get(endpoint);
         
-        // Check if response is OK
+      
         if (!response.ok) {
             const errorText = await response.text();
             console.error("getMyEvents - Response not OK:", response.status, errorText);
@@ -430,7 +428,7 @@ export async function getMyEvents(filters?: IEventFilters) {
         
         const result = await response.json();
 
-        // Handle response structure
+        
         if (result.success !== undefined) {
             if (result.success && Array.isArray(result.data)) {
                 return {
@@ -459,7 +457,7 @@ export async function getMyEvents(filters?: IEventFilters) {
             return result;
         }
 
-        // Handle array response
+    
         if (Array.isArray(result.data)) {
             return {
                 success: true,

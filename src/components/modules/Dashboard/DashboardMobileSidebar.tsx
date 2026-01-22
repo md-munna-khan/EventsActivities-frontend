@@ -29,13 +29,13 @@ const DashboardMobileSidebar = ({
       {/* Logo */}
       <div className="flex h-16 items-center border-b px-6">
         <Link href="/">
-          {/* <span className="text-xl font-bold text-primary">Evenzo</span> */}
+     
           <Logo/>
         </Link>
       </div>
       <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
-      {/* Navigation */}
+   
       <ScrollArea className="flex-1 px-3 py-4">
         <nav className="space-y-6">
           {navItems.map((section, sectionIdx) => (
@@ -80,7 +80,7 @@ const DashboardMobileSidebar = ({
         </nav>
       </ScrollArea>
 
-      {/* User Info at Bottom */}
+   
       <div className="border-t p-4">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">

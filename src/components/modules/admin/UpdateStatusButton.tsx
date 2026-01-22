@@ -36,7 +36,6 @@ export default function UpdateStatusButton({ resource, id, currentStatus = "ACTI
     try {
       setLoading(true);
 
-      // use service which uses serverFetch internally
       const json = await updateUserStatus(id, status);
 
       if (json?.success === false) {

@@ -5,9 +5,9 @@
 import React from "react";
 import Image from "next/image";
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+
 import { Separator } from "@/components/ui/separator";
 
 import EventApproveRejectButtons from "./EventApproveRejectButtons.client";
@@ -43,9 +43,9 @@ const PendingEventsList = async () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((ev: any) => (
             <Card key={ev.id} className="overflow-hidden">
-              {/* Thumbnail */}
+          
               <div className="relative w-full h-44 bg-muted/10">
-                {/* Next/Image - ensure next.config.js allows external domain or use remotePatterns */}
+               
                 <Image
                   src={ev.image || "/placeholder.png"}
                   alt={ev.title || "event image"}
@@ -98,7 +98,7 @@ const PendingEventsList = async () => {
                     </div>
                   </div>
 
-                  {/* Right column: capacity / status chip */}
+                
                   <div className="hidden md:flex flex-col items-end justify-between">
                     <div className="text-right">
                       <div className="text-sm font-medium">{ev.capacity ?? "-"}</div>
@@ -115,7 +115,7 @@ const PendingEventsList = async () => {
                 
                  
 
-                  {/* EventApproveRejectButtons is a client component (already .client) */}
+             
                   <EventApproveRejectButtons eventId={ev.id} />
                 </div>
 

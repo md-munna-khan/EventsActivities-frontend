@@ -49,7 +49,7 @@ export async function getPayments({
 
     const json = await res.json();
 
-    // Some backends wrap data; normalize
+ 
     const data = json?.data ?? json?.results ?? [];
     const meta = json?.meta ?? json?.pagination ?? {};
 

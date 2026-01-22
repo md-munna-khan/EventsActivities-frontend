@@ -24,21 +24,21 @@ import {
 import { getAllHosts, getEvents } from '@/services/host/hostService';
 import { homeMeta } from '@/services/meta/meta.service';
 import Image from 'next/image';
-// removed unused getAllUsers import — counts now come from homeMeta
+
 
 export const HomeMeta = async () => {
-  // Fetch summary counts from backend meta endpoint
+ 
   const metaResult = await homeMeta();
 
   const usersCount = metaResult?.data?.totalUsers ?? 0;
   const hostsCount = metaResult?.data?.totalHosts ?? 0;
   const eventsCount = metaResult?.data?.totalEvents ?? 0;
 
-  // Fetch featured events (kept separate from counts)
+
   const eventsResult = await getEvents({ status: 'OPEN', limit: 6, page: 1 });
   const featuredEvents = eventsResult.success && eventsResult.data ? eventsResult.data.slice(0, 6) : [];
 
-  // Fetch top-rated hosts (limit 3)
+
   const topHostsResult = await getAllHosts();
   const topHosts = Array.isArray(topHostsResult?.data) ? topHostsResult.data : [];
   topHosts.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0));
@@ -46,7 +46,7 @@ export const HomeMeta = async () => {
 
   return (
     <main className="flex flex-col ">
-      {/* Hero Section */}
+     
       <section className="relative bg-linear-to-br from-primary/10 via-background to-primary/5 py-20 px-4">
         <div className=" mx-auto max-w-7xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -73,7 +73,7 @@ export const HomeMeta = async () => {
                 </Link>
               </div>
 
-              {/* Stats row */}
+           
               <div className="flex items-center gap-4 mt-6">
                 <div className="flex items-center gap-3 bg-background/80 p-3 rounded-lg shadow-sm">
                   <div className="p-2 rounded-full bg-primary/10">
@@ -115,9 +115,9 @@ export const HomeMeta = async () => {
         </div>
       </section>
 
-     {/* How It Works Section */}
-      <section className="py-24 px-4 bg-background relative overflow-hidden">
-        {/* Subtle Background Accent */}
+    
+      <section className="py-14 px-4 bg-background relative overflow-hidden">
+      
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px bg-linear-to-r from-transparent via-border to-transparent hidden md:block" />
 
         <div className="mx-auto max-w-7xl relative">
@@ -153,7 +153,7 @@ export const HomeMeta = async () => {
             ].map((item, i) => (
               <div key={i} className="relative group">
                 <div className="flex flex-col items-center text-center space-y-6">
-                  {/* Step Circle */}
+                 
                   <div className="relative">
                     <div className="h-20 w-20 rounded-3xl bg-muted flex items-center justify-center border-2 border-transparent group-hover:border-primary group-hover:bg-primary/5 transition-all duration-300 rotate-3 group-hover:rotate-0">
                       <div className="text-primary">
@@ -165,7 +165,7 @@ export const HomeMeta = async () => {
                     </div>
                   </div>
 
-                  {/* Text Content */}
+            
                   <div className="space-y-3">
                     <h3 className="text-2xl font-bold tracking-tight">{item.title}</h3>
                     <p className="text-muted-foreground leading-relaxed">
@@ -174,7 +174,7 @@ export const HomeMeta = async () => {
                   </div>
                 </div>
 
-                {/* Arrow Connector for Desktop */}
+             
                 {i < 2 && (
                   <div className="hidden lg:block absolute top-10 -right-6 translate-x-1/2">
                     <ArrowRight className="h-6 w-6 text-muted-foreground/30" />
@@ -185,10 +185,10 @@ export const HomeMeta = async () => {
           </div>
         </div>
       </section>
-    {/* Popular Events Section */}
-      <section className="py-24 px-4 bg-muted/30">
+
+      <section className="py-14 px-4 bg-muted/30">
         <div className="mx-auto max-w-7xl">
-          {/* Header Area */}
+        
           <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
             <div className="space-y-3 text-center md:text-left">
               <h2 className="text-4xl md:text-5xl font-black tracking-tighter">
@@ -209,8 +209,8 @@ export const HomeMeta = async () => {
           {featuredEvents.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredEvents.map((event: any) => (
-                <Card key={event.id} className="group overflow-hidden border-none shadow-md hover:shadow-2xl transition-all duration-500 rounded-[2rem] bg-card">
-                  {/* Image Container */}
+                <Card key={event.id} className="group overflow-hidden border-none shadow-md hover:shadow-2xl transition-all duration-500 pt-0  bg-card">
+              
                   <div className="relative h-64 w-full overflow-hidden">
                     <Image
                       src={event.image || '/api/placeholder/600/400'}
@@ -218,9 +218,9 @@ export const HomeMeta = async () => {
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    {/* Floating Category Badge */}
+                   
                     <div className="absolute top-4 left-4">
-                      <div className="bg-background/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-primary shadow-sm">
+                      <div className="bg-background/90 backdrop-blur-md px-3 py-1  text-[10px] font-black uppercase tracking-widest text-primary shadow-sm">
                         {event.category || 'Featured'}
                       </div>
                     </div>
@@ -243,7 +243,7 @@ export const HomeMeta = async () => {
                   </CardHeader>
 
                   <CardContent className="space-y-6">
-                    {/* Capacity Progress Bar */}
+                 
                     <div className="space-y-2">
                       <div className="flex justify-between text-xs font-bold uppercase tracking-tighter">
                         <span className="text-muted-foreground">Availability</span>
@@ -269,7 +269,7 @@ export const HomeMeta = async () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-24 rounded-[3rem] border-2 border-dashed border-muted bg-muted/10">
+            <div className="text-center py-14rounded-[3rem] border-2 border-dashed border-muted bg-muted/10">
               <Sparkles className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
               <p className="text-xl font-medium text-muted-foreground">
                 No events found today. Check back soon for new experiences!
@@ -279,8 +279,8 @@ export const HomeMeta = async () => {
         </div>
       </section>
 
-   {/* Event Categories Section */}
-      <section className="py-24 px-4 bg-background">
+  
+      <section className="py-14 px-4 bg-background">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-6">
             <div className="text-center md:text-left space-y-2">
@@ -324,7 +324,7 @@ export const HomeMeta = async () => {
                 <p className="font-bold tracking-tight text-center group-hover:text-primary transition-colors">
                   {cat.name}
                 </p>
-                {/* Visual indicator on hover */}
+             
                 <div className="absolute bottom-4 opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="h-1 w-4 rounded-full bg-primary" />
                 </div>
@@ -333,9 +333,9 @@ export const HomeMeta = async () => {
           </div>
         </div>
       </section>
-   {/* Why Choose Us Section */}
-      <section className="py-24 px-4 bg-muted/30 relative overflow-hidden">
-        {/* Decorative Background Glow */}
+
+      <section className="py-14 px-4 bg-muted/30 relative overflow-hidden">
+  
         <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-primary/5 blur-[100px]" />
         
         <div className="mx-auto max-w-7xl relative">
@@ -402,8 +402,8 @@ export const HomeMeta = async () => {
         </div>
       </section>
 
-  {/* Top-Rated Hosts Section */}
-      <section className="py-24 px-4 bg-background overflow-hidden">
+ 
+      <section className="py-14 px-4 bg-background overflow-hidden">
         <div className="mx-auto max-w-7xl">
           <div className="text-center mb-16 space-y-4">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter">
@@ -421,7 +421,7 @@ export const HomeMeta = async () => {
                   key={host.id} 
                   className="group relative flex flex-col items-center p-8 rounded-[2.5rem] bg-card border transition-all duration-300 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1"
                 >
-                  {/* Profile Image with Verified Badge */}
+               
                   <div className="relative mb-6">
                     <div className="h-28 w-28 rounded-full p-1 border-2 border-dashed border-primary/30 group-hover:border-solid group-hover:border-primary transition-all duration-500">
                       <div className="h-full w-full rounded-full bg-muted overflow-hidden relative">
@@ -439,7 +439,7 @@ export const HomeMeta = async () => {
                         )}
                       </div>
                     </div>
-                    {/* Verification Badge */}
+                 
                     <div className="absolute bottom-1 right-1 bg-background rounded-full p-1 shadow-lg">
                       <div className="bg-primary rounded-full p-1">
                         <CheckCircle2 className="h-3 w-3 text-primary-foreground" />
@@ -452,7 +452,7 @@ export const HomeMeta = async () => {
                       {host.name || host.email?.split('@')[0] || 'Top Host'}
                     </h3>
                     
-                    {/* Rating Stars */}
+             
                     <div className="flex items-center justify-center gap-1">
                       {Array.from({ length: 5 }).map((_, idx) => (
                         <Star
@@ -474,15 +474,15 @@ export const HomeMeta = async () => {
                     </p>
 
                     <div className="pt-4">
-                       <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 text-primary text-xs font-black uppercase tracking-widest">
-                         {host.completedEventsCount ?? Math.floor(Math.random() * 20 + 5)} Successful Events
-                       </div>
+                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 text-primary text-xs font-black uppercase tracking-widest">
+       {host.completedEventsCount ?? Math.floor(Math.random() * 20 + 5)} Successful Events
+      </div>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              /* Fallback / Skeleton state */
+             
               [1, 2, 3].map((i) => (
                 <div key={i} className="animate-pulse flex flex-col items-center p-8 rounded-[2.5rem] bg-muted/20 border border-dashed">
                   <div className="h-28 w-28 rounded-full bg-muted mb-6" />
@@ -493,19 +493,12 @@ export const HomeMeta = async () => {
             )}
           </div>
           
-          <div className="mt-16 text-center">
-             <Link href="/hosts">
-               <Button variant="link" className="group text-primary font-bold text-lg">
-                 View all community leaders
-                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-2" />
-               </Button>
-             </Link>
-          </div>
+      
         </div>
       </section>
 
-    {/* Testimonials/Reviews Section */}
-      <section className="py-24 px-4 bg-muted/30">
+   
+      <section className="py-14 px-4 bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col items-center text-center mb-16 space-y-4">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter">
@@ -544,25 +537,25 @@ export const HomeMeta = async () => {
                 key={i} 
                 className="relative bg-card p-10 rounded-[2.5rem] border border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 group"
               >
-                {/* Large Decorative Quote Mark */}
+             
                 <span className="absolute top-6 left-8 text-8xl text-primary/5 font-serif select-none group-hover:text-primary/10 transition-colors">
                   “
                 </span>
 
                 <div className="relative space-y-6">
-                  {/* Stars */}
+              
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
 
-                  {/* Content */}
+          
                   <p className="text-lg leading-relaxed font-medium tracking-tight">
                     &quot;{testimonial.content}&quot;
                   </p>
 
-                  {/* User Profile Info */}
+             
                   <div className="flex items-center gap-4 pt-4">
                     <div className={`h-12 w-12 rounded-2xl ${testimonial.color} flex items-center justify-center text-white font-bold shadow-lg shadow-black/5`}>
                       {testimonial.avatar}

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server"
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 
 
 export interface IAdminFilters {
@@ -42,7 +42,7 @@ export async function applyHost() {
   }
 }
 
-// Users, Hosts, Events management
+
 export async function getAllUsers(filters: IAdminFilters = {}, options: IPaginationOptions = {}) {
   try {
     const qs = new URLSearchParams();

@@ -1,92 +1,22 @@
-// /* components/modules/admin/ClientsManagement.tsx */
-// import React from "react";
-
-// import UpdateStatusButton from "./UpdateStatusButton";
-
-// import { getAllUsers } from "@/services/user/userService";
-
-// type User = {
-//   id: string;
-//   email?: string | null;
-//   role?: string | null;
-//   status?: string | null;
-//   createdAt?: string;
-//   updatedAt?: string;
-// };
-
-// const ClientsManagement = async () => {
-//   const res = await getAllUsers({ role: "CLIENT" }, { page: 1, limit: 50 });
-//   const users: User[] = Array.isArray(res?.data) ? res.data : [];
-
-//   if (!res || res.success === false) {
-//     return (
-//       <div>
-//         <h2 className="text-2xl font-semibold">Clients Management</h2>
-//         <div className="mt-4 text-red-600">Failed to load clients: {res?.message ?? "Unknown error"}</div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div>
-//       <h2 className="text-2xl font-semibold">Clients Management</h2>
-
-//       {users.length === 0 ? (
-//         <div className="mt-4 text-muted-foreground">No clients found</div>
-//       ) : (
-//         <div className="mt-4 overflow-x-auto rounded-md border">
-//           <table className="table w-full">
-//             <thead>
-//               <tr>
-//                 <th className="pl-4">Email</th>
-//                 <th>Role</th>
-//                 <th>Status</th>
-//                 <th className="text-right pr-4">Actions</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {users.map((u) => (
-//                 <tr key={u.id}>
-//                   <td className="pl-4">{u.email ?? "-"}</td>
-//                   <td>{u.role ?? "-"}</td>
-//                   <td>{u.status ?? "-"}</td>
-//                   <td className="flex justify-end gap-2 pr-4">
-//                     <UpdateStatusButton resource="users" id={u.id} currentStatus={u.status ?? "ACTIVE"} />
-                    
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default ClientsManagement;
-
-
-
-
-
 import React from "react";
-
 import { getAllUsers } from "@/services/user/userService";
 import UpdateStatusButton from "./UpdateStatusButton";
-
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import {
+  UserCircle2,
+  Mail,
+  Calendar,
+  Activity,
+  ShieldAlert,
+} from "lucide-react";
 
 type User = {
   id: string;
@@ -103,79 +33,166 @@ const ClientsManagement = async () => {
 
   if (!res || res.success === false) {
     return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Clients Management</CardTitle>
+      <Card className="w-full border-destructive/20 bg-destructive/5">
+        <CardHeader className="flex flex-row items-center gap-4">
+          <div className="p-3 bg-destructive/10 rounded-full">
+            <ShieldAlert className="h-6 w-6 text-destructive" />
+          </div>
+          <div>
+            <CardTitle className="text-destructive font-black uppercase italic">
+              Access Denied
+            </CardTitle>
+            <CardDescription>
+              Failed to sync client records: {res?.message ?? "Unknown error"}
+            </CardDescription>
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className="text-sm text-destructive">Failed to load clients: {res?.message ?? "Unknown error"}</div>
-        </CardContent>
       </Card>
     );
   }
 
+  const getStatusStyles = (status: string) => {
+    const s = status?.toUpperCase();
+    if (s === "ACTIVE")
+      return "bg-emerald-500/10 text-emerald-600 border-emerald-200";
+    if (s === "BLOCKED")
+      return "bg-destructive/10 text-destructive border-destructive/20";
+    return "bg-amber-500/10 text-amber-600 border-amber-200";
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">Clients Management</h2>
-        <div className="flex items-center gap-3">
-          <Input placeholder="Search by email or name" className="max-w-sm" />
-          <Button variant="outline">Filter</Button>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+        <div className="space-y-1">
+          <h2 className="text-2xl md:text-4xl font-black tracking-tighter uppercase  text-foreground">
+            Client{" "}
+            <span className="text-primary not-italic text-secondary-foreground">
+              Database
+            </span>
+          </h2>
+          <p className="text-muted-foreground font-medium flex items-center gap-2">
+            <Activity className="h-4 w-4 text-primary" />
+            Monitoring{" "}
+            <span className="text-foreground font-bold">
+              {users.length} registered clients
+            </span>
+          </p>
         </div>
       </div>
 
-      <Card className="overflow-hidden">
+      <Card className="border-none shadow-2xl bg-card overflow-hidden rounded-[var(--radius-xl)] ring-1 ring-border">
         <CardContent className="p-0">
-          <div className="w-full overflow-auto">
-            <table className="w-full table-auto">
+          <div className="w-full overflow-auto no-scrollbar">
+            <table className="w-full table-auto border-collapse">
               <thead>
-                <tr className="text-sm text-muted-foreground">
-                  <th className="text-left pl-6 py-3">Client</th>
-                  <th className="text-left py-3">Role</th>
-                  <th className="text-left py-3">Status</th>
-                  <th className="text-right pr-6 py-3">Actions</th>
+                <tr className="bg-muted/30 border-b border-border">
+                  <th className="text-left pl-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    User Identity
+                  </th>
+                  <th className="text-left py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground hidden sm:table-cell">
+                    Privileges
+                  </th>
+                  <th className="text-left py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    Current Status
+                  </th>
+                  <th className="text-right pr-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    Quick Management
+                  </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-border">
                 {users.map((u) => (
-                  <tr key={u.id} className="border-t last:border-b">
-                    <td className="pl-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
-                          {u.email ? (
-                            <AvatarFallback>{u.email.charAt(0).toUpperCase()}</AvatarFallback>
-                          ) : (
-                            <AvatarFallback>C</AvatarFallback>
-                          )}
-                        </Avatar>
+                  <tr
+                    key={u.id}
+                    className="group hover:bg-primary/[0.02] transition-colors"
+                  >
+                    <td className="pl-8 py-5">
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          <Avatar className="h-12 w-12 border-2 border-background shadow-sm ring-1 ring-border transition-all group-hover:ring-primary/40">
+                            <AvatarFallback className="bg-primary/5 text-primary font-bold">
+                              {u.email?.charAt(0).toUpperCase() ?? "C"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div
+                            className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-background ${u.status === "ACTIVE" ? "bg-emerald-500" : "bg-amber-500"}`}
+                          />
+                        </div>
                         <div className="min-w-0">
-                          <div className="font-semibold truncate">{u.email ?? "-"}</div>
-                          <div className="text-xs text-muted-foreground truncate">Joined: {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "-"}</div>
+                          <div className="font-bold text-foreground truncate group-hover:text-primary transition-colors">
+                            {u.email?.split("@")[0] ?? "Anonymous User"}
+                          </div>
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+                            <span className="flex items-center gap-1">
+                              <Mail className="h-3 w-3" /> {u.email}
+                            </span>
+                            <span className="hidden lg:flex items-center gap-1 font-medium">
+                              <Calendar className="h-3 w-3" />{" "}
+                              {u.createdAt
+                                ? new Date(u.createdAt).toLocaleDateString()
+                                : "-"}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </td>
 
-                    <td className="py-4">
-                      <div className="text-sm">{u.role ?? "-"}</div>
+                    <td className="py-5 hidden sm:table-cell">
+                      <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-secondary/30 text-[10px] font-bold text-secondary-foreground border border-secondary/50 uppercase">
+                        <UserCircle2 className="h-3 w-3" />
+                        {u.role ?? "CLIENT"}
+                      </div>
                     </td>
 
-                    <td className="py-4">
-                      <Badge variant={u.status === 'ACTIVE' ? 'secondary' : 'outline'}>
-                        {u.status ?? "-"}
+                    <td className="py-5">
+                      <Badge
+                        className={`rounded-full border px-3 py-0.5 text-[10px] font-black tracking-tighter shadow-sm ${getStatusStyles(u.status ?? "")}`}
+                      >
+                        {u.status ?? "PENDING"}
                       </Badge>
                     </td>
 
-                    <td className="pr-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <UpdateStatusButton resource="users" id={u.id} currentStatus={u.status ?? "ACTIVE"} />
-
-                    
+                    <td className="pr-8 py-5 text-right">
+                      <div className="flex items-center justify-end gap-3">
+                        <UpdateStatusButton
+                          resource="users"
+                          id={u.id}
+                          currentStatus={u.status ?? "ACTIVE"}
+                        />
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {users.length === 0 && (
+            <div className="py-24 flex flex-col items-center text-center">
+              <div className="h-20 w-20 bg-muted rounded-full flex items-center justify-center mb-6">
+                <UserCircle2 className="h-10 w-10 text-muted-foreground/20" />
+              </div>
+              <h3 className="text-xl font-black italic uppercase text-muted-foreground">
+                Zero Clients Registered
+              </h3>
+              <p className="text-muted-foreground text-sm max-w-xs mt-2">
+                The client list is currently empty. New users will appear here
+                once they register.
+              </p>
+            </div>
+          )}
+
+          <div className="p-6 bg-muted/20 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+              Verified Records Index:{" "}
+              <span className="text-foreground">{users.length} Profiles</span>
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase text-muted-foreground">
+                Admin Access Only
+              </span>
+              <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -184,4 +201,3 @@ const ClientsManagement = async () => {
 };
 
 export default ClientsManagement;
-

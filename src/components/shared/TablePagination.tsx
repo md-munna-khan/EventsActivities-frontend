@@ -39,9 +39,7 @@ const TablePagination = ({ currentPage, totalPages }: TablePaginationProps) => {
 
   const currentLimit = searchParams.get("limit") || "10";
 
-  // if (totalPages <= 1) {
-  //   return null;
-  // }
+
 
   return (
     <div className="flex items-center justify-center gap-2">

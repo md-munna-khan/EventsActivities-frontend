@@ -47,7 +47,7 @@ interface EditEventModalProps {
     event: Event | null;
 }
 
-// Event categories matching backend enum
+
 const eventCategories = [
     { label: 'Music', value: 'MUSIC' },
     { label: 'Movie', value: 'MOVIE' },
@@ -118,7 +118,7 @@ const EditEventModal = ({ open, onOpenChange, event }: EditEventModalProps) => {
         capacity: '',
     });
 
-    // Initialize form when event changes
+ 
     useEffect(() => {
         if (event && open) {
             const eventDate = new Date(event.date);
@@ -140,7 +140,7 @@ const EditEventModal = ({ open, onOpenChange, event }: EditEventModalProps) => {
         }
     }, [event, open]);
 
-    // Handle file selection and preview
+ 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -153,7 +153,7 @@ const EditEventModal = ({ open, onOpenChange, event }: EditEventModalProps) => {
         }
     };
 
-    // Remove selected file
+
     const handleRemoveFile = () => {
         setSelectedFile(null);
         if (event?.image && event.image.trim() !== '') {
@@ -163,7 +163,7 @@ const EditEventModal = ({ open, onOpenChange, event }: EditEventModalProps) => {
         }
     };
 
-    // Handle form submission
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!event) return;
@@ -174,7 +174,7 @@ const EditEventModal = ({ open, onOpenChange, event }: EditEventModalProps) => {
                 title: formData.title,
                 category: formData.category,
                 description: formData.description,
-                // Convert local datetime to ISO UTC to keep exact selection across timezones
+    
                 date: new Date(formData.date).toISOString(),
                 location: formData.location,
                 joiningFee: Number(formData.joiningFee),
@@ -202,7 +202,7 @@ if (new Date(formData.date) <= new Date()) {
         }
     };
 
-    // Reset form when modal closes
+   
     useEffect(() => {
         if (!open) {
             setPreview(null);
@@ -224,7 +224,7 @@ if (new Date(formData.date) <= new Date()) {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <FieldGroup>
-                        {/* Title */}
+                    
                         <Field>
                             <FieldLabel htmlFor="edit-title">Event Title</FieldLabel>
                             <Input
@@ -237,7 +237,7 @@ if (new Date(formData.date) <= new Date()) {
                             />
                         </Field>
 
-                        {/* Category */}
+                      
                         <Field>
                             <FieldLabel htmlFor="edit-category">Category</FieldLabel>
                             <Select
@@ -258,7 +258,7 @@ if (new Date(formData.date) <= new Date()) {
                             </Select>
                         </Field>
 
-                        {/* Description */}
+                       
                         <Field>
                             <FieldLabel htmlFor="edit-description">Description</FieldLabel>
                             <Textarea
@@ -271,7 +271,7 @@ if (new Date(formData.date) <= new Date()) {
                             />
                         </Field>
 
-                        {/* Date and Location Row */}
+                      
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Field>
                                 <FieldLabel htmlFor="edit-date">Event Date</FieldLabel>
@@ -297,7 +297,7 @@ if (new Date(formData.date) <= new Date()) {
                             </Field>
                         </div>
 
-                        {/* Joining Fee and Capacity Row */}
+                      
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Field>
                                 <FieldLabel htmlFor="edit-joiningFee">Joining Fee ($)</FieldLabel>
@@ -327,7 +327,7 @@ if (new Date(formData.date) <= new Date()) {
                             </Field>
                         </div>
 
-                        {/* Image Upload */}
+                      
                         <Field>
                             <FieldLabel htmlFor="edit-file">Event Image</FieldLabel>
                             <div className="space-y-4">

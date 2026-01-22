@@ -6,7 +6,7 @@ export async function homeMeta() {
     const response = await serverFetch.get('/meta/home-meta');
     const result = await response.json();
 
-    // Ensure we return the backend pattern strictly: { statusCode, success, message, data }
+ 
     return {
       statusCode: result?.statusCode ?? response.status,
       success: result?.success ?? Boolean(response.ok),

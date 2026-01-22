@@ -18,14 +18,14 @@ import {
 import ReviewModal from "./ReviewModal";
 import Link from "next/link";
 
-// 1. Define a consistent interface for the date object
+
 interface FormattedDate {
   full: string;
   day: string | number;
   month: string;
 }
 
-// 2. Updated formatDate to always return the same object structure
+
 const formatDate = (iso?: string): FormattedDate => {
   const fallback = { full: "-", day: "-", month: "-" };
   
@@ -34,7 +34,7 @@ const formatDate = (iso?: string): FormattedDate => {
   try {
     const date = new Date(iso);
     
-    // Check for "Invalid Date"
+
     if (isNaN(date.getTime())) {
       return { full: iso, day: "!", month: "!" };
     }
@@ -106,8 +106,8 @@ const MyBookingEventsClient = ({ bookings }: MyBookingEventsClientProps) => {
         />
       )}
 
-      <div className="container mx-auto px-4 max-w-6xl">
-        {/* Header Section */}
+      <div className="container mx-auto px-4 ">
+    
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
@@ -144,14 +144,14 @@ const MyBookingEventsClient = ({ bookings }: MyBookingEventsClientProps) => {
               const pStatus = booking.participantStatus ?? "PENDING";
               const eStatus = ev.status ?? "UNKNOWN";
               
-              // dateInfo is now safely typed as FormattedDate
+             
               const dateInfo = formatDate(ev.date);
               const bookedOnInfo = formatDate(booking.createdAt);
 
               return (
                 <Card key={booking.id} className="group overflow-hidden border-none shadow-md hover:shadow-xl transition-all duration-300">
                   <div className="flex flex-col md:flex-row">
-                    {/* Left Side: Image & Date Badge */}
+             
                     <div className="relative w-full md:w-64 h-48 md:h-auto overflow-hidden shrink-0">
                       <Image
                         src={ev.image || "/placeholder.png"}
@@ -161,14 +161,14 @@ const MyBookingEventsClient = ({ bookings }: MyBookingEventsClientProps) => {
                       />
                       <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
                       
-                      {/* Floating Date Badge */}
+                  
                       <div className="absolute top-4 left-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm rounded-xl p-2 min-w-[55px] text-center shadow-lg border">
                         <p className="text-[10px] font-black uppercase text-primary leading-none">{dateInfo.month}</p>
                         <p className="text-2xl font-black text-slate-900 dark:text-white leading-none mt-1">{dateInfo.day}</p>
                       </div>
                     </div>
 
-                    {/* Right Side: Content */}
+                  
                     <div className="flex-1 p-5 md:p-6 flex flex-col">
                       <div className="flex flex-col sm:flex-row justify-between items-start gap-3 mb-4">
                         <div className="space-y-1">

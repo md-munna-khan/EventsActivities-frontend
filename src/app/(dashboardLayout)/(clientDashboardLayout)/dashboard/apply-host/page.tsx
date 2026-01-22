@@ -7,7 +7,7 @@ const ApplyHostPage = () => {
     <div className="min-h-screen bg-background pb-12 transition-colors duration-300">
       <div className="container mx-auto px-4 py-10 max-w-6xl">
         
-        {/* Header Section */}
+    
         <div className="text-center space-y-4 mb-16 animate-in fade-in slide-in-from-top-4 duration-700">
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground italic">
             SHARE YOUR PASSION, <span className="text-primary not-italic">BECOME A HOST</span>
@@ -19,10 +19,10 @@ const ApplyHostPage = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           
-          {/* Left Side: Benefits & Info (Col-span 8) */}
+       
           <div className="lg:col-span-8 space-y-10">
             
-            {/* Benefits Grid */}
+         
             <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <BenefitCard 
                 icon={Zap} 
@@ -46,7 +46,7 @@ const ApplyHostPage = () => {
               />
             </section>
 
-            {/* Visual Process Section */}
+          
             <div className="bg-card text-card-foreground p-8 rounded-[var(--radius)] border border-border shadow-sm">
               <div className="flex items-center gap-3 mb-8">
                 <div className="h-8 w-1.5 bg-primary rounded-full" />
@@ -73,12 +73,12 @@ const ApplyHostPage = () => {
             </div>
           </div>
 
-          {/* Right Side: Action Card (Col-span 4) */}
+        
           <div className="lg:col-span-4 relative">
             <div className="sticky top-24">
                <ApplyHostClient />
                
-               {/* Community Social Proof */}
+       
                <div className="mt-6 p-4 rounded-xl bg-secondary/50 border border-border flex items-center gap-4">
                   <div className="flex -space-x-2">
                     {[1,2,3].map(i => (
@@ -100,7 +100,7 @@ const ApplyHostPage = () => {
   );
 };
 
-/* --- Refined Sub-components --- */
+
 
 const BenefitCard = ({ icon: Icon, title, desc }: any) => (
   <div className="group p-8 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all duration-300">
@@ -114,11 +114,11 @@ const BenefitCard = ({ icon: Icon, title, desc }: any) => (
 
 const Step = ({ num, title, desc }: any) => (
   <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-    {/* Dot */}
+  
     <div className="flex items-center justify-center w-10 h-10 rounded-full border border-primary bg-background text-primary font-black text-xs z-10 shrink-0 shadow-[0_0_15px_rgba(var(--primary),0.2)] md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
       {num}
     </div>
-    {/* Content */}
+   
     <div className="w-[calc(100%-4rem)] md:w-[45%] p-4 rounded-xl bg-muted/30 border border-transparent hover:border-border transition-colors">
       <h5 className="font-black text-foreground uppercase tracking-tighter italic">{title}</h5>
       <p className="text-xs text-muted-foreground font-medium mt-1">{desc}</p>

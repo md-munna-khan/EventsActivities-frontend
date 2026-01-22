@@ -20,14 +20,14 @@ const AdminMetaDashboard = async () => {
     recentEvents = [],
   } = stats;
 
-  // Calculate percentages for progress indicators
+  
   const totalEvents = totals.events || 1;
   const successPercentage = Math.round((successCount / totalEvents) * 100);
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="container mx-auto space-y-8">
-        {/* Header Section */}
+    
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-4xl font-bold text-foreground">Admin Dashboard</h1>
@@ -38,9 +38,8 @@ const AdminMetaDashboard = async () => {
           </div>
         </div>
 
-        {/* Primary Stats Grid - 4 Column Layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Users Card - with gradient background */}
+         
           <div className="group relative overflow-hidden rounded-2xl bg-card shadow-lg hover:shadow-xl transition-all duration-300">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative p-6">
@@ -58,7 +57,7 @@ const AdminMetaDashboard = async () => {
             </div>
           </div>
 
-          {/* Clients Card */}
+         
           <div className="group relative overflow-hidden rounded-2xl bg-card shadow-lg hover:shadow-xl transition-all duration-300">
             <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative p-6">
@@ -76,7 +75,7 @@ const AdminMetaDashboard = async () => {
             </div>
           </div>
 
-          {/* Hosts Card */}
+   
           <div className="group relative overflow-hidden rounded-2xl bg-card shadow-lg hover:shadow-xl transition-all duration-300">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative p-6">
@@ -94,7 +93,7 @@ const AdminMetaDashboard = async () => {
             </div>
           </div>
 
-          {/* Events Card */}
+       
           <div className="group relative overflow-hidden rounded-2xl bg-card shadow-lg hover:shadow-xl transition-all duration-300">
             <div className="absolute inset-0 bg-gradient-to-br from-destructive/5 to-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative p-6">
@@ -113,9 +112,9 @@ const AdminMetaDashboard = async () => {
           </div>
         </div>
 
-        {/* Secondary Stats - 3 Column Layout */}
+ 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Revenue Card - Premium Style */}
+         
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/80  shadow-xl">
             <div className="absolute top-0 right-0 w-40 h-40 opacity-10 rounded-full -mr-20 -mt-20" />
             <div className="relative p-8">
@@ -125,9 +124,7 @@ const AdminMetaDashboard = async () => {
                   <p className="text-5xl font-bold">${(totals.revenue ?? 0).toLocaleString()}</p>
                 </div>
                 <div className="p-4 rounded-lg  bg-opacity-20 backdrop-blur">
-                  {/* <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M8.16 5.314l4.897-.795A2 2 0 0116 6.416v8.001a2 2 0 01-1.943 1.897l-4.897.795a1 1 0 01-.11.005H7a2 2 0 01-2-2V7.314a2 2 0 012-2h1.16z" />
-                  </svg> */}
+              
                 </div>
               </div>
               <div className="flex items-center gap-4 pt-6 border-t border-white/20">
@@ -138,7 +135,7 @@ const AdminMetaDashboard = async () => {
             </div>
           </div>
 
-          {/* Pending Applications Card - Warning Style */}
+       
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-destructive to-destructive/80  shadow-xl">
             <div className="absolute top-0 right-0 w-40 h-40 opacity-10 rounded-full -mr-20 -mt-20" />
             <div className="relative p-8">
@@ -147,12 +144,7 @@ const AdminMetaDashboard = async () => {
                   <p className="text-white/80 text-sm font-medium mb-2">Pending Applications</p>
                   <p className="text-5xl font-bold">{totals.pendingHostApplications ?? 0}</p>
                 </div>
-                <div className="p-4 rounded-lg  bg-opacity-20 backdrop-blur">
-                  {/* <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                    <path d="M4 5a2 2 0 012-2 1 1 0 000 2H2a1 1 0 100 2h1a1 1 0 000 2H2a1 1 0 100 2h1a1 1 0 000 2H2a1 1 0 100 2h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.382a1 1 0 00-.894.553l-.448.894a1 1 0 01-.894.553H10a1 1 0 100 2h1.118a1 1 0 01.894.553l.448.894a1 1 0 00.894.553h2.382a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2z" />
-                  </svg> */}
-                </div>
+             
               </div>
               <div className="pt-6 border-t border-white/20">
                 <p className="text-white/80 text-xs">Awaiting your approval</p>
@@ -160,7 +152,7 @@ const AdminMetaDashboard = async () => {
             </div>
           </div>
 
-          {/* Event Success Rate Card - Info Style */}
+     
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-accent to-accent/80 shadow-xl">
             <div className="absolute top-0 right-0 w-40 h-40 opacity-10 rounded-full -mr-20 -mt-20" />
             <div className="relative p-8">
@@ -182,7 +174,7 @@ const AdminMetaDashboard = async () => {
           </div>
         </div>
 
-        {/* Events by Status - Bar Chart Style */}
+      
         <div className="rounded-2xl bg-card shadow-lg p-8">
           <h2 className="text-2xl font-bold text-foreground mb-6">Events Distribution</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -211,7 +203,7 @@ const AdminMetaDashboard = async () => {
           </div>
         </div>
 
-        {/* Recent Events Table */}
+       
         <div className="rounded-2xl bg-card shadow-lg p-8">
           <h2 className="text-2xl font-bold text-foreground mb-6">Recent Events</h2>
           {recentEvents.length === 0 ? (

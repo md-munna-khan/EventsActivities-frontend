@@ -59,7 +59,7 @@ export async function deleteAdmin(id: string) {
   }
 }
 
-// Host application management
+
 export async function getPendingHostApplications() {
   try {
     const res = await serverFetch.get('/admin/pending-host-applications');

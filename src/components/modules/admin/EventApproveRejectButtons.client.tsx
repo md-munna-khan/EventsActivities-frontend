@@ -37,9 +37,9 @@ export default function EventApproveRejectButtons({ eventId }: Props) {
 
       if (result?.success) {
         toast.success(result.message || `Event ${action}d`);
-        // refresh current route so server component re-fetches
+     
         router.refresh();
-        // close dialog
+      
         setOpenApprove(false);
         setOpenReject(false);
       } else {
@@ -55,7 +55,7 @@ export default function EventApproveRejectButtons({ eventId }: Props) {
 
   return (
     <div className="flex items-center gap-2">
-      {/* Approve dialog */}
+    
       <Dialog open={openApprove} onOpenChange={setOpenApprove}>
         <DialogTrigger asChild>
           <Button size="sm" variant="outline" className="flex items-center gap-2">
@@ -90,7 +90,7 @@ export default function EventApproveRejectButtons({ eventId }: Props) {
         </DialogContent>
       </Dialog>
 
-      {/* Reject dialog */}
+  
       <Dialog open={openReject} onOpenChange={setOpenReject}>
         <DialogTrigger asChild>
           <Button size="sm" variant="destructive" className="flex items-center gap-2">

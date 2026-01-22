@@ -28,7 +28,7 @@ const ResetPasswordForm = ({ redirect }: { redirect?: string }) => {
       {redirect && <Input type="hidden" name="redirect" value={redirect} />}
       <FieldGroup>
         <div className="grid grid-cols-1 gap-4">
-          {/* New Password */}
+       
           <Field>
             <FieldLabel htmlFor="newPassword">New Password</FieldLabel>
             <Input
@@ -41,7 +41,7 @@ const ResetPasswordForm = ({ redirect }: { redirect?: string }) => {
             <InputFieldError field="newPassword" state={state as any} />
           </Field>
 
-          {/* Confirm Password */}
+         
           <Field>
             <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
             <Input

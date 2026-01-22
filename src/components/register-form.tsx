@@ -52,7 +52,7 @@ const RegisterForm = () => {
 
   useEffect(() => {
     if (state) {
-      // Show validation errors as toast
+  
       if (!state.success && state.errors && state.errors.length > 0) {
         (state.errors as Array<{ field: string; message: string }>).forEach(
           (err) => {
@@ -60,7 +60,7 @@ const RegisterForm = () => {
           }
         );
       }
-      // Show general error message
+  
       if (
         !state.success &&
         state.message &&
@@ -69,10 +69,10 @@ const RegisterForm = () => {
         toast.error(state.message);
       }
    
-      // Show success message
+
       if (state.success && state.message) {
         toast.success(state.message);
-        // Clear form on success
+    
         if (formRef.current) {
           formRef.current.reset();
         }

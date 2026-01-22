@@ -1,8 +1,8 @@
 
 import SpinnerLoader from "@/components/shared/SpinnerLoader";
 
-const AdminDashboardLoading = () => {
+const HostDashboardLoading = () => {
   return <SpinnerLoader />;
 };
 
-export default AdminDashboardLoading;
+export default HostDashboardLoading;

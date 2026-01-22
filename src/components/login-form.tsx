@@ -21,7 +21,7 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
 
   return (
     <form action={formAction}>
-      {/* Quick-fill credentials for testing/demo */}
+   
       <div className="mb-4 flex gap-2  mx-auto justify-center">
         <Button
           type="button"
@@ -65,7 +65,7 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
       {redirect && <input type="hidden" name="redirect" value={redirect} />}
       <FieldGroup>
         <div className="grid grid-cols-1 gap-4">
-          {/* Email */}
+    
           <Field>
             <FieldLabel htmlFor="email">Email</FieldLabel>
             <Input
@@ -74,13 +74,13 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
               type="email"
               placeholder="m@example.com"
               ref={emailRef}
-              //   required
+           
             />
 
             <InputFieldError field="email" state={state} />
           </Field>
 
-          {/* Password */}
+     
           <Field>
             <FieldLabel htmlFor="password">Password</FieldLabel>
             <Input
@@ -89,7 +89,7 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
               type="password"
               placeholder="Enter your password"
               ref={passwordRef}
-              //   required
+            
             />
             <InputFieldError field="password" state={state} />
           </Field>

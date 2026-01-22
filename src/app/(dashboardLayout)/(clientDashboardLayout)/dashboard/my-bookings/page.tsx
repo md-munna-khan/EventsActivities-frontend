@@ -8,7 +8,7 @@ const MyBookingsPage = async () => {
 
     return (
         <div>
-          {/* <MyBookingEvents bookings={bookings} /> */}
+         
 
             <MyBookingEvents bookings={bookings} />
         </div>

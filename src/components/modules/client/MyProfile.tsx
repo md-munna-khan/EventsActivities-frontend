@@ -14,6 +14,7 @@ import InputFieldError from '@/components/shared/InputFieldError';
 import { getInitials } from '@/lib/formatters';
 import { Badge } from '@/components/ui/badge';
 import { Camera, Mail, MapPin, Phone, User as UserIcon, Check } from 'lucide-react';
+import SpinnerLoader from '@/components/shared/SpinnerLoader';
 
 const INTERESTS = [
     "MUSIC", "SPORTS", "HIKING", "TRAVEL", "COOKING", "READING", "DANCING",
@@ -60,7 +61,7 @@ export const MyProfile = () => {
         }
     }, [state]);
 
-    if (!userInfo) return <div className="flex h-screen items-center justify-center">Loading...</div>;
+    if (!userInfo) return <div className="flex h-screen items-center justify-center"><SpinnerLoader/></div>;
 
     const user = userInfo.client || userInfo.host || userInfo.admin || userInfo;
 
@@ -72,12 +73,12 @@ export const MyProfile = () => {
 
     return (
         <div className="min-h-screen bg-slate-50/50 dark:bg-transparent pb-12">
-            <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8">
+            <div className="container mx-auto px-4 py-8  space-y-8">
                 
-                {/* Header Section */}
+            
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div className="space-y-1">
-                        <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase italic">
+                        <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase ">
                             Profile <span className="text-primary not-italic">Settings</span>
                         </h1>
                         <p className="text-muted-foreground font-medium">Update your identity and discoverable preferences.</p>
@@ -85,7 +86,7 @@ export const MyProfile = () => {
                 </div>
 
                 <form action={formAction} className="space-y-8">
-                    {/* Profile Banner & Photo */}
+                 
                     <Card className="overflow-hidden border-none shadow-xl bg-card">
                         <div className="h-32 bg-gradient-to-r from-primary/20 via-primary/5 to-background" />
                         <CardContent className="relative pt-0 pb-8">
@@ -116,7 +117,7 @@ export const MyProfile = () => {
                         </CardContent>
                     </Card>
 
-                    {/* Form Details */}
+                 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 space-y-6">
                             <Card className="border-none shadow-lg">
@@ -166,7 +167,7 @@ export const MyProfile = () => {
                             </Card>
                         </div>
 
-                        {/* Interests Sidebar */}
+                      
                         <div className="space-y-6">
                             <Card className="border-none shadow-lg h-full">
                                 <CardHeader>

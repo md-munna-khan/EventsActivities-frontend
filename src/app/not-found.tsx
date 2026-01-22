@@ -15,17 +15,17 @@ import { Suspense } from "react";
         <div className="max-w-7xl mx-auto flex flex-col items-center justify-center gap-8 px-4 text-center">
           <div className="scale-in">
             <div className="relative">
-              {/* Animated Circle */}
+            
               <div className="absolute inset-0 rounded-full bg-destructive/10 pulse-scale" />
 
-              {/* 404 Text */}
+      
               <div className="relative z-10 flex h-48 w-48 items-center justify-center">
                 <h1 className="text-8xl font-bold text-primary fade-up-delay-1">
                   404
                 </h1>
               </div>
 
-              {/* Floating Icon */}
+           
               <div className="absolute -top-4 -right-4 rounded-full bg-destructive p-3 text-destructive-foreground shadow-lg float-icon">
                 <AlertCircle className="h-8 w-8" />
               </div>
@@ -57,7 +57,7 @@ import { Suspense } from "react";
               </Link>
             </Button>
           </div>
-          {/* Decorative Elements */}
+        
           <div className="absolute top-1/4 left-1/4 h-64 w-64 rounded-full bg-primary/5 blur-3xl glow-1" />
           <div className="absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-blue-500/5 blur-3xl glow-2" />
         </div>

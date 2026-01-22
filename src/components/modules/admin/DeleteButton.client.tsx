@@ -32,7 +32,7 @@ export default function DeleteButton({ resource, id }: Props) {
     try {
       setLoading(true);
 
-      // call service which uses serverFetch internally
+ 
       const json = await deleteUser(id);
 
       if (json?.success === false) {

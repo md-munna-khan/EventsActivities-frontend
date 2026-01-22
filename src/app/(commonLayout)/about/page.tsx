@@ -16,13 +16,13 @@ const AboutPage = () => {
 
   return (
     <div className="min-h-screen bg-background selection:bg-primary/10">
-      {/* Background Orbs */}
+    
       <div className="fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-[10%] -left-[10%] h-[40%] w-[40%] rounded-full bg-primary/5 blur-[120px]" />
         <div className="absolute top-[20%] -right-[10%] h-[40%] w-[40%] rounded-full bg-accent/10 blur-[120px]" />
       </div>
 
-      {/* Hero Section */}
+    
       <section className="relative max-w-7xl mx-auto px-6 pt-10 pb-16 md:pt-12 md:pb-24">
         <motion.div 
           {...fadeIn}
@@ -40,10 +40,10 @@ const AboutPage = () => {
         </motion.div>
       </section>
 
-      {/* Bento Grid Features */}
+   
       <section className="max-w-7xl mx-auto px-6 pb-24">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Main Mission Card */}
+     
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -64,7 +64,7 @@ const AboutPage = () => {
             </Card>
           </motion.div>
 
-          {/* Side Info Cards */}
+         
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -92,7 +92,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Stats Section with a Divider */}
+   
       <section className="border-y border-border bg-muted/30">
         <div className="max-w-7xl mx-auto px-6 py-20">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
@@ -118,7 +118,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+    
       <section className="max-w-7xl mx-auto px-6 py-10 text-center">
         <motion.div 
            initial={{ opacity: 0 }}

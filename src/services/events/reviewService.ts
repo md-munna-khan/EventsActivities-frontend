@@ -29,7 +29,7 @@ export async function createEventReview(eventId: string, rating: number, comment
 
     const result = await response.json();
 
-    // Check for authorization errors from backend
+
     if (!response.ok) {
       if (response.status === 401) {
         return {

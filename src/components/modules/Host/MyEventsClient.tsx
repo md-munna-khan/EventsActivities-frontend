@@ -77,18 +77,18 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     
-    // Use props directly - they update when server component re-fetches
+
     const events = initialEvents;
     const meta = initialMeta;
 
-    // Debug logging
+
     useEffect(() => {
         console.log("MyEventsClient - Events received:", events.length);
         console.log("MyEventsClient - Events data:", events);
         console.log("MyEventsClient - Meta:", meta);
     }, [events, meta]);
 
-    // Category options (adjust based on your backend enum)
+
     const categoryOptions = [
         { label: 'All Categories', value: 'All' },
         { label: 'Sports', value: 'SPORTS' },
@@ -102,7 +102,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
         { label: 'Other', value: 'OTHER' },
     ];
 
-    // Status options - must match backend EventStatus enum
+  
     const statusOptions = [
         { label: 'All Statuses', value: 'All' },
         { label: 'Pending', value: 'PENDING' },
@@ -145,11 +145,11 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
     };
 
     const handleStatusUpdate = async (event: Event, newStatus: string) => {
-        // Frontend validation based on backend business rules
+    
         const participantCount = event.participantCount || 0;
         const isEventPast = new Date(event.date) < new Date();
 
-        // Validation messages
+     
         if (newStatus === 'OPEN') {
             toast.error('Only admin can approve and open events');
             return;
@@ -170,7 +170,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
             return;
         }
 
-        // Confirmation dialogs
+      
         let confirmMessage = '';
         if (newStatus === 'CANCELLED') {
             confirmMessage = `Are you sure you want to cancel "${event.title}"?`;
@@ -226,7 +226,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
 
     return (
         <div className="space-y-4">
-            {/* Header Actions */}
+        
             <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4 flex-1">
                     <SearchFilter 
@@ -252,13 +252,13 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                 </Button>
             </div>
 
-            {/* Create Event Modal */}
+   
             <CreateEventModal 
                 open={isCreateModalOpen} 
                 onOpenChange={setIsCreateModalOpen} 
             />
 
-            {/* Edit Event Modal */}
+   
             <EditEventModal
                 open={isEditModalOpen}
                 onOpenChange={(open) => {
@@ -268,7 +268,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                 event={selectedEvent}
             />
 
-            {/* Events Grid */}
+      
             <div className="relative">
                 {isPending && (
                     <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-10 rounded-lg flex items-center justify-center">
@@ -302,7 +302,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                             key={event.id} 
                             className="group hover:shadow-lg transition-all duration-300 overflow-hidden"
                         >
-                            {/* Event Image */}
+                            
                             <div className="relative h-48 w-full overflow-hidden bg-muted">
                                 {event.image && event.image.trim() !== '' ? (
                                     <Image
@@ -318,7 +318,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                                         <Calendar className="h-16 w-16 text-primary/30" />
                                     </div>
                                 )}
-                                {/* Status Badge Overlay */}
+                              
                                 <div className="absolute top-3 right-3">
                                     <span
                                         className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold shadow-md ${getStatusColor(event.status)}`}
@@ -326,7 +326,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                                         {event.status}
                                     </span>
                                 </div>
-                                {/* Category Badge */}
+                             
                                 <div className="absolute top-3 left-3">
                                     <span className="inline-flex items-center rounded-full bg-background/90 backdrop-blur-sm px-3 py-1 text-xs font-medium text-foreground shadow-sm">
                                         {event.category}
@@ -389,12 +389,12 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                             </CardHeader>
 
                             <CardContent className="space-y-4">
-                                {/* Description */}
+                            
                                 <p className="text-sm text-muted-foreground line-clamp-2">
                                     {event.description}
                                 </p>
 
-                                {/* Event Details */}
+                         
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-sm">
                                         <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -427,7 +427,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
                                             {' participants'}
                                         </span>
                                     </div>
-                                    {/* Host Info */}
+                                  
                                     {event.host && (
                                         <div className="flex items-center gap-2 text-sm pt-2 border-t">
                                             <div className="relative h-8 w-8 rounded-full overflow-hidden bg-muted shrink-0">

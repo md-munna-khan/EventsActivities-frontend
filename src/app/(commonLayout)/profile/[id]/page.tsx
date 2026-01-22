@@ -31,7 +31,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   const profile = profileResult.data;
   const user = profile.client || profile.host || profile.admin;
 
-  // Fetch hosted and joined events
+
   const hostedEventsResult = await getUserEvents(id, "hosted");
   const joinedEventsResult = await getUserEvents(id, "joined");
 
@@ -41,7 +41,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="space-y-6">
-        {/* Profile Header */}
+      
         <Card>
           <CardContent className="pt-6">
             <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
@@ -103,7 +103,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           </CardContent>
         </Card>
 
-        {/* Rating Summary */}
+        
         {user?.rating && (
           <Card>
             <CardHeader>
@@ -134,7 +134,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           </Card>
         )}
 
-        {/* Hosted Events */}
+   
         {hostedEvents.length > 0 && (
           <Card>
             <CardHeader>
@@ -186,7 +186,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           </Card>
         )}
 
-        {/* Joined Events */}
+      
         {joinedEvents.length > 0 && (
           <Card>
             <CardHeader>
@@ -238,7 +238,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           </Card>
         )}
 
-        {/* Empty State */}
+       
         {hostedEvents.length === 0 && joinedEvents.length === 0 && (
           <Card>
             <CardContent className="py-12 text-center">

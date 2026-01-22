@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin, Send, MessageCircle, Clock, Globe } from "lucide-react";
+import { Mail, MapPin, Send, MessageCircle,  Globe } from "lucide-react";
 
 const ContactPage = () => {
   return (

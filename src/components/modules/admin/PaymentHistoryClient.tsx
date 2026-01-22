@@ -105,13 +105,7 @@ const PaymentHistoryClient: React.FC<PaymentHistoryClientProps> = ({ payments, m
     return `?${params.toString()}`;
   };
 
-  // const filters = [
-  //   { label: "All", value: "all" },
-  //   { label: "Paid", value: "PAID" },
-  //   { label: "Pending", value: "PENDING" },
-  //   { label: "Failed", value: "FAILED" },
-  //   { label: "Cancelled", value: "CANCELLED" },
-  // ];
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
@@ -164,29 +158,10 @@ const PaymentHistoryClient: React.FC<PaymentHistoryClientProps> = ({ payments, m
           />
         </div>
 
-        {/* Filters */}
-        {/* <div className="flex flex-wrap items-center gap-3">
-          {filters.map((f) => {
-            const active = statusFilter === f.value || (!statusFilter && f.value === "all");
-            return (
-              <Link
-                key={f.value}
-                href={f.value === "all" ? "?page=1" : `?status=${f.value}&page=1`}
-                className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
-                  active
-                    ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/30"
-                    : "bg-card hover:bg-muted border-border"
-                }`}
-              >
-                {f.label}
-              </Link>
-            );
-          })}
-        </div> */}
-
+   
         <Separator />
 
-        {/* Table */}
+       
         <Card className="border-0 shadow-xl">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-2xl font-black">Transactions</CardTitle>
@@ -246,7 +221,7 @@ const PaymentHistoryClient: React.FC<PaymentHistoryClientProps> = ({ payments, m
           </CardContent>
         </Card>
 
-        {/* Pagination */}
+       
         <div className="flex items-center justify-between gap-3">
           <div className="text-sm text-muted-foreground">
             Page {currentPage} of {totalPages}

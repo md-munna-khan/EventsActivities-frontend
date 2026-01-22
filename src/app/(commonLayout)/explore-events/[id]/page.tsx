@@ -19,7 +19,7 @@ const EventDetailsPage = async ({ params }: EventDetailsPageProps) => {
         notFound();
     }
 
-    // Get current user info to check if they're the host
+   
     const userInfo = await getUserInfo();
     const currentUserId = userInfo?.id || userInfo?.host?.id || null;
 

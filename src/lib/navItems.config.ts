@@ -1,4 +1,4 @@
-("");
+
 import { NavSection } from "@/types/dashboard.interface";
 import { getDefaultDashboardRoute, UserRole } from "./auth-utils";
 
@@ -30,26 +30,15 @@ export const hostNavItems: NavSection[] = [
   {
     title: "Event Management",
     items: [
-      // {
-      //   title: "All Events",
-      //   href: "/host/dashboard/all-events",
-      //   icon: "List", // ✅ String
-      //   roles: ["HOST"],
-      // },
+    
       {
         title: "My Events",
         href: "/host/dashboard/my-events",
-        icon: "Calendar", // ✅ String
+        icon: "Calendar", 
         roles: ["HOST"],
       },
 
-      // {
-      //   title: "Participants",
-      //   href: "/host/dashboard/participants",
-      //   icon: "Users", // ✅ String
-      //   badge: "new",
-      //   roles: ["HOST"],
-      // },
+   
     ],
   },
 ];
@@ -65,18 +54,7 @@ export const clientNavItems: NavSection[] = [
         icon: "Calendar",
         roles: ["CLIENT"],
       },
-      // {
-      //   title: "My Reviews",
-      //   href: "/dashboard/my-reviews",
-      //   icon: "Star",
-      //   roles: ["CLIENT"],
-      // },
-      // {
-      //   title: "My Payments",
-      //   href: "/dashboard/my-payments",
-      //   icon: "CreditCard",
-      //   roles: ["CLIENT"],
-      // },
+  
     ],
   },
 

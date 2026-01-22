@@ -81,13 +81,13 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
     const [reviews, setReviews] = useState<any[]>([]);
     const [isLoadingReviews, setIsLoadingReviews] = useState(false);
     
-    // Check if current user is the host
+ 
     const isHost = currentUserId && event.hostId && String(currentUserId) === String(event.hostId);
     
-    // Check if event date is over
+
     const isEventPast = new Date(event.date) < new Date();
     
-    // Check participation status and user role
+    
     useEffect(() => {
         const checkStatus = async () => {
             try {
@@ -99,7 +99,7 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
                     if (participation.success && participation.data) {
                         setIsJoined(participation.data.isJoined || false);
                     } else {
-                        // Check if user is in participants list
+                     
                         const userEmail = userInfo.email || userInfo.client?.email || userInfo.host?.email;
                         const isInParticipants = event.participants?.some(
                             (p: any) => p.client?.email === userEmail || p.clientId === userInfo.id || p.clientId === userInfo.client?.id
@@ -118,17 +118,17 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
     }, [event.id, event.participants, isHost]);
 
     useEffect(() => {
-        // Clear reviews immediately when event changes to prevent showing stale reviews
+    
         setReviews([]);
         setIsLoadingReviews(true);
 
-        let isMounted = true; // Track if component is still mounted to prevent state updates after unmount
+        let isMounted = true; 
 
         const fetchReviews = async () => {
             try {
                 const res = await getEventReviews(event.id);
                 
-                if (!isMounted) return; // Prevent state updates if component unmounted
+                if (!isMounted) return;
                 
                 if (res && res.success === false) {
                     toast.error(res.message || 'Failed to load reviews');
@@ -161,7 +161,7 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
 
         fetchReviews();
 
-        // Cleanup function to prevent state updates from outdated requests
+     
         return () => {
             isMounted = false;
         };
@@ -296,7 +296,7 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
                 </div>
             </div>
 
-            {/* Hero Section with Image */}
+           
             <div className="relative max-w-7xl mx-auto px-4 pt-6">
                 <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
                     <div className="relative h-[500px] w-full overflow-hidden">
@@ -318,7 +318,7 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
                             </div>
                         )}
                         
-                        {/* Floating Badges */}
+                   
                         <div className="absolute top-6 right-6 flex flex-col gap-2">
                             <span
                                 className={`inline-flex items-center rounded-full px-5 py-2.5 text-sm font-bold shadow-2xl backdrop-blur-md border border-white/20 ${getStatusColor(event.status)} animate-in fade-in slide-in-from-top-4 duration-500`}
@@ -332,7 +332,7 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
                             </span>
                         </div>
 
-                        {/* Title Overlay */}
+                     
                         <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
                             <h1 className="text-5xl font-black mb-4 drop-shadow-2xl animate-in fade-in slide-in-from-bottom-6 duration-700">
                                 {event.title}
@@ -356,12 +356,12 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
                 </div>
             </div>
 
-            {/* Event Details */}
+         
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Main Content */}
+             
                     <div className="lg:col-span-2 space-y-8">
-                        {/* Quick Stats Bar */}
+             
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-600/10 p-4 border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20">
                                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -389,7 +389,7 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
                             </div>
                         </div>
 
-                        {/* Description Card */}
+                        
                         <Card className="border-0 shadow-xl bg-gradient-to-br from-card to-card/50">
                             <CardHeader className="border-b border-border/50">
                                 <CardTitle className="text-2xl font-black flex items-center gap-2">
@@ -404,7 +404,7 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
                             </CardContent>
                         </Card>
 
-                        {/* Participants */}
+                  
                         {event.participants && event.participants.length > 0 && (
                             <Card className="border-0 shadow-xl bg-gradient-to-br from-card to-card/50">
                                 <CardHeader className="border-b border-border/50">
@@ -458,9 +458,9 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
                         )}
                     </div>
 
-                    {/* Sidebar */}
+                    
                     <div className="space-y-6">
-                        {/* Host Info */}
+                   
                         {event.host && (
                             <Card className="border-0 shadow-xl bg-gradient-to-br from-primary/5 via-card to-accent/5 overflow-hidden">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
@@ -507,7 +507,7 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
                             </Card>
                         )}
 
-                        {/* Event Stats */}
+                  
                         <Card className="border-0 shadow-xl bg-gradient-to-br from-card to-card/50">
                             <CardHeader className="border-b border-border/50">
                                 <CardTitle className="text-lg font-black flex items-center gap-2">
@@ -545,7 +545,7 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
                             </CardContent>
                         </Card>
 
-                        {/* Join/Leave Button - Only show for non-hosts */}
+                     
                         {!isHost && userRole === 'CLIENT' && !isChecking && (
                             <Card className="border-0 shadow-2xl bg-gradient-to-br from-primary via-primary to-accent overflow-hidden relative">
                                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/20 to-transparent" />
@@ -594,7 +594,7 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
                 </div>
             </div>
 
-            {/* Reviews Section */}
+         
             <div className="max-w-7xl mx-auto px-4 pb-12">
                 <Card className="border-0 shadow-2xl bg-gradient-to-br from-card via-card/95 to-accent/5">
                     <CardHeader className="border-b border-border/50 pb-6">
@@ -679,7 +679,7 @@ const EventDetailsClient = ({ event, currentUserId }: EventDetailsClientProps) =
                 </Card>
             </div>
 
-            {/* Edit Modal - Only show for host */}
+       
             {isHost && (
                 <EditEventModal
                     open={isEditModalOpen}

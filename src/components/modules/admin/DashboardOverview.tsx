@@ -3,7 +3,7 @@ import { getPendingEvents } from "@/services/admin/admin.service";
 
 
 const DashboardOverview = async () => {
-  // fetch some basic counts
+
 
   const pendingEventsRes = await getPendingEvents();
 

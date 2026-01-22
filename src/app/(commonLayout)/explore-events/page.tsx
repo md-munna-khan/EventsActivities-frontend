@@ -9,8 +9,7 @@ interface ExploreEventsPageProps {
 
 const ExploreEventsPage = async ({ searchParams }: ExploreEventsPageProps) => {
     const params = await searchParams;
-    
-    // Extract filters from search params
+   
     const filters: IEventFilters = {
         category: typeof params.category === 'string' ? params.category : undefined,
         status: typeof params.status === 'string' ? params.status : undefined,
@@ -21,10 +20,10 @@ const ExploreEventsPage = async ({ searchParams }: ExploreEventsPageProps) => {
         limit: params.limit ? Number(params.limit) : 10,
     };
 
-    // Fetch events
+
     const result = await getEvents(filters);
  
-    // Debug logging
+ 
     console.log("ExploreEventsPage - Filters:", filters);
     console.log("ExploreEventsPage - Result:", JSON.stringify(result, null, 2));
 
@@ -36,14 +35,8 @@ const ExploreEventsPage = async ({ searchParams }: ExploreEventsPageProps) => {
     console.log("ExploreEventsPage - Meta:", meta);
 
     return (
-        <div className="space-y-6 max-w-7xl p-4 md:p-8 mx-auto">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight ">Explore Events</h1>
-                <p className="text-muted-foreground">
-                    Discover and explore all available events
-                </p>
-            </div>
-
+        <div className="space-y-6 p-4 md:p-8 mx-auto">
+           
             <Suspense fallback={<TableSkeleton columns={7} rows={10} />}>
                 <ExploreEventsClient 
                     initialEvents={events} 

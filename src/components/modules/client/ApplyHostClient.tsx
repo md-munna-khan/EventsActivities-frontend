@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getUserInfo } from "@/services/auth/getUserInfo";
 import { applyHost } from "@/services/user/userService";
-import { CheckCircle2, Clock, ShieldCheck, Star, Users, LayoutDashboard } from "lucide-react";
+import { CheckCircle2, Clock, ShieldCheck, Star } from "lucide-react";
 
 export const ApplyHostClient = () => {
   const [loading, setLoading] = useState(false);
@@ -73,17 +73,7 @@ export const ApplyHostClient = () => {
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">
-      {/* 1. Header Section */}
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl mb-3">
-          Share your passion with the world
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          Join our community of hosts and start organizing unique events today.
-        </p>
-      </div>
-
-      {/* 2. Status Notifications */}
+ 
       {isPending && (
         <Alert className="mb-8 border-amber-200 bg-amber-50 dark:bg-amber-950/20">
           <Clock className="h-5 w-5 text-amber-600" />
@@ -104,22 +94,9 @@ export const ApplyHostClient = () => {
         </Alert>
       )}
 
-      {/* 3. Benefits / Feature Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        {[
-          { icon: <Users className="w-6 h-6 text-primary" />, title: "Grow Community", desc: "Connect with thousands of eager participants." },
-          { icon: <LayoutDashboard className="w-6 h-6 text-primary" />, title: "Manage Easily", desc: "Professional tools to track bookings and attendees." },
-          { icon: <ShieldCheck className="w-6 h-6 text-primary" />, title: "Verified Trust", desc: "Gain credibility with our host verification badge." },
-        ].map((feature, i) => (
-          <div key={i} className="p-5 rounded-xl border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow">
-            <div className="mb-3">{feature.icon}</div>
-            <h3 className="font-bold mb-1">{feature.title}</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
-          </div>
-        ))}
-      </div>
+   
 
-      {/* 4. The Action Card */}
+    
       <Card className="border-2 border-primary/10 shadow-xl overflow-hidden">
         <CardHeader className="bg-primary/5 border-b border-primary/10">
           <div className="flex items-center justify-between">
@@ -153,7 +130,7 @@ export const ApplyHostClient = () => {
         </CardContent>
       </Card>
 
-      {/* 5. Confirmation Dialog */}
+     
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

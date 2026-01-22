@@ -107,7 +107,7 @@ export const ReviewModal = ({
             </div>
           </div>
 
-          {/* Comment */}
+         
           <div className="space-y-2">
             <label htmlFor="comment" className="text-sm font-medium">
               Your Review

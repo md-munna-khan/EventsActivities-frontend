@@ -32,7 +32,7 @@ interface ClientDashboardClientProps {
 const ClientDashboardClient = ({ bookings }: ClientDashboardClientProps) => {
     const [selectedFilter, setSelectedFilter] = useState<'all' | 'upcoming' | 'completed' | 'cancelled'>('all');
 
-    // Stats Calculation Logic (No changes to functionality)
+  
     const totalBookings = bookings.length;
     const upcomingEvents = bookings.filter(b => 
         b.event?.status === 'OPEN' || b.event?.status === 'PENDING'
@@ -72,14 +72,14 @@ const ClientDashboardClient = ({ bookings }: ClientDashboardClientProps) => {
 
     return (
         <div className="min-h-screen bg-background pb-20">
-            {/* Background Decorative Elements */}
+          
             <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
                 <div className="absolute -top-[10%] -right-[10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[120px]" />
                 <div className="absolute -bottom-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-secondary/5 blur-[120px]" />
             </div>
 
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-                {/* Header Section - Responsive Stack */}
+            
                 <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div className="space-y-2">
                         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground">
@@ -95,7 +95,7 @@ const ClientDashboardClient = ({ bookings }: ClientDashboardClientProps) => {
                     </div>
                 </header>
 
-                {/* Main Stats Grid */}
+             
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                     <StatCard 
                         title="Total Bookings" 
@@ -127,7 +127,7 @@ const ClientDashboardClient = ({ bookings }: ClientDashboardClientProps) => {
                     />
                 </div>
 
-                {/* Secondary Activity Metrics */}
+            
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <ActivityMiniCard 
                         icon={Activity} 
@@ -149,7 +149,7 @@ const ClientDashboardClient = ({ bookings }: ClientDashboardClientProps) => {
                     />
                 </div>
 
-                {/* Filter Navigation - Custom Scroll for Mobile */}
+             
                 <div className="flex flex-col space-y-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -181,7 +181,7 @@ const ClientDashboardClient = ({ bookings }: ClientDashboardClientProps) => {
                     </div>
                 </div>
 
-                {/* Events List Grid */}
+                
                 <div className="min-h-[400px]">
                     {filteredBookings.length === 0 ? (
                         <Card className="border-dashed border-2 flex flex-col items-center justify-center py-20 text-center">
@@ -265,7 +265,7 @@ const ClientDashboardClient = ({ bookings }: ClientDashboardClientProps) => {
                     )}
                 </div>
 
-                {/* Quick Actions - Responsive Grid */}
+             
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <ActionCard 
                         title="Explore Events"
@@ -289,7 +289,7 @@ const ClientDashboardClient = ({ bookings }: ClientDashboardClientProps) => {
     );
 };
 
-/* --- Refined Sub-components for better Clean Code --- */
+
 
 const StatCard = ({ title, value, icon: Icon, variant, footer }: any) => {
     const variants: any = {

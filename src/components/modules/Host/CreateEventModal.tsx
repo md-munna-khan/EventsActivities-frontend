@@ -33,11 +33,11 @@ interface CreateEventModalProps {
 }
 const getLocalDateTimeNow = (): string => {
   const now = new Date();
-  // adjust to local timezone by subtracting the offset, then ISO and slice
+ 
   const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
   return local.toISOString().slice(0, 16);
 };
-// Event categories matching backend enum
+
 const eventCategories = [
     { label: 'Music', value: 'MUSIC' },
     { label: 'Movie', value: 'MOVIE' },
@@ -108,7 +108,7 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
         capacity: '',
     });
 
-    // Handle file selection and preview
+   
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -121,13 +121,13 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
         }
     };
 
-    // Remove selected file
+
     const handleRemoveFile = () => {
         setSelectedFile(null);
         setPreview(null);
     };
 
-    // Handle form submission
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -137,7 +137,7 @@ const CreateEventModal = ({ open, onOpenChange }: CreateEventModalProps) => {
                 title: formData.title,
                 category: formData.category,
                 description: formData.description,
-                // Convert local datetime input to ISO string (UTC) to avoid timezone shifts
+              
                 date: new Date(formData.date).toISOString(),
                 location: formData.location,
                 joiningFee: Number(formData.joiningFee),
@@ -154,11 +154,11 @@ if (new Date(formData.date) <= new Date()) {
             if (result.success) {
                 toast.success('Event created successfully!');
                 onOpenChange(false);
-                // Add a small delay to ensure backend has processed the image
+            
                 setTimeout(() => {
                     router.refresh();
                 }, 1000);
-                // Reset form
+            
                 setPreview(null);
                 setSelectedFile(null);
                 setFormData({
@@ -181,7 +181,7 @@ if (new Date(formData.date) <= new Date()) {
         }
     };
 
-    // Reset form when modal closes
+
     useEffect(() => {
         if (!open) {
             setPreview(null);
@@ -210,7 +210,7 @@ if (new Date(formData.date) <= new Date()) {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <FieldGroup>
-                        {/* Title */}
+                     
                         <Field>
                             <FieldLabel htmlFor="title">Event Title *</FieldLabel>
                             <Input
@@ -224,7 +224,7 @@ if (new Date(formData.date) <= new Date()) {
                             />
                         </Field>
 
-                        {/* Category */}
+                 
                         <Field>
                             <FieldLabel htmlFor="category">Category *</FieldLabel>
                             <Select 
@@ -246,7 +246,7 @@ if (new Date(formData.date) <= new Date()) {
                             </Select>
                         </Field>
 
-                        {/* Description */}
+                   
                         <Field>
                             <FieldLabel htmlFor="description">Description *</FieldLabel>
                             <Textarea
@@ -260,7 +260,7 @@ if (new Date(formData.date) <= new Date()) {
                             />
                         </Field>
 
-                        {/* Date and Location Row */}
+                   
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Field>
                                 <FieldLabel htmlFor="date">Event Date *</FieldLabel>
@@ -289,7 +289,7 @@ if (new Date(formData.date) <= new Date()) {
                             </Field>
                         </div>
 
-                        {/* Joining Fee and Capacity Row */}
+                      
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Field>
                                 <FieldLabel htmlFor="joiningFee">Joining Fee ($) *</FieldLabel>
@@ -321,7 +321,7 @@ if (new Date(formData.date) <= new Date()) {
                             </Field>
                         </div>
 
-                       {/* Image Upload */}
+                     
                        <Field>
                             <FieldLabel htmlFor="file">Event Image</FieldLabel>
                             <div className="space-y-4">
