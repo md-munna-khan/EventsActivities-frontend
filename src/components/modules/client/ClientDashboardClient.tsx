@@ -23,6 +23,7 @@ import { formatDateTime } from '@/lib/formatters';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface ClientDashboardClientProps {
     bookings: any[];
@@ -31,7 +32,7 @@ interface ClientDashboardClientProps {
 const ClientDashboardClient = ({ bookings }: ClientDashboardClientProps) => {
     const [selectedFilter, setSelectedFilter] = useState<'all' | 'upcoming' | 'completed' | 'cancelled'>('all');
 
-    // Calculate statistics
+    // Stats Calculation Logic (No changes to functionality)
     const totalBookings = bookings.length;
     const upcomingEvents = bookings.filter(b => 
         b.event?.status === 'OPEN' || b.event?.status === 'PENDING'
@@ -50,384 +51,320 @@ const ClientDashboardClient = ({ bookings }: ClientDashboardClientProps) => {
         return sum;
     }, 0);
 
-    // Filter bookings
     const filteredBookings = bookings.filter(booking => {
         if (selectedFilter === 'all') return true;
-        if (selectedFilter === 'upcoming') {
-            return booking.event?.status === 'OPEN' || booking.event?.status === 'PENDING';
-        }
-        if (selectedFilter === 'completed') {
-            return booking.event?.status === 'COMPLETED';
-        }
-        if (selectedFilter === 'cancelled') {
-            return booking.event?.status === 'CANCELLED' || booking.participantStatus === 'CANCELLED';
-        }
+        if (selectedFilter === 'upcoming') return booking.event?.status === 'OPEN' || booking.event?.status === 'PENDING';
+        if (selectedFilter === 'completed') return booking.event?.status === 'COMPLETED';
+        if (selectedFilter === 'cancelled') return booking.event?.status === 'CANCELLED' || booking.participantStatus === 'CANCELLED';
         return true;
     });
 
-    const getStatusColor = (status: string) => {
-        const colors: Record<string, string> = {
-            PENDING: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-            CONFIRMED: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-            CANCELLED: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-            OPEN: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-            COMPLETED: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+    const getStatusStyles = (status: string) => {
+        const styles: Record<string, string> = {
+            PENDING: 'bg-amber-500/10 text-amber-600 border-amber-200 dark:border-amber-900',
+            CONFIRMED: 'bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-900',
+            CANCELLED: 'bg-destructive/10 text-destructive border-destructive/20',
+            OPEN: 'bg-primary/10 text-primary border-primary/20',
+            COMPLETED: 'bg-secondary/10 text-secondary-foreground border-secondary/20',
         };
-        return colors[status] || 'bg-gray-100 text-gray-800';
+        return styles[status] || 'bg-gray-100 text-gray-800';
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-            <div className="container mx-auto p-6 space-y-8">
-                {/* Header Section */}
-                <div className="flex flex-col gap-4">
+        <div className="min-h-screen bg-background pb-20">
+            {/* Background Decorative Elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+                <div className="absolute -top-[10%] -right-[10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[120px]" />
+                <div className="absolute -bottom-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-secondary/5 blur-[120px]" />
+            </div>
+
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+                {/* Header Section - Responsive Stack */}
+                <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="space-y-2">
+                        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground">
+                            My <span className="text-primary">Dashboard</span>
+                        </h1>
+                        <p className="text-muted-foreground max-w-md">
+                            Welcome back! You have <span className="text-foreground font-semibold">{upcomingEvents} upcoming</span> events this month.
+                        </p>
+                    </div>
+                    <div className="flex flex-col items-start md:items-end p-4 rounded-2xl bg-muted/30 border border-border/50 backdrop-blur-sm">
+                        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">System Status: Active</p>
+                        <p className="text-sm font-bold">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+                    </div>
+                </header>
+
+                {/* Main Stats Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <StatCard 
+                        title="Total Bookings" 
+                        value={totalBookings} 
+                        icon={Ticket} 
+                        variant="primary" 
+                        footer="Lifetime activity"
+                    />
+                    <StatCard 
+                        title="Upcoming" 
+                        value={upcomingEvents} 
+                        icon={Clock} 
+                        variant="secondary" 
+                        footer="Awaiting events"
+                    />
+                    <StatCard 
+                        title="Completed" 
+                        value={completedEvents} 
+                        icon={CheckCircle2} 
+                        variant="success" 
+                        footer="Events attended"
+                    />
+                    <StatCard 
+                        title="Total Spent" 
+                        value={formatCurrency(totalSpent)} 
+                        icon={DollarSign} 
+                        variant="accent" 
+                        footer="Invested in events"
+                    />
+                </div>
+
+                {/* Secondary Activity Metrics */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <ActivityMiniCard 
+                        icon={Activity} 
+                        label="Attendance Rate" 
+                        value={`${totalBookings > 0 ? Math.round((completedEvents / totalBookings) * 100) : 0}%`}
+                        color="text-emerald-500"
+                    />
+                    <ActivityMiniCard 
+                        icon={XCircle} 
+                        label="Cancellations" 
+                        value={cancelledEvents} 
+                        color="text-destructive"
+                    />
+                    <ActivityMiniCard 
+                        icon={TrendingUp} 
+                        label="Avg. Per Event" 
+                        value={totalBookings > 0 ? formatCurrency(totalSpent / totalBookings) : formatCurrency(0)}
+                        color="text-primary"
+                    />
+                </div>
+
+                {/* Filter Navigation - Custom Scroll for Mobile */}
+                <div className="flex flex-col space-y-4">
                     <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-5xl font-black bg-gradient-to-r from-primary via-accent to-primary bg-clip-text  animate-gradient-x">
-                                My Dashboard
-                            </h1>
-                            <p className="text-muted-foreground mt-2 text-lg">Track your events, bookings, and activity</p>
-                        </div>
-                        <div className="text-right">
-                            <p className="text-sm text-muted-foreground">
-                                Last updated: {new Date().toLocaleDateString()}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                                {new Date().toLocaleTimeString()}
-                            </p>
-                        </div>
+                        <h2 className="text-2xl font-bold flex items-center gap-2">
+                            Recent Bookings
+                        </h2>
+                    </div>
+                    <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+                        <FilterButton 
+                            active={selectedFilter === 'all'} 
+                            onClick={() => setSelectedFilter('all')}
+                            label={`All (${totalBookings})`}
+                        />
+                        <FilterButton 
+                            active={selectedFilter === 'upcoming'} 
+                            onClick={() => setSelectedFilter('upcoming')}
+                            label="Upcoming"
+                            color="active:bg-primary"
+                        />
+                        <FilterButton 
+                            active={selectedFilter === 'completed'} 
+                            onClick={() => setSelectedFilter('completed')}
+                            label="Completed"
+                        />
+                        <FilterButton 
+                            active={selectedFilter === 'cancelled'} 
+                            onClick={() => setSelectedFilter('cancelled')}
+                            label="Cancelled"
+                        />
                     </div>
                 </div>
 
-                {/* Stats Grid - Primary Metrics */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {/* Total Bookings Card */}
-                    <Card className="group relative overflow-hidden border-0 shadow-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white transition-all duration-500 hover:shadow-2xl hover:scale-105">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-                        <CardContent className="p-8 relative">
-                            <div className="flex items-start justify-between mb-6">
-                                <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm">
-                                    <Ticket className="h-8 w-8" />
-                                </div>
-                                <span className="text-xs font-bold bg-white/20 px-3 py-1.5 rounded-full backdrop-blur-sm">
-                                    Total
-                                </span>
+                {/* Events List Grid */}
+                <div className="min-h-[400px]">
+                    {filteredBookings.length === 0 ? (
+                        <Card className="border-dashed border-2 flex flex-col items-center justify-center py-20 text-center">
+                            <div className="p-4 rounded-full bg-muted mb-4">
+                                <AlertCircle className="h-10 w-10 text-muted-foreground" />
                             </div>
-                            <p className="text-white/80 text-sm font-semibold mb-2">Total Bookings</p>
-                            <p className="text-5xl font-black mb-2">{totalBookings}</p>
-                            <p className="text-white/70 text-xs">All time events</p>
-                        </CardContent>
-                    </Card>
+                            <h3 className="text-xl font-bold">No events found</h3>
+                            <p className="text-muted-foreground mb-6">Try changing your filters or explore new events.</p>
+                            <Link href="/explore-events">
+                                <Button>Find New Events</Button>
+                            </Link>
+                        </Card>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+                            {filteredBookings.map((booking: any) => (
+                                <Link key={booking.id} href={`/explore-events/${booking.event?.id}`} className="group">
+                                    <Card className="h-full overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/5">
+                                        <div className="relative aspect-video overflow-hidden">
+                                            {booking.event?.image ? (
+                                                <Image
+                                                    src={booking.event.image}
+                                                    alt={booking.event.title}
+                                                    fill
+                                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    unoptimized
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full bg-secondary/20 flex items-center justify-center">
+                                                    <Calendar className="h-12 w-12 text-secondary" />
+                                                </div>
+                                            )}
+                                            <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
+                                                <Badge variant="outline" className={`backdrop-blur-md shadow-sm ${getStatusStyles(booking.event?.status || 'PENDING')}`}>
+                                                    {booking.event?.status}
+                                                </Badge>
+                                            </div>
+                                            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+                                                <Badge className="mb-2 bg-primary/90 text-primary-foreground hover:bg-primary">
+                                                    {booking.event?.category || 'General'}
+                                                </Badge>
+                                                <h3 className="text-white font-bold line-clamp-1">{booking.event?.title}</h3>
+                                            </div>
+                                        </div>
 
-                    {/* Upcoming Events Card */}
-                    <Card className="group relative overflow-hidden border-0 shadow-xl bg-gradient-to-br from-green-500 to-green-600 text-white transition-all duration-500 hover:shadow-2xl hover:scale-105">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-                        <CardContent className="p-8 relative">
-                            <div className="flex items-start justify-between mb-6">
-                                <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm">
-                                    <Clock className="h-8 w-8" />
-                                </div>
-                                <span className="text-xs font-bold bg-white/20 px-3 py-1.5 rounded-full backdrop-blur-sm">
-                                    Active
-                                </span>
-                            </div>
-                            <p className="text-white/80 text-sm font-semibold mb-2">Upcoming Events</p>
-                            <p className="text-5xl font-black mb-2">{upcomingEvents}</p>
-                            <p className="text-white/70 text-xs">Events to attend</p>
-                        </CardContent>
-                    </Card>
-
-                    {/* Completed Events Card */}
-                    <Card className="group relative overflow-hidden border-0 shadow-xl bg-gradient-to-br from-purple-500 to-purple-600 text-white transition-all duration-500 hover:shadow-2xl hover:scale-105">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-                        <CardContent className="p-8 relative">
-                            <div className="flex items-start justify-between mb-6">
-                                <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm">
-                                    <CheckCircle2 className="h-8 w-8" />
-                                </div>
-                                <span className="text-xs font-bold bg-white/20 px-3 py-1.5 rounded-full backdrop-blur-sm">
-                                    Done
-                                </span>
-                            </div>
-                            <p className="text-white/80 text-sm font-semibold mb-2">Completed</p>
-                            <p className="text-5xl font-black mb-2">{completedEvents}</p>
-                            <p className="text-white/70 text-xs">Attended events</p>
-                        </CardContent>
-                    </Card>
-
-                    {/* Total Spent Card */}
-                    <Card className="group relative overflow-hidden border-0 shadow-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white transition-all duration-500 hover:shadow-2xl hover:scale-105">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-                        <CardContent className="p-8 relative">
-                            <div className="flex items-start justify-between mb-6">
-                                <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm">
-                                    <DollarSign className="h-8 w-8" />
-                                </div>
-                                <span className="text-xs font-bold bg-white/20 px-3 py-1.5 rounded-full backdrop-blur-sm">
-                                    Total
-                                </span>
-                            </div>
-                            <p className="text-white/80 text-sm font-semibold mb-2">Total Spent</p>
-                            <p className="text-5xl font-black mb-2">{formatCurrency(totalSpent)}</p>
-                            <p className="text-white/70 text-xs">On all bookings</p>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Secondary Stats - Activity Metrics */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Card className="border-0 shadow-lg bg-gradient-to-br from-card to-card/50 hover:shadow-xl transition-shadow">
-                        <CardContent className="p-6">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 rounded-xl bg-green-500/10">
-                                    <Activity className="h-6 w-6 text-green-600" />
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-sm text-muted-foreground font-medium">Success Rate</p>
-                                    <p className="text-3xl font-black text-foreground">
-                                        {totalBookings > 0 ? Math.round((completedEvents / totalBookings) * 100) : 0}%
-                                    </p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border-0 shadow-lg bg-gradient-to-br from-card to-card/50 hover:shadow-xl transition-shadow">
-                        <CardContent className="p-6">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 rounded-xl bg-red-500/10">
-                                    <XCircle className="h-6 w-6 text-red-600" />
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-sm text-muted-foreground font-medium">Cancelled</p>
-                                    <p className="text-3xl font-black text-foreground">{cancelledEvents}</p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border-0 shadow-lg bg-gradient-to-br from-card to-card/50 hover:shadow-xl transition-shadow">
-                        <CardContent className="p-6">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 rounded-xl bg-blue-500/10">
-                                    <TrendingUp className="h-6 w-6 text-blue-600" />
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-sm text-muted-foreground font-medium">Average Spend</p>
-                                    <p className="text-3xl font-black text-foreground">
-                                        {totalBookings > 0 ? formatCurrency(totalSpent / totalBookings) : formatCurrency(0)}
-                                    </p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Filter Tabs */}
-                <div className="flex items-center gap-3 flex-wrap">
-                    <button
-                        onClick={() => setSelectedFilter('all')}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 ${
-                            selectedFilter === 'all'
-                                ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105'
-                                : 'bg-card hover:bg-muted border border-border'
-                        }`}
-                    >
-                        All Events ({totalBookings})
-                    </button>
-                    <button
-                        onClick={() => setSelectedFilter('upcoming')}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 ${
-                            selectedFilter === 'upcoming'
-                                ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 scale-105'
-                                : 'bg-card hover:bg-muted border border-border'
-                        }`}
-                    >
-                        Upcoming ({upcomingEvents})
-                    </button>
-                    <button
-                        onClick={() => setSelectedFilter('completed')}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 ${
-                            selectedFilter === 'completed'
-                                ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30 scale-105'
-                                : 'bg-card hover:bg-muted border border-border'
-                        }`}
-                    >
-                        Completed ({completedEvents})
-                    </button>
-                    <button
-                        onClick={() => setSelectedFilter('cancelled')}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 ${
-                            selectedFilter === 'cancelled'
-                                ? 'bg-red-500 text-white shadow-lg shadow-red-500/30 scale-105'
-                                : 'bg-card hover:bg-muted border border-border'
-                        }`}
-                    >
-                        Cancelled ({cancelledEvents})
-                    </button>
-                </div>
-
-                {/* Events List */}
-                <Card className="border-0 shadow-2xl bg-gradient-to-br from-card via-card/95 to-primary/5">
-                    <CardHeader className="border-b border-border/50 pb-6">
-                        <CardTitle className="text-3xl font-black flex items-center gap-3">
-                            <span className="w-1.5 h-10 bg-gradient-to-b from-primary to-accent rounded-full" />
-                            My Bookings
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-8">
-                        {filteredBookings.length === 0 ? (
-                            <div className="text-center py-16">
-                                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-muted/50 mb-6">
-                                    <AlertCircle className="h-12 w-12 text-muted-foreground" />
-                                </div>
-                                <h3 className="text-2xl font-bold text-foreground mb-2">No bookings found</h3>
-                                <p className="text-muted-foreground mb-6">
-                                    {selectedFilter === 'all' 
-                                        ? 'Start exploring events and make your first booking!'
-                                        : `No ${selectedFilter} bookings at the moment.`
-                                    }
-                                </p>
-                                <Link href="/explore-events">
-                                    <Button size="lg" className="gap-2">
-                                        Explore Events <ArrowRight className="h-4 w-4" />
-                                    </Button>
-                                </Link>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {filteredBookings.map((booking: any) => (
-                                    <Link 
-                                        key={booking.id} 
-                                        href={`/explore-events/${booking.event?.id}`}
-                                        className="group"
-                                    >
-                                        <Card className="h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden bg-gradient-to-br from-card to-card/50 hover:scale-105">
-                                            <div className="relative h-48 w-full overflow-hidden bg-muted">
-                                                {booking.event?.image ? (
-                                                    <Image
-                                                        src={booking.event.image}
-                                                        alt={booking.event.title}
-                                                        fill
-                                                        className="object-cover group-hover:scale-110 transition-transform duration-700"
-                                                        unoptimized
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
-                                                        <Calendar className="h-16 w-16 text-primary/40" />
-                                                    </div>
-                                                )}
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                                                
-                                                {/* Status Badge */}
-                                                <div className="absolute top-3 right-3">
-                                                    <span className={`px-3 py-1.5 rounded-full text-xs font-bold backdrop-blur-md ${getStatusColor(booking.event?.status || 'PENDING')}`}>
-                                                        {booking.event?.status || 'PENDING'}
+                                        <CardContent className="p-5 space-y-4">
+                                            <div className="grid gap-2">
+                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                    <Calendar className="h-4 w-4 text-primary" />
+                                                    <span className="truncate font-medium text-foreground">
+                                                        {booking.event?.date ? formatDateTime(booking.event.date) : 'TBA'}
                                                     </span>
                                                 </div>
-
-                                                {/* Category Badge */}
-                                                <div className="absolute top-3 left-3">
-                                                    <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-white/90 text-gray-800 backdrop-blur-md">
-                                                        {booking.event?.category || 'Event'}
-                                                    </span>
+                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                    <MapPin className="h-4 w-4 text-primary" />
+                                                    <span className="truncate">{booking.event?.location || 'Location TBA'}</span>
                                                 </div>
-
-                                                {/* Title Overlay */}
-                                                <div className="absolute bottom-0 left-0 right-0 p-4">
-                                                    <h3 className="text-white font-black text-lg line-clamp-2 drop-shadow-lg">
-                                                        {booking.event?.title}
-                                                    </h3>
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <DollarSign className="h-4 w-4 text-primary" />
+                                                    <span className="font-bold text-lg text-foreground">
+                                                        {formatCurrency(booking.event?.joiningFee || 0)}
+                                                    </span>
                                                 </div>
                                             </div>
 
-                                            <CardContent className="p-5 space-y-4">
-                                                <div className="space-y-3">
-                                                    <div className="flex items-center gap-2 text-sm">
-                                                        <Calendar className="h-4 w-4 text-primary flex-shrink-0" />
-                                                        <span className="font-semibold text-foreground">
-                                                            {booking.event?.date ? formatDateTime(booking.event.date) : 'TBA'}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-sm">
-                                                        <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                                                        <span className="text-muted-foreground line-clamp-1">
-                                                            {booking.event?.location || 'Location TBA'}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-sm">
-                                                        <DollarSign className="h-4 w-4 text-primary flex-shrink-0" />
-                                                        <span className="font-bold text-foreground">
-                                                            {formatCurrency(booking.event?.joiningFee || 0)}
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                <div className="pt-3 border-t border-border/50 flex items-center justify-between">
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(booking.participantStatus)}`}>
+                                            <div className="pt-4 border-t flex items-center justify-between">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Your Status</span>
+                                                    <span className={`text-sm font-bold ${booking.participantStatus === 'CONFIRMED' ? 'text-emerald-600' : 'text-primary'}`}>
                                                         {booking.participantStatus}
                                                     </span>
-                                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                                        View Details
-                                                        <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
-                                                    </span>
                                                 </div>
-                                            </CardContent>
-                                        </Card>
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                                                <div className="h-8 w-8 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                                                    <ArrowRight className="h-4 w-4" />
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+                </div>
 
-                {/* Quick Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card className="border-0 shadow-xl bg-gradient-to-br from-primary/10 via-card to-accent/10 hover:shadow-2xl transition-all duration-300 group">
-                        <CardContent className="p-8">
-                            <div className="flex items-center gap-6">
-                                <div className="p-4 rounded-2xl bg-primary/20 group-hover:bg-primary/30 transition-colors">
-                                    <Users className="h-10 w-10 text-primary" />
-                                </div>
-                                <div className="flex-1">
-                                    <h3 className="text-xl font-black text-foreground mb-2">Explore Events</h3>
-                                    <p className="text-sm text-muted-foreground mb-4">Discover amazing events happening around you</p>
-                                    <Link href="/explore-events">
-                                        <Button variant="default" className="gap-2 group-hover:gap-3 transition-all">
-                                            Browse Events <ArrowRight className="h-4 w-4" />
-                                        </Button>
-                                    </Link>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border-0 shadow-xl bg-gradient-to-br from-accent/10 via-card to-primary/10 hover:shadow-2xl transition-all duration-300 group">
-                        <CardContent className="p-8">
-                            <div className="flex items-center gap-6">
-                                <div className="p-4 rounded-2xl bg-accent/20 group-hover:bg-accent/30 transition-colors">
-                                    <Star className="h-10 w-10 text-accent" />
-                                </div>
-                                <div className="flex-1">
-                                    <h3 className="text-xl font-black text-foreground mb-2">Become a Host</h3>
-                                    <p className="text-sm text-muted-foreground mb-4">Start hosting your own events and grow your community</p>
-                                    <Link href="/dashboard/apply-host">
-                                        <Button variant="outline" className="gap-2 group-hover:gap-3 transition-all">
-                                            Apply Now <ArrowRight className="h-4 w-4" />
-                                        </Button>
-                                    </Link>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                {/* Quick Actions - Responsive Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <ActionCard 
+                        title="Explore Events"
+                        description="Find your next favorite activity nearby."
+                        icon={Users}
+                        href="/explore-events"
+                        btnText="Browse All"
+                        variant="primary"
+                    />
+                    <ActionCard 
+                        title="Become a Host"
+                        description="Share your passion and lead your own community."
+                        icon={Star}
+                        href="/dashboard/apply-host"
+                        btnText="Apply to Host"
+                        variant="secondary"
+                    />
                 </div>
             </div>
         </div>
     );
 };
+
+/* --- Refined Sub-components for better Clean Code --- */
+
+const StatCard = ({ title, value, icon: Icon, variant, footer }: any) => {
+    const variants: any = {
+        primary: "bg-primary text-primary-foreground shadow-primary/20",
+        secondary: "bg-secondary text-secondary-foreground shadow-secondary/20",
+        success: "bg-emerald-600 text-white shadow-emerald-200",
+        accent: "bg-slate-900 text-white shadow-slate-200",
+    };
+
+    return (
+        <Card className={`relative overflow-hidden border-none shadow-lg transition-transform hover:-translate-y-1 duration-300 ${variants[variant]}`}>
+            <CardContent className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                    <div className="p-2 rounded-lg bg-white/20 backdrop-blur-md">
+                        <Icon className="h-6 w-6" />
+                    </div>
+                </div>
+                <div className="space-y-1">
+                    <h3 className="text-3xl font-extrabold">{value}</h3>
+                    <p className="text-xs font-medium opacity-80 uppercase tracking-widest">{title}</p>
+                </div>
+                <div className="mt-4 pt-4 border-t border-white/10 text-[10px] font-medium opacity-70">
+                    {footer}
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
+
+const ActivityMiniCard = ({ icon: Icon, label, value, color }: any) => (
+    <Card className="border-none shadow-md bg-card/50 backdrop-blur-sm">
+        <CardContent className="p-4 flex items-center gap-4">
+            <div className={`p-2 rounded-xl bg-muted`}>
+                <Icon className={`h-5 w-5 ${color}`} />
+            </div>
+            <div>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{label}</p>
+                <p className="text-xl font-bold">{value}</p>
+            </div>
+        </CardContent>
+    </Card>
+);
+
+const FilterButton = ({ active, onClick, label }: any) => (
+    <button
+        onClick={onClick}
+        className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-200 border ${
+            active 
+            ? 'bg-primary text-primary-foreground border-primary shadow-md' 
+            : 'bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground'
+        }`}
+    >
+        {label}
+    </button>
+);
+
+const ActionCard = ({ title, description, icon: Icon, href, btnText, variant }: any) => (
+    <Card className={`group border-none shadow-xl overflow-hidden`}>
+        <CardContent className="p-0">
+            <div className={`p-6 sm:p-8 flex items-center gap-6 ${variant === 'primary' ? 'bg-primary/5' : 'bg-secondary/5'}`}>
+                <div className={`hidden sm:flex p-4 rounded-2xl ${variant === 'primary' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>
+                    <Icon className="h-8 w-8" />
+                </div>
+                <div className="flex-1 space-y-3">
+                    <h3 className="text-xl font-bold">{title}</h3>
+                    <p className="text-sm text-muted-foreground">{description}</p>
+                    <Link href={href} className="inline-block">
+                        <Button variant={variant === 'primary' ? 'default' : 'outline'} className="gap-2 group-hover:translate-x-1 transition-transform">
+                            {btnText} <ArrowRight className="h-4 w-4" />
+                        </Button>
+                    </Link>
+                </div>
+            </div>
+        </CardContent>
+    </Card>
+);
 
 export default ClientDashboardClient;

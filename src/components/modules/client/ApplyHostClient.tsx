@@ -1,124 +1,3 @@
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// "use client";
-
-// import React, { useEffect, useState, useRef } from "react";
-// import { toast } from "sonner";
-// import { useRouter } from "next/navigation";
-// import { Button } from "@/components/ui/button";
-// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-// import { getUserInfo } from "@/services/auth/getUserInfo";
-// import { applyHost } from "@/services/user/applyHost";
-
-
-// export const ApplyHostClient = () => {
-//   const [loading, setLoading] = useState(false);
-//   const [open, setOpen] = useState(false);
-//   const [userStatus, setUserStatus] = useState<string | null>(null);
-//   const [userRole, setUserRole] = useState<string | null>(null);
-//   const [prevWasPending, setPrevWasPending] = useState(false);
-//   const router = useRouter();
-//   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-//   const fetchMe = async () => {
-//     try {
-//       const result = await getUserInfo();
-
-//       if (result && result.success) {
-//         const data = result.data || {};
-//         const status = data.user?.status || data.status || data.host?.status || data.client?.status || null;
-//         const role = data.user?.role || data.role || data.host?.role || data.client?.role || null;
-//         setUserStatus(status || null);
-//         setUserRole(role || null);
-//       }
-//     } catch {
-//       // ignore
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchMe();
-//     intervalRef.current = setInterval(fetchMe, 10000);
-//     return () => {
-//       if (intervalRef.current) clearInterval(intervalRef.current);
-//     };
-//   }, []);
-
-//   useEffect(() => {
-//     if (prevWasPending && userStatus === "ACTIVE" && userRole === "HOST") {
-//       toast.success("Your host application was approved. Please login again to access host features.");
-//       router.push("/login");
-//     }
-//     if (userStatus === "PENDING") setPrevWasPending(true);
-//   }, [userStatus, userRole, prevWasPending, router]);
-
-//   const handleApply = async () => {
-//     setLoading(true);
-//     try {
-//       const result = await applyHost(); // ✅ call server function
-
-//       if (result.success) {
-//         toast.success(result.message || "Host application submitted");
-//         setUserStatus("PENDING");
-//       } else {
-//         toast.error(result.message || "Failed to submit application");
-//       }
-//     } catch (error: any) {
-//       toast.error(error?.message || "Something went wrong");
-//     } finally {
-//       setLoading(false);
-//       setOpen(false);
-//     }
-//   };
-
-//   const isPending = userStatus === "PENDING";
-
-//   return (
-//     <div className="space-y-4">
-//       <p>
-//         By applying to become a host, your account will be marked <strong>PENDING</strong> until an admin
-//         reviews and approves your application.
-//       </p>
-
-//       {isPending  ? (
-//   <div className="p-3 bg-red-500 rounded border">
-//     {userRole === "HOST"
-//       ? "You are already a host."
-//       : "Please wait for admin approval. Your application is under review."}
-//   </div>
-// ) : (
-//   <Button
-//   onClick={() => setOpen(true)}
-//   disabled={loading || isPending } // disable if pending 
-// >
-//   {loading ? "Submitting..." : "Apply to become a host"}
-// </Button>
-
-// )}
-
-
-//       <Dialog open={open} onOpenChange={setOpen}>
-//         <DialogContent>
-//           <DialogHeader>
-//             <DialogTitle>Confirm Host Application</DialogTitle>
-//             <DialogDescription>
-//               Are you sure you want to apply to become a host? Your account will be pending until admin approval.
-//             </DialogDescription>
-//           </DialogHeader>
-//           <DialogFooter className="flex justify-end space-x-2 mt-4">
-//             <Button variant="outline" onClick={() => setOpen(false)}>
-//               Cancel
-//             </Button>
-//             <Button onClick={handleApply} disabled={loading}>
-//               {loading ? "Submitting..." : "Yes, Apply"}
-//             </Button>
-//           </DialogFooter>
-//         </DialogContent>
-//       </Dialog>
-//     </div>
-//   );
-// };
-
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -126,9 +5,20 @@ import React, { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription, 
+  DialogFooter 
+} from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getUserInfo } from "@/services/auth/getUserInfo";
 import { applyHost } from "@/services/user/userService";
+import { CheckCircle2, Clock, ShieldCheck, Star, Users, LayoutDashboard } from "lucide-react";
 
 export const ApplyHostClient = () => {
   const [loading, setLoading] = useState(false);
@@ -141,7 +31,6 @@ export const ApplyHostClient = () => {
   const fetchMe = async () => {
     try {
       const result = await getUserInfo();
-
       if (result && result.success) {
         const data = result.data || {};
         const status = data.user?.status || data.status || data.host?.status || data.client?.status || null;
@@ -149,9 +38,7 @@ export const ApplyHostClient = () => {
         setUserStatus(status || null);
         setUserRole(role || null);
       }
-    } catch {
-      // ignore
-    }
+    } catch { /* ignore */ }
   };
 
   useEffect(() => {
@@ -165,16 +52,11 @@ export const ApplyHostClient = () => {
   const handleApply = async () => {
     setLoading(true);
     try {
-      const result = await applyHost(); // call server function
-
+      const result = await applyHost();
       if (result.success) {
-        toast.success(result.message || "Host application submitted");
+        toast.success(result.message || "Host application submitted successfully!");
         setUserStatus("PENDING");
-
-        // redirect after successful application
-        setTimeout(() => {
-          router.push("/login");
-        }, 1500); // 1.5s delay for toast to show
+        setTimeout(() => router.push("/login"), 1500);
       } else {
         toast.error(result.message || "Failed to submit application");
       }
@@ -190,41 +72,109 @@ export const ApplyHostClient = () => {
   const isHost = userRole === "HOST";
 
   return (
-    <div className="space-y-4">
-      <p>
-        By applying to become a host, your account will be marked <strong>PENDING</strong> until an admin
-        reviews and approves your application.
-      </p>
+    <div className="max-w-3xl mx-auto py-8 px-4">
+      {/* 1. Header Section */}
+      <div className="mb-8 text-center">
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl mb-3">
+          Share your passion with the world
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          Join our community of hosts and start organizing unique events today.
+        </p>
+      </div>
 
-      {isPending || isHost ? (
-        <div className="p-3 bg-red-500 rounded border">
-          {isHost
-            ? "You are already a host."
-            : "Please wait for admin approval. Your application is under review."}
-        </div>
-      ) : null}
+      {/* 2. Status Notifications */}
+      {isPending && (
+        <Alert className="mb-8 border-amber-200 bg-amber-50 dark:bg-amber-950/20">
+          <Clock className="h-5 w-5 text-amber-600" />
+          <AlertTitle className="text-amber-800 dark:text-amber-400 font-bold">Application Under Review</AlertTitle>
+          <AlertDescription className="text-amber-700 dark:text-amber-500">
+            Your request to become a host is being processed by our team. We&apos;ll notify you once your account is verified.
+          </AlertDescription>
+        </Alert>
+      )}
 
-      <Button
-        onClick={() => setOpen(true)}
-        disabled={loading || isPending || isHost} // disable if pending or already host
-      >
-        {loading ? "Submitting..." : "Apply to become a host"}
-      </Button>
+      {isHost && (
+        <Alert className="mb-8 border-emerald-200 bg-emerald-50 dark:bg-emerald-950/20">
+          <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+          <AlertTitle className="text-emerald-800 dark:text-emerald-400 font-bold">You are a Host!</AlertTitle>
+          <AlertDescription className="text-emerald-700 dark:text-emerald-500">
+            Welcome to the team! You already have access to all host features.
+          </AlertDescription>
+        </Alert>
+      )}
 
+      {/* 3. Benefits / Feature Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        {[
+          { icon: <Users className="w-6 h-6 text-primary" />, title: "Grow Community", desc: "Connect with thousands of eager participants." },
+          { icon: <LayoutDashboard className="w-6 h-6 text-primary" />, title: "Manage Easily", desc: "Professional tools to track bookings and attendees." },
+          { icon: <ShieldCheck className="w-6 h-6 text-primary" />, title: "Verified Trust", desc: "Gain credibility with our host verification badge." },
+        ].map((feature, i) => (
+          <div key={i} className="p-5 rounded-xl border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow">
+            <div className="mb-3">{feature.icon}</div>
+            <h3 className="font-bold mb-1">{feature.title}</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* 4. The Action Card */}
+      <Card className="border-2 border-primary/10 shadow-xl overflow-hidden">
+        <CardHeader className="bg-primary/5 border-b border-primary/10">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-xl">Host Application</CardTitle>
+            <Badge variant={isHost ? "default" : isPending ? "secondary" : "outline"}>
+              {isHost ? "Active Host" : isPending ? "Pending" : "Not Started"}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="space-y-4">
+            <p className="text-muted-foreground">
+              By submitting this application, you agree to our Host Terms of Service. Our admin team will review your profile to ensure quality standards.
+            </p>
+            <div className="flex flex-col gap-3">
+               <Button
+                size="lg"
+                className="w-full text-lg h-12 shadow-lg"
+                onClick={() => setOpen(true)}
+                disabled={loading || isPending || isHost}
+              >
+                {loading ? "Submitting Request..." : isHost ? "Already a Host" : "Apply to Become a Host"}
+              </Button>
+              {!isHost && !isPending && (
+                <p className="text-[11px] text-center text-muted-foreground uppercase tracking-widest">
+                  Process takes 24-48 hours
+                </p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 5. Confirmation Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Confirm Host Application</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to apply to become a host? Your account will be pending until admin approval.
+            <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <Star className="w-6 h-6 text-primary" />
+            </div>
+            <DialogTitle className="text-center text-2xl">Confirm Application</DialogTitle>
+            <DialogDescription className="text-center pt-2">
+              Ready to start hosting? This will send your profile to our administrators for review.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex justify-end space-x-2 mt-4">
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
+          <DialogFooter className="flex flex-col sm:flex-row gap-3 mt-6">
+            <Button variant="ghost" className="w-full sm:w-auto" onClick={() => setOpen(false)}>
+              Not yet
             </Button>
-            <Button onClick={handleApply} disabled={loading || isPending || isHost}>
-              {loading ? "Submitting..." : "Yes, Apply"}
+            <Button 
+              className="w-full sm:w-auto px-8" 
+              onClick={handleApply} 
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "Submit Application"}
             </Button>
           </DialogFooter>
         </DialogContent>

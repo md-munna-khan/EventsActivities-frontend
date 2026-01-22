@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useTransition, useEffect, useState } from 'react';
@@ -19,7 +20,8 @@ import {
     Trash2,
     MoreVertical,
     Check,
-    XCircle
+    XCircle,
+    ArrowUpRight
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { formatDateTime } from '@/lib/formatters';
@@ -29,10 +31,13 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
+    DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
+import { Progress } from "@/components/ui/progress";
 import CreateEventModal from './CreateEventModal';
 import EditEventModal from './EditEventModal';
 import DeleteConfirmationDialog from '@/components/shared/DeleteConfirmationDialog';
+import { Badge } from '@/components/ui/badge';
 
 interface Event {
     id: string;
@@ -58,19 +63,7 @@ interface Event {
     updatedAt?: string | Date;
 }
 
-interface Meta {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
-}
-
-interface MyEventsClientProps {
-    initialEvents: Event[];
-    initialMeta: Meta;
-}
-
-const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
+const MyEventsHost = ({ initialEvents, initialMeta }: { initialEvents: Event[], initialMeta: any }) => {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -80,20 +73,10 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
     const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     
- 
     const events = initialEvents;
     const meta = initialMeta;
 
- 
-    useEffect(() => {
-        console.log("MyEventsClient - Events received:", events.length);
-        console.log("MyEventsClient - Events data:", events);
-        console.log("MyEventsClient - Meta:", meta);
-    }, [events, meta]);
-
-
     const categoryOptions = [
-        { label: 'All Categories', value: 'All' },
         { label: 'Sports', value: 'SPORTS' },
         { label: 'Music', value: 'MUSIC' },
         { label: 'Food', value: 'FOOD' },
@@ -105,9 +88,7 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
         { label: 'Other', value: 'OTHER' },
     ];
 
- 
     const statusOptions = [
-        { label: 'All Statuses', value: 'All' },
         { label: 'Pending', value: 'PENDING' },
         { label: 'Open', value: 'OPEN' },
         { label: 'Full', value: 'FULL' },
@@ -116,412 +97,197 @@ const MyEventsHost = ({ initialEvents, initialMeta }: MyEventsClientProps) => {
         { label: 'Completed', value: 'COMPLETED' },
     ];
 
-    const handleView = (event: Event) => {
-        router.push(`/explore-events/${event.id}`);
-    };
-
-    const handleEdit = (event: Event) => {
-        setSelectedEvent(event);
-        setIsEditModalOpen(true);
-    };
-
-    const openDeleteModal = (event: Event) => {
-        setEventToDelete(event);
-        setIsDeleteDialogOpen(true);
-    };
-
-
+    const handleView = (event: Event) => router.push(`/explore-events/${event.id}`);
+    const handleEdit = (event: Event) => { setSelectedEvent(event); setIsEditModalOpen(true); };
+    const openDeleteModal = (event: Event) => { setEventToDelete(event); setIsDeleteDialogOpen(true); };
 
     const confirmDelete = async () => {
         if (!eventToDelete) return;
         setIsDeleting(true);
-
         startTransition(async () => {
             try {
                 const { deleteEvent } = await import('@/services/host/hostService');
                 const result = await deleteEvent(eventToDelete.id);
-
                 if (result.success) {
                     toast.success('Event deleted successfully');
                     setIsDeleteDialogOpen(false);
-                    setEventToDelete(null);
                     router.refresh();
                 } else {
                     toast.error(result.message || 'Failed to delete event');
                 }
-            } catch (err) {
-                console.error(err);
-                toast.error('An error occurred while deleting the event');
-            } finally {
-                setIsDeleting(false);
-            }
+            } catch (err) { toast.error('An error occurred'); } finally { setIsDeleting(false); }
         });
     };
 
     const handleStatusUpdate = async (event: Event, newStatus: string) => {
-      
-        const participantCount = event.participantCount || 0;
-        const isEventPast = new Date(event.date) < new Date();
-
-        // Validation messages
-        if (newStatus === 'OPEN') {
-            toast.error('Only admin can approve and open events');
-            return;
-        }
-
-        if (event.status === 'PENDING' && newStatus !== 'CANCELLED') {
-            toast.error('Pending events can only be cancelled by host');
-            return;
-        }
-
-        if (event.status === 'OPEN' && newStatus === 'CANCELLED' && participantCount > 0) {
-            toast.error('Cannot cancel event with confirmed bookings. Contact admin.');
-            return;
-        }
-
-        if (newStatus === 'COMPLETED' && !isEventPast) {
-            toast.error('Cannot mark event as completed. Event date has not passed yet.');
-            return;
-        }
-
-        // Confirmation dialogs
-        let confirmMessage = '';
-        if (newStatus === 'CANCELLED') {
-            confirmMessage = `Are you sure you want to cancel "${event.title}"?`;
-        } else if (newStatus === 'COMPLETED') {
-            confirmMessage = `Mark "${event.title}" as completed?`;
-        }
-
-        if (confirmMessage && !confirm(confirmMessage)) {
-            return;
-        }
-
         startTransition(async () => {
             try {
                 const { updateEventStatus } = await import('@/services/host/hostService');
                 const result = await updateEventStatus(event.id, newStatus);
-
                 if (result.success) {
                     toast.success(`Event status updated to ${newStatus}`);
                     router.refresh();
                 } else {
-                    toast.error(result.message || 'Failed to update event status');
+                    toast.error(result.message || 'Update failed');
                 }
-            } catch (err) {
-                console.error(err);
-                toast.error('An error occurred while updating the event status');
-            }
+            } catch (err) { toast.error('Error updating status'); }
         });
     };
 
-    const canCancelEvent = (event: Event) => {
-        const participantCount = event.participantCount || 0;
-        return (
-            (event.status === 'PENDING') ||
-            (event.status === 'OPEN' && participantCount === 0)
-        );
-    };
-
-    const canCompleteEvent = (event: Event) => {
-        const isEventPast = new Date(event.date) < new Date();
-        return (event.status === 'OPEN' || event.status === 'FULL') && isEventPast;
-    };
-
-    const getStatusColor = (status: string) => {
-        const statusColors: Record<string, string> = {
-            PENDING: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-            OPEN: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-            FULL: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
-            REJECTED: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-            CANCELLED: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
-            COMPLETED: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+    const getStatusStyles = (status: string) => {
+        const styles: Record<string, string> = {
+            PENDING: 'bg-amber-500/10 text-amber-600 border-amber-200',
+            OPEN: 'bg-emerald-500/10 text-emerald-600 border-emerald-200',
+            FULL: 'bg-orange-500/10 text-orange-600 border-orange-200',
+            REJECTED: 'bg-destructive/10 text-destructive border-destructive/20',
+            CANCELLED: 'bg-slate-100 text-slate-500 border-slate-200',
+            COMPLETED: 'bg-primary/10 text-primary border-primary/20',
         };
-        return statusColors[status] || 'bg-gray-100 text-gray-800';
+        return styles[status] || 'bg-slate-100 text-slate-800';
     };
 
     return (
-        <div className="space-y-4">
-            {/* Header Actions */}
-            <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4 flex-1">
-                    <SearchFilter 
-                        placeholder="Search events..." 
-                        paramName="search"
-                    />
-                    <SelectFilter
-                        paramName="category"
-                        placeholder="Category"
-                        options={categoryOptions.slice(1)}
-                        defaultValue="All"
-                    />
-                    <SelectFilter
-                        paramName="status"
-                        placeholder="Status"
-                        options={statusOptions.slice(1)}
-                        defaultValue="All"
-                    />
+        <div className="space-y-6">
+            {/* Control Panel */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-muted/30 p-4 rounded-2xl border">
+                <div className="flex flex-wrap items-center gap-3 flex-1 w-full">
+                    <SearchFilter placeholder="Filter events..." paramName="search" />
+                    <SelectFilter paramName="category" placeholder="Category" options={categoryOptions} />
+                    <SelectFilter paramName="status" placeholder="Status" options={statusOptions} />
                 </div>
-                <Button onClick={() => setIsCreateModalOpen(true)}>
-                    <Plus className=" h-4 w-4" />
-                    Create Event
+                <Button onClick={() => setIsCreateModalOpen(true)} className="w-full md:w-auto rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-primary/20 h-11 px-6">
+                    <Plus className="mr-2 h-4 w-4" /> Create Event
                 </Button>
             </div>
 
-            {/* Create Event Modal */}
-            <CreateEventModal 
-                open={isCreateModalOpen} 
-                onOpenChange={setIsCreateModalOpen} 
-            />
-
-            {/* Edit Event Modal */}
-            <EditEventModal
-                open={isEditModalOpen}
-                onOpenChange={(open) => {
-                    setIsEditModalOpen(open);
-                    if (!open) setSelectedEvent(null);
-                }}
-                event={selectedEvent}
-            />
-
-            {/* Events Grid */}
             <div className="relative">
                 {isPending && (
-                    <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-10 rounded-lg flex items-center justify-center">
-                        <div className="flex flex-col items-center gap-2">
-                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                            <p className="text-sm text-muted-foreground">Refreshing...</p>
-                        </div>
+                    <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] z-20 flex items-center justify-center rounded-3xl">
+                        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
                     </div>
                 )}
                 
                 {events.length === 0 ? (
-                    <Card className="py-12 ">
-                        <CardContent className="flex flex-col items-center justify-center text-center">
-                            <div className="rounded-full bg-muted p-4 mb-4">
-                                <Calendar className="h-8 w-8 text-muted-foreground" />
+                    <Card className="py-20 border-dashed border-2 bg-muted/10">
+                        <CardContent className="flex flex-col items-center text-center">
+                            <div className="p-4 bg-background rounded-full shadow-inner mb-4">
+                                <Calendar className="h-10 w-10 text-muted-foreground/40" />
                             </div>
-                            <h3 className="text-lg font-semibold mb-2">No events found</h3>
-                            <p className="text-muted-foreground mb-4">
-                                Create your first event to get started!
+                            <h3 className="text-xl font-black italic uppercase tracking-tight mb-2">No Active Records</h3>
+                            <p className="text-muted-foreground text-sm max-w-xs mb-6 text-balance font-medium">
+                                You haven&apos;t hosted any events matching these criteria yet.
                             </p>
-                            <Button onClick={() => setIsCreateModalOpen(true)}>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Create Event
+                            <Button variant="outline" onClick={() => setIsCreateModalOpen(true)} className="rounded-full">
+                                Create New Event
                             </Button>
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {events.map((event) => (
-                        <Card 
-                            key={event.id} 
-                            className="group hover:shadow-lg transition-all duration-300 pt-0 overflow-hidden"
-                        >
-                            {/* Event Image */}
-                            <div className="relative h-48 w-full overflow-hidden bg-muted">
-                                {event.image && event.image.trim() !== '' ? (
-                                    <Image
-                                        src={event.image}
-                                        alt={event.title}
-                                        fill
-                                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                        unoptimized
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-primary/20 to-primary/5">
-                                        <Calendar className="h-16 w-16 text-primary/30" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {events.map((event) => {
+                            const fillPercentage = Math.min(((event.participantCount || 0) / event.capacity) * 100, 100);
+                            return (
+                                <Card key={event.id} className="group border-none shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col bg-card">
+                                    {/* Image & Status */}
+                                    <div className="relative h-44 overflow-hidden">
+                                        {event.image ? (
+                                            <Image src={event.image} alt="" fill className="object-cover group-hover:scale-105 transition-transform duration-500" unoptimized />
+                                        ) : (
+                                            <div className="w-full h-full bg-secondary/20 flex items-center justify-center"><Calendar className="h-12 w-12 text-primary/20" /></div>
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                                        <Badge className={`absolute top-3 right-3 font-bold border backdrop-blur-md ${getStatusStyles(event.status)}`}>
+                                            {event.status}
+                                        </Badge>
+                                        <div className="absolute bottom-3 left-3">
+                                            <Badge variant="secondary" className="bg-white/90 text-black border-none font-bold text-[10px] uppercase tracking-tighter">
+                                                {event.category}
+                                            </Badge>
+                                        </div>
                                     </div>
-                                )}
-                                {/* Status Badge Overlay */}
-                                <div className="absolute top-3 right-3">
-                                    <span
-                                        className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold shadow-md ${getStatusColor(event.status)}`}
-                                    >
-                                        {event.status}
-                                    </span>
-                                </div>
-                                {/* Category Badge */}
-                                <div className="absolute top-3 left-3">
-                                    <span className="inline-flex items-center rounded-full bg-background/90 backdrop-blur-sm px-3 py-1 text-xs font-medium text-foreground shadow-sm">
-                                        {event.category}
-                                    </span>
-                                </div>
-                            </div>
 
-                            <CardHeader className="pb-3">
-                                <div className="flex items-start justify-between gap-2">
-                                    <CardTitle className="text-xl line-clamp-2 group-hover:text-primary transition-colors">
-                                        {event.title}
-                                    </CardTitle>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button 
-                                                variant="ghost" 
-                                                size="icon" 
-                                                className="h-8 w-8 shrink-0"
-                                            >
-                                                <MoreVertical className="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => handleView(event)}>
-                                                <Eye className="mr-2 h-4 w-4" />
-                                                View Details
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleEdit(event)}>
-                                                <Edit className="mr-2 h-4 w-4" />
-                                                Edit Event
-                                            </DropdownMenuItem>
-                                            {canCompleteEvent(event) && (
-                                                <DropdownMenuItem 
-                                                    onClick={() => handleStatusUpdate(event, 'COMPLETED')}
-                                                    className="text-blue-600"
-                                                >
-                                                    <Check className="mr-2 h-4 w-4" />
-                                                    Mark as Completed
-                                                </DropdownMenuItem>
-                                            )}
-                                            {canCancelEvent(event) && (
-                                                <DropdownMenuItem 
-                                                    onClick={() => handleStatusUpdate(event, 'CANCELLED')}
-                                                    className="text-orange-600"
-                                                >
-                                                    <XCircle className="mr-2 h-4 w-4" />
-                                                    Cancel Event
-                                                </DropdownMenuItem>
-                                            )}
-                                            <DropdownMenuItem 
-                                                onClick={() => openDeleteModal(event)}
-                                                className="text-destructive"
-                                            >
-                                                <Trash2 className="mr-2 h-4 w-4" />
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
-                            </CardHeader>
+                                    <CardHeader className="p-4 space-y-1">
+                                        <div className="flex justify-between items-start">
+                                            <CardTitle className="text-lg font-black line-clamp-1 group-hover:text-primary transition-colors italic tracking-tight uppercase">
+                                                {event.title}
+                                            </CardTitle>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full"><MoreVertical className="h-4 w-4" /></Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-48 rounded-xl">
+                                                    <DropdownMenuItem onClick={() => handleView(event)}><Eye className="mr-2 h-4 w-4" /> Details</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleEdit(event)}><Edit className="mr-2 h-4 w-4" /> Edit Event</DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    {event.status === 'OPEN' && (
+                                                        <DropdownMenuItem onClick={() => handleStatusUpdate(event, 'COMPLETED')} className="text-blue-600"><Check className="mr-2 h-4 w-4" /> Complete</DropdownMenuItem>
+                                                    )}
+                                                    <DropdownMenuItem onClick={() => openDeleteModal(event)} className="text-destructive font-bold"><Trash2 className="mr-2 h-4 w-4" /> Delete</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground/80">
+                                            <Calendar className="h-3 w-3" />
+                                            {formatDateTime(event.date).split(',')[0]}
+                                        </div>
+                                    </CardHeader>
 
-                            <CardContent className="space-y-4">
-                                {/* Description */}
-                                <p className="text-sm text-muted-foreground line-clamp-2">
-                                    {event.description}
-                                </p>
-
-                                {/* Event Details */}
-                                <div className="space-y-2  ">
-                                    <div className="flex items-center gap-2 text-sm">
-                                        <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
-                                        <span className="text-muted-foreground">
-                                            {formatDateTime(event.date)}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm">
-                                        <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
-                                        <span className="text-muted-foreground line-clamp-1">
-                                            {event.location}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm">
-                                        <DollarSign className="h-4 w-4 text-muted-foreground shrink-0" />
-                                        <span className="font-semibold text-foreground">
-                                            {formatCurrency(event.joiningFee)}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm">
-                                        <Users className="h-4 w-4 text-muted-foreground shrink-0" />
-                                        <span className="text-muted-foreground">
-                                            <span className="font-semibold text-foreground">
-                                                {event.participantCount || 0}
-                                            </span>
-                                            {' / '}
-                                            <span className="font-semibold text-foreground">
-                                                {event.capacity}
-                                            </span>
-                                            {' participants'}
-                                        </span>
-                                    </div>
-                                 
-                                </div>
-                            </CardContent>
-
-                            <CardFooter className="flex gap-2 justify-between pt-0">
-                                   {/* Host Info */}
-                                    {event.host && (
-                                        <div className="flex items-center gap-2 text-sm pt-2 border-t">
-                                            <div className="relative h-8 w-8 rounded-full overflow-hidden bg-muted shrink-0">
-                                                {event.host.profilePhoto && event.host.profilePhoto.trim() !== '' ? (
-                                                    <Image
-                                                        src={event.host.profilePhoto}
-                                                        alt={event.host.name}
-                                                        fill
-                                                        className="object-cover"
-                                                        unoptimized
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary text-xs font-semibold">
-                                                        {event.host.name.charAt(0).toUpperCase()}
-                                                    </div>
-                                                )}
+                                    <CardContent className="p-4 pt-0 space-y-4 flex-grow">
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                                                <span>Attendance</span>
+                                                <span>{event.participantCount || 0} / {event.capacity}</span>
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-foreground truncate">
-                                                    {event.host.name}
-                                                </p>
-                                                {event.host.rating && (
-                                                    <p className="text-xs text-muted-foreground">
-                                                        ⭐ {event.host.rating.toFixed(1)}
-                                                    </p>
-                                                )}
+                                            <Progress value={fillPercentage} className="h-1.5" />
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div className="bg-muted/40 p-2 rounded-lg flex items-center gap-2">
+                                                <DollarSign className="h-3.5 w-3.5 text-primary" />
+                                                <span className="text-xs font-bold">{formatCurrency(event.joiningFee)}</span>
+                                            </div>
+                                            <div className="bg-muted/40 p-2 rounded-lg flex items-center gap-2">
+                                                <MapPin className="h-3.5 w-3.5 text-primary" />
+                                                <span className="text-xs font-bold truncate">{event.location}</span>
                                             </div>
                                         </div>
-                                    )}
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    title="View"
-                                    onClick={() => handleView(event)}
-                                >
-                                    <Eye className="h-full w-full" />
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    title="Edit"
-                                    onClick={() => handleEdit(event)}
-                                >
-                                    <Edit className="h-4 w-4" />
-                                </Button>
-                              
-                            </CardFooter>
-                        </Card>
-                    ))}
+                                    </CardContent>
+
+                                    <CardFooter className="p-4 pt-0">
+                                        <Button 
+                                            variant="ghost" 
+                                            onClick={() => handleView(event)}
+                                            className="w-full justify-between hover:bg-primary/5 hover:text-primary group/btn rounded-xl font-bold text-xs uppercase tracking-widest"
+                                        >
+                                            Manage Event
+                                            <ArrowUpRight className="h-4 w-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                                        </Button>
+                                    </CardFooter>
+                                </Card>
+                            );
+                        })}
                     </div>
                 )}
             </div>
 
-            {/* Pagination */}
-            {/* Delete confirmation modal */}
+            {/* Modals & Pagination */}
+            <CreateEventModal open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen} />
+            <EditEventModal open={isEditModalOpen} onOpenChange={(o) => { setIsEditModalOpen(o); if(!o) setSelectedEvent(null); }} event={selectedEvent} />
             <DeleteConfirmationDialog
                 open={isDeleteDialogOpen}
                 onOpenChange={setIsDeleteDialogOpen}
                 onConfirm={confirmDelete}
-                title="Delete Event"
-                description={eventToDelete ? `Are you sure you want to delete "${eventToDelete.title}"? This action cannot be undone.` : undefined}
                 itemName={eventToDelete?.title}
                 isDeleting={isDeleting}
             />
 
             {meta.pages > 1 && (
-                <TablePagination
-                    currentPage={meta.page}
-                    totalPages={meta.pages}
-                />
+                <div className="pt-6">
+                    <TablePagination currentPage={meta.page} totalPages={meta.pages} />
+                </div>
             )}
         </div>
     );
 };
 
 export default MyEventsHost;
-
