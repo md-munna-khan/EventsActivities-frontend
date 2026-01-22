@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
   Star, 
@@ -18,12 +18,32 @@ import {
 import ReviewModal from "./ReviewModal";
 import Link from "next/link";
 
-const formatDate = (iso?: string) => {
-  if (!iso) return "-";
+// 1. Define a consistent interface for the date object
+interface FormattedDate {
+  full: string;
+  day: string | number;
+  month: string;
+}
+
+// 2. Updated formatDate to always return the same object structure
+const formatDate = (iso?: string): FormattedDate => {
+  const fallback = { full: "-", day: "-", month: "-" };
+  
+  if (!iso) return fallback;
+  
   try {
     const date = new Date(iso);
+    
+    // Check for "Invalid Date"
+    if (isNaN(date.getTime())) {
+      return { full: iso, day: "!", month: "!" };
+    }
+
     return {
-      full: date.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+      full: date.toLocaleString("en-US", { 
+        dateStyle: "medium", 
+        timeStyle: "short" 
+      }),
       day: date.getDate(),
       month: date.toLocaleString("en-US", { month: "short" }),
     };
@@ -123,7 +143,10 @@ const MyBookingEventsClient = ({ bookings }: MyBookingEventsClientProps) => {
               const ev = booking.event ?? {};
               const pStatus = booking.participantStatus ?? "PENDING";
               const eStatus = ev.status ?? "UNKNOWN";
-              const dateInfo: any = formatDate(ev.date);
+              
+              // dateInfo is now safely typed as FormattedDate
+              const dateInfo = formatDate(ev.date);
+              const bookedOnInfo = formatDate(booking.createdAt);
 
               return (
                 <Card key={booking.id} className="group overflow-hidden border-none shadow-md hover:shadow-xl transition-all duration-300">
@@ -132,7 +155,7 @@ const MyBookingEventsClient = ({ bookings }: MyBookingEventsClientProps) => {
                     <div className="relative w-full md:w-64 h-48 md:h-auto overflow-hidden shrink-0">
                       <Image
                         src={ev.image || "/placeholder.png"}
-                        alt={ev.title}
+                        alt={ev.title || "Event Image"}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                       />
@@ -183,7 +206,7 @@ const MyBookingEventsClient = ({ bookings }: MyBookingEventsClientProps) => {
                           </div>
                           <div className="min-w-0">
                             <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">Booked On</p>
-                            <p className="text-sm font-semibold truncate leading-none">{formatDate(booking.createdAt).full}</p>
+                            <p className="text-sm font-semibold truncate leading-none">{bookedOnInfo.full}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3 sm:col-span-2 md:col-span-1">

@@ -171,7 +171,7 @@ export const MyProfile = () => {
                             <Card className="border-none shadow-lg h-full">
                                 <CardHeader>
                                     <CardTitle className="text-lg font-bold">Interests</CardTitle>
-                                    <CardDescription>Select topics you're passionate about.</CardDescription>
+                                    <CardDescription>Select topics you are passionate about.</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="flex flex-wrap gap-2">
